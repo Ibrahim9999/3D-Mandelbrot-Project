@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 
 #define EXIT_SUCCESS 0
+#define EXIT_ERROR 1
 
 //Render Funcion
 void render() {
@@ -29,8 +30,11 @@ int main(int argc, char* argv[]) {
 	glutInitWindowSize(600,600);
 	glutCreateWindow("3D Mandelbulb Viewer");
 
-    //Setup loop
+    //Setup functions
     glutDisplayFunc(render);
+    
+    //Setup shaders
+    loadShaders();
 
     //Loop
     glutMainLoop();
