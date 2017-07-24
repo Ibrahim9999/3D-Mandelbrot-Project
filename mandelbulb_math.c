@@ -19,7 +19,7 @@ Point CalculateMandelbulb (Point v, Point c, double power){
 		y = -x;
 		z = (v.x*v.x-v.y*v.y) / (v.x*v.x-v.y*v.y);
 		
-		return Point{x, y, z};
+		return (Point){x, y, z};
 	}
 	
 	double rN = pow( sqrt( xx + yy + zz ), power );
@@ -32,7 +32,7 @@ Point CalculateMandelbulb (Point v, Point c, double power){
 	y = sinNTheta * sin(nPhi);
 	z = cos(nTheta);
 	
-	return Point{rN*x + c.x, rN*y + c.y, rN*z + c.z};
+	return (Point){rN*x + c.x, rN*y + c.y, rN*z + c.z};
 }
 
 int equals(double a, double b) {
