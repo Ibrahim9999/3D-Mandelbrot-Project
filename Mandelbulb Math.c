@@ -1,39 +1,46 @@
+#include <math.h>
 
-
-struct Point
+typedef struct
 {
-	double X, double Y, double Z
-};
+	double x; double y; double z;
+} Point;
+
+int equals(double, double);
 
 Point CalculateMandelbulb (Point v, Point c, double power){
 	double x = 0;
 	double y = 0;
 	double z = 0;
 	
-	double xx = v.X * v.X;
-	double yy = v.Y * v.Y;
-	double zz = v.Z * v.Z;
+	double xx = v.x * v.x;
+	double yy = v.y * v.y;
+	double zz = v.z * v.z;
 	
-	if (power.Equals(1))
+	if (equals(power, 1.0))
 		return v;
-	if (power.Equals(2))
+	if (equals(power, 2.0))
 	{
-		x = -(2*v.X*v.Y * ( xx + yy - zz )) / (( xx + yy ) * ( xx + yy + +v.Z*v.Z));
+		x = -(2*v.x*v.y * ( xx + yy - zz )) / (( xx + yy ) * ( xx + yy + +v.z*v.z));
 		y = -x;
-		z = (v.X*v.X-v.Y*v.Y) / (v.X*v.X-v.Y*v.Y);
+		z = (v.x*v.x-v.y*v.y) / (v.x*v.x-v.y*v.y);
 		
-		return new Point(x, y, z);
+		return Point{x, y, z};
 	}
 	
-	double rN = Math.pow( Math.sqrt( xx + yy + zz ), power );
-	double nPhi =  power * Math.atan2( v.Y, v.X ) ;
-	double nTheta = power * arccos( v.Z / Math.sqrt( xx + yy + zz ) );
+	double rN = pow( sqrt( xx + yy + zz ), power );
+	double nPhi =  power * atan2( v.y, v.x ) ;
+	double nTheta = power * acos( v.z / sqrt( xx + yy + zz ) );
 	
-	double sinNTheta = Math.sin( nTheta);
+	double sinNTheta = sin( nTheta);
 	
-	x = sinNTheta * Math.cos(nPhi);
-	y = sinNTheta * Math.sin(nPhi);
-	z = Math.cos(nTheta);
+	x = sinNTheta * cos(nPhi);
+	y = sinNTheta * sin(nPhi);
+	z = cos(nTheta);
 	
-	return new Point(x, y, z);
+	return Point{rN*x + c.x, rN*y + c.y, rN*z + c.z};
+}
+
+int equals(double a, double b) {
+    double epsilon = 0.000000001;
+    return (fabs(a-b) < epsilon);
 }
