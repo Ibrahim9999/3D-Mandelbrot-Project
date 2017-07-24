@@ -1,5 +1,5 @@
 CFLAGS=-I/usr/local/include -D_REENTRANT -g -Wall
-LIBS=-L/usr/local/lib -Wl,-rpath,/usr/local/lib -lGL -lGLU -lglut -lpthread
+LIBS=-L/usr/local/lib -Wl,-rpath,/usr/local/lib -lGL -lGLU -lglut -lpthread -lm
 CC=gcc
 
 include makefile.vars.mak
@@ -15,4 +15,4 @@ clean:
 	@echo Done.
 
 all: $(TARGETS)
-	$(CC) $(CFLAGS) $(TARGETS) -o $(OUTPUT) $(LIBS)
+	$(CC) $(TARGETS) -o $(OUTPUT) $(CFLAGS) $(LIBS)
