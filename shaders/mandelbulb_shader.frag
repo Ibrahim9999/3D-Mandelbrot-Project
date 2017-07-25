@@ -31,7 +31,7 @@ vec3 nextPoint (in vec3 v, in vec3 c, in double power){
 	
 	if (equals(power, 1.0))
 		return v;
-	else if (equals(power, 2.0))
+	if (equals(power, 2.0))
 	{
 		x = (v.x*v.x - v.y*v.y) * (1 - (v.z*v.z) / (v.x*v.x + v.y*v.y));
 		y = 2 * v.x * v.y * (1 - (v.z*v.z) / (v.x*v.x + v.y*v.y));
