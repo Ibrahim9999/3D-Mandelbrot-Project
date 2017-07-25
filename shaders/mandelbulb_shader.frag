@@ -59,6 +59,8 @@ int equals(in double a, in double b) {
 }
 
 vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in double sphereRadius) {
+
+    if (length(rayPos-spherePos) <= 2.0) return rayPos;
     vec3 offset = rayPos - spherePos;
     
     double rSquared = sphereRadius*sphereRadius;
