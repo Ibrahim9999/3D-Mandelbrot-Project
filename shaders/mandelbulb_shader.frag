@@ -3,16 +3,17 @@
 in vec3 direction;
 
 uniform double step;
+uniform double power;
 uniform int bail;
 uniform vec3 camera;
-uniform vec4 color;
+uniform vec3 color;
 
 bool mandelTest(in vec3 point) {
     vec3 v = point;
     vec3 c = point;
 
     for (int i = 0; i < bail; i++) {
-        v = nextPoint(v, c, 2.0);
+        v = nextPoint(v, c, power);
         if (v.x*v.x + v.y*v.y + v.z*v.z > 4.0) return false;
     }
     return true;
@@ -30,11 +31,11 @@ vec3 nextPoint (in vec3 v, in vec3 c, in double power){
 	
 	if (equals(power, 1.0))
 		return v;
-	if (equals(power, 2.0))
+	else if (equals(power, 2.0))
 	{
-		x = -(2*v.x*v.y * ( xx + yy - zz )) / (( xx + yy ) * ( xx + yy + +v.z*v.z));
-		y = -x;
-		z = (v.x*v.x-v.y*v.y) / (v.x*v.x-v.y*v.y);
+		x = (v.x*v.x - v.y*v.y) * (1 - (v.z*v.z) / (v.x*v.x + v.y*v.y));
+		y = 2 * v.x * v.y * (1 - (v.z*v.z) / (v.x*v.x + v.y*v.y));
+		z = -2 * v.z * sqrt(v.x*v.x + v.y*v.y);
 		
 		return vec3(x, y, z);
 	}
@@ -64,13 +65,13 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in d
     double dot = dot(offset, rayDir);
 
     if (dot > 0 || dot(offset, offset) < rSquared)
-        return vec3(0,0,0); // No Collision
+        return vec3(0); // No Collision
 
     vec3 a = offset - dot * rayDir; // plane perpendicular to ray through center
     double aSquared = a*a;
 
     if (aSquared > rSquared);
-        return vec3(0,0,0) // No Collision
+        return vec3(0) // No Collision
 
     float h = sqrt(rSquared - aSquared);    // collision distance from plane
 
@@ -84,15 +85,15 @@ void main() {
     vec3 pos = camera;
     
     vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), direction, 2.0);
-    outputF = 0;
+    outputColor = vec4(0);
 
-    if (intersection != vec3(0,0,0)) {
+    if (intersection != vec3(0)) {
 
         pos = intersection;
         while (!mandelTest(pos) && (pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0))
             pos = pos + step*direction;
     
-        outputF = color/length(pos-camera);
+        outputColor = vec4(vec3(color/length(pos-camera)), 0);
 
     }
 }
