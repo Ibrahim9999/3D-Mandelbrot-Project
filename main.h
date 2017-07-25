@@ -1,5 +1,5 @@
-#ifndef {HEADER_NAME}
-#define {HEADER_NAME}
+#ifndef HEADER_MAIN_DEFINED
+#define HEADER_MAIN_DEFINED
 
 #ifdef __cplusplus
 extern "C" {
