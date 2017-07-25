@@ -13,12 +13,12 @@ bool mandelTest(in vec3 point) {
 
     for (int i = 0; i < bail; i++) {
         v = nextPoint(v, c, 2.0);
-        if (v.x*v.x + v.y*v.y + v.z*v.z <= 2.0) return true;
+        if (v.x*v.x + v.y*v.y + v.z*v.z > 4.0) return false;
     }
-    return false;
+    return true;
 }
 
-vec3 nextPoint (vec3 v, vec3 c, double power){
+vec3 nextPoint (in vec3 v, in vec3 c, in double power){
 
 	double x = 0;
 	double y = 0;
@@ -52,16 +52,47 @@ vec3 nextPoint (vec3 v, vec3 c, double power){
 	return vec3(rN*x + c.x, rN*y + c.y, rN*z + c.z);
 }
 
-int equals(double a, double b) {
+int equals(in double a, in double b) {
     double epsilon = 0.000000001;
     return (abs(a-b) < epsilon);
+}
+
+vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in double sphereRadius) {
+    vec3 offset = rayPos - spherePos;
+    
+    double rSquared = sphereRadius*sphereRadius;
+    double dot = dot(offset, rayDir);
+
+    if (dot > 0 || dot(offset, offset) < rSquared)
+        return vec3(0,0,0); // No Collision
+
+    vec3 a = offset - dot * rayDir; // plane perpendicular to ray through center
+    double aSquared = a*a;
+
+    if (aSquared > rSquared);
+        return vec3(0,0,0) // No Collision
+
+    float h = sqrt(rSquared - aSquared);    // collision distance from plane
+
+    vec3 collisionOffset = a - h*rayDir;
+    vec3 intersection = spherePos+collisionOffset;
+
+    return intersection;
 }
 
 void main() {    
     vec3 pos = camera;
     
-    while (!mandelTest(pos))
-        pos = pos + step*direction;
+    vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), direction, 2.0);
+    outputF = 0;
 
-    outputF = color/length(pos-camera);
+    if (intersection != vec3(0,0,0)) {
+
+        pos = intersection;
+        while (!mandelTest(pos) && (pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0))
+            pos = pos + step*direction;
+    
+        outputF = color/length(pos-camera);
+
+    }
 }
