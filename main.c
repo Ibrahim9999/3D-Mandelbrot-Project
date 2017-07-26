@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
     fflush(stdout);
 
     //Setup shaders
-    loadMandelbulbProgram(mandelbulb_shader, fov, camerapos, cameradir, color, step, bail);
+    loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir, color, step, bail);
     printf("loaded program");
     fflush(stdout);
     printProgramLog(mandelbulb_shader);    

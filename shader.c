@@ -126,12 +126,12 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     glUniform1i(bail_loc, bail);
 }
 
-void loadMandelbulbProgram(shaderprogram program, vec3f fov, vec3f camerapos,
+void loadMandelbulbProgram(shaderprogram* program, vec3f fov, vec3f camerapos,
     vec3f cameradir, vec3f color, float step, int bail) {
 
-    loadShaders(&program, "shaders/mandelbulb_shader.vert", "shaders/mandelbulb_shader.frag");
+    loadShaders(program, "shaders/mandelbulb_shader.vert", "shaders/mandelbulb_shader.frag");
 
-    loadMandelbulbVars(program, fov, camerapos, cameradir, color, step, bail);
+    loadMandelbulbVars(*program, fov, camerapos, cameradir, color, step, bail);
 }
 
 
