@@ -13,13 +13,13 @@ char* loadTextFile(const char* filename) {
     FILE* file = fopen(filename, "r");
     long size;
     char* text;
-    
+  
     fseek(file, 0, SEEK_END);
-    size = ftell(file);
+    size = ftell(file); 
     text = (char*) malloc(size);
-    fseek(file, 0, SEEK_SET);
+    rewind(file);
 
-    if (fread(text, sizeof(char), 1000, file) == 0) {
+    if (fread(text, sizeof(char), size, file) == 0) {
         fprintf(stderr, "cannot load file");
         exit(1);
     }
@@ -80,6 +80,9 @@ void loadShaders(shaderprogram *program, const char* vname, const char* fname) {
 
     vs = loadTextFile(vname);
     fs = loadTextFile(fname);
+
+    printf("%s\n\n\n\n", vs);
+    printf("%s\n", fs);
 
     cvs = vs, cfs = fs;
 
