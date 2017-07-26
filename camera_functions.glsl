@@ -1,9 +1,9 @@
 #define PI 3.1415926535897932384626433832795
 
 /* GLSL Code
- * X-Axis: Up/Down
- * Y-Axis: Right/Left
- * Z-Axis: Forward/Backward
+ *.x-Axis: Up/Down
+ *.y-Axis: Right/Left
+ *.z-Axis: Forward/Backward
  * 
  * horizontalAxis, verticalAxis, and depthAxis
  * are all relative to the camera direction
@@ -28,7 +28,7 @@ vec4 QuatFromAxisAngle(in double angle, in vec3 axis)
 	q.w = cos(angle / 2);
 	
 	
-	return new Quaternion(Math.Cos(angle/2), axis * Math.Sin(angle/2));
+	return new Quaternion(cos(angle/2), axis * sin(angle/2));
 }
 
 vec4 QuatQuatAdd(in vec4 a, in vec4 b)
@@ -81,9 +81,9 @@ vec3 QuatVecMultiply(in vec4 q, in vec3 v)
 	
 	vec3 result;
 	
-	result.X = v.x * (1 - 2 * (yy + zz)) + v.y * 2 * (xy - wz) + v.z * 2 * (xz + wy);
-	result.Y = v.x * 2 * (xy + wz) + v.y * (1 - 2 * (xx + zz)) + v.z * 2 * (yz - wx);
-	result.Z = v.x * 2 * (xz - wy) + v.y * 2 * (yz + wx) + v.z * (1 - 2 * (xx + yy));
+	result.x = v.x * (1 - 2 * (yy + zz)) + v.y * 2 * (xy - wz) + v.z * 2 * (xz + wy);
+	result.y = v.x * 2 * (xy + wz) + v.y * (1 - 2 * (xx + zz)) + v.z * 2 * (yz - wx);
+	result.z = v.x * 2 * (xz - wy) + v.y * 2 * (yz + wx) + v.z * (1 - 2 * (xx + yy));
 	
 	return result;
 }
@@ -179,10 +179,10 @@ void InitializeCamera(inout vec3 facingForward, inout vec3 cameraPosition, inout
 	
 	v.x = 0;
 	v.y = 1;
-	horizontalAxis = v;
+	verticalAxis = v;
 }
 
-void Yaw(in double angle, inout vec3 vector in vec3 horizontalAxis, in vec3 verticalAxis, in vec3 depthAxis)
+void.yaw(in double angle, inout vec3 vector in vec3 horizontalAxis, in vec3 verticalAxis, in vec3 depthAxis)
 {
 	// Convert angle to radians
 	angle = angle * PI / 180;
