@@ -11,13 +11,13 @@ typedef struct shaderprogram_struct {
     GLuint frag;
 } shaderprogram;
 
-char* loadTextFile(char* filename);
-void setFOVvec(vec3f& vector, float vertFOV, float horiFOV);
-void loadShaders(shaderprogram& program, char* vname, char* fname);
-void printProgramLog(shaderprogram& program);
-void loadMandelbulbVars(shaderprogram& program, vec3f fov, vec3f& camera, vec3f& color,
-    float step, int bail);
-void loadMandelbulbProgram(shaderprogram& program, vec3f& fov, vec3f& camerapos,
-    vec3f& cameradir, vec3f& color, float step, int bail);
+char* loadTextFile(const char* filename);
+void setFOVvec(vec3f *vector, float vertFOV, float horiFOV);
+void loadShaders(shaderprogram *program, const char* vname, const char* fname);
+void printProgramLog(shaderprogram program);
+void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos, vec3f camerdir,
+    vec3f color, float step, int bail);
+void loadMandelbulbProgram(shaderprogram program, vec3f fov, vec3f camerapos,
+    vec3f cameradir, vec3f color, float step, int bail);
 
 #endif

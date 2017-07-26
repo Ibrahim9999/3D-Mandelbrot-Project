@@ -29,15 +29,15 @@ char* loadTextFile(const char* filename) {
     return text;
 }
 
-void setFOVvec(vec3f& vector, float vertFOV, float horiFOV) {
-    vector.z = cos(vertFOV/360*PI_CONST);
-    vector.y = sin(horiFOV/360*PI_CONST);
-    vector.x = cos(vertFOV/360*PI_CONST)*tan(horiFOV/360*PI_CONST);
+void setFOVvec(vec3f *vector, float vertFOV, float horiFOV) {
+    vector->z = cos(vertFOV/360*PI_CONST);
+    vector->y = sin(horiFOV/360*PI_CONST);
+    vector->x = cos(vertFOV/360*PI_CONST)*tan(horiFOV/360*PI_CONST);
 
-    v3f_normalize(vector);
+    *vector = v3f_normalize(*vector);
 }
 
-void printProgramLog(shaderprogram& program) {
+void printProgramLog(shaderprogram program) {
     int length, written;
     char* log;
 
@@ -65,15 +65,15 @@ void printShaderLog(GLuint shader) {
     }
 }
 
-void loadShaders(shaderprogram& program, const char* vname, const char* fname) {
+void loadShaders(shaderprogram *program, const char* vname, const char* fname) {
     char *vs=NULL, *fs=NULL;
     const char *cvs, *cfs;
     
     printf("making a shader\n");
     fflush(stdout);
 
-    program.vert = glCreateShader(GL_VERTEX_SHADER);
-    program.frag = glCreateShader(GL_FRAGMENT_SHADER);
+    program->vert = glCreateShader(GL_VERTEX_SHADER);
+    program->frag = glCreateShader(GL_FRAGMENT_SHADER);
 
     printf("loading the files\n");
     fflush(stdout);
@@ -86,29 +86,29 @@ void loadShaders(shaderprogram& program, const char* vname, const char* fname) {
     printf("starting compile");
     fflush(stdout);
 
-    glShaderSource(program.vert, 1, &cvs, NULL);
-    glShaderSource(program.frag, 1, &cfs, NULL);
+    glShaderSource(program->vert, 1, &cvs, NULL);
+    glShaderSource(program->frag, 1, &cfs, NULL);
 
-    glCompileShader(program.vert);
-    glCompileShader(program.frag);
+    glCompileShader(program->vert);
+    glCompileShader(program->frag);
 
-    printShaderLog(program.vert);
-    printShaderLog(program.frag);
+    printShaderLog(program->vert);
+    printShaderLog(program->frag);
     
 
     printf("compiled");
     fflush(stdout);
 
-    program.prog = glCreateProgram();
-    glAttachShader(program.prog, program.vert);
-    glAttachShader(program.prog, program.frag);
+    program->prog = glCreateProgram();
+    glAttachShader(program->prog, program->vert);
+    glAttachShader(program->prog, program->frag);
 
     printf("linking");
-    glLinkProgram(program.prog);
+    glLinkProgram(program->prog);
 }
 
-void loadMandelbulbVars(shaderprogram& program, vec3f& fov, vec3f& camerapos,
-    vec3f& cameradir, vec3f& color, float step, int bail) {
+void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
+    vec3f cameradir, vec3f color, float step, int bail) {
     GLint fov_loc, camerapos_loc, cameradir_loc, color_loc, step_loc, bail_loc;  
 
     fov_loc = glGetUniformLocation(program.prog, "FOV");
@@ -126,10 +126,10 @@ void loadMandelbulbVars(shaderprogram& program, vec3f& fov, vec3f& camerapos,
     glUniform1i(bail_loc, bail);
 }
 
-void loadMandelbulbProgram(shaderprogram& program, vec3f& fov, vec3f& camerapos,
-    vec3f& cameradir, vec3f& color, float step, int bail) {
+void loadMandelbulbProgram(shaderprogram program, vec3f fov, vec3f camerapos,
+    vec3f cameradir, vec3f color, float step, int bail) {
 
-    loadShaders(program, "shaders/mandelbulb_shader.vert", "shaders/mandelbulb_shader.frag");
+    loadShaders(&program, "shaders/mandelbulb_shader.vert", "shaders/mandelbulb_shader.frag");
 
     loadMandelbulbVars(program, fov, camerapos, cameradir, color, step, bail);
 }
