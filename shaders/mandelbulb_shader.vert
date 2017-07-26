@@ -22,9 +22,9 @@ void main() {
         direction = vec3(FOV.x, -FOV.y, FOV.z);
     }
 
-    double x = cameradir.x;
-    double y = cameradir.y;
-    double z = cameradir.z;
+    float x = cameradir.x;
+    float y = cameradir.y;
+    float z = cameradir.z;
 
     mat3 yaw =      mat3( cos(y),       0,  sin(y),
                                0,       1,       0,
@@ -51,7 +51,7 @@ void main() {
  * are all relative to the camera direction
  */
 
-vec4 QuatFromDoubleVec(in double d, in vec3 v)
+vec4 QuatFromDoubleVec(in float d, in vec3 v)
 {
 	vec4 q;
 	
@@ -63,7 +63,7 @@ vec4 QuatFromDoubleVec(in double d, in vec3 v)
 	return q;
 }
 
-vec4 QuatFromAxisAngle(in double angle, in vec3 axis)
+vec4 QuatFromAxisAngle(in float angle, in vec3 axis)
 {
 	vec4 q;
 	
@@ -111,15 +111,15 @@ vec4 QuatQuationMultiply(in vec4 a, in vec4 b)
 
 vec3 QuatVecMultiply(in vec4 q, in vec3 v)
 {
-	double xx = q.x * q.x;
-	double yy = q.y * q.y;
-	double zz = q.z * q.z;
-	double xy = q.x * q.y;
-	double xz = q.x * q.z;
-	double yz = q.y * q.z;
-	double wx = q.w * q.x;
-	double wy = q.w * q.y;
-	double wz = q.w * q.z;
+	float xx = q.x * q.x;
+	float yy = q.y * q.y;
+	float zz = q.z * q.z;
+	float xy = q.x * q.y;
+	float xz = q.x * q.z;
+	float yz = q.y * q.z;
+	float wx = q.w * q.x;
+	float wy = q.w * q.y;
+	float wz = q.w * q.z;
 	
 	vec3 result;
 	
@@ -133,7 +133,7 @@ vec3 QuatVecMultiply(in vec4 q, in vec3 v)
 vec4 QuatQuatDivide(in vec4 a, in vec4 b)
 {
 	vec4 c;
-	double s = b.w*b.w + b.x*b.x + b.y*b.y + b.z*b.z;
+	float s = b.w*b.w + b.x*b.x + b.y*b.y + b.z*b.z;
 	
 	c.w = (a.w*b.w + a.x*b.x + a.y*b.y + a.z*b.z) / s;
 	c.x = (-a.w*b.x + a.x*b.w - a.y*b.z + a.z*b.y) / s;
@@ -143,7 +143,7 @@ vec4 QuatQuatDivide(in vec4 a, in vec4 b)
 	return c;
 }
 
-vec4 QuatDoubleDivide(in vec4 a, in double b)
+vec4 QuatDoubleDivide(in vec4 a, in float b)
 {
 	b.w = b.w / b;
 	b.x = b.x / b;
@@ -161,9 +161,9 @@ vec4 QuatInverse(in vec4 q)
 vec4 QuatExp(in vec4 a)
 {
 	vec4 c;
-	double r = sqrt(q.x*q.x + q.y*q.y + q.z*q.z);
-	double et = exp(q.w);
-	double s = r == 0 ? 0 : et * sin(r) / r;
+	float r = sqrt(q.x*q.x + q.y*q.y + q.z*q.z);
+	float et = exp(q.w);
+	float s = r == 0 ? 0 : et * sin(r) / r;
 	
 	q.w = et * cos(r);
 	q.x = q.x * s;
@@ -176,8 +176,8 @@ vec4 QuatExp(in vec4 a)
 vec4 QuatLn(in vec4 a)
 {
 	vec4 c;
-	double r = sqrt(q.x*q.x + q.y*q.y + q.z*q.z);
-	double t = r == 0 ? 0 : atan(r, q.w) / r ;
+	float r = sqrt(q.x*q.x + q.y*q.y + q.z*q.z);
+	float t = r == 0 ? 0 : atan(r, q.w) / r ;
 	
 	q.w = .5 * log(q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z);
 	q.x = q.x * t;
@@ -187,12 +187,12 @@ vec4 QuatLn(in vec4 a)
 	return c;
 }
 
-vec4 QuatPower(in vec4 q, in double p)
+vec4 QuatPower(in vec4 q, in float p)
 {
 	return QuaternionExp(QuaternionMultiply(QuaternionLn(q),power));
 }
 
-void MoveForward(inout vec3 position, in vec3 forward, in double scalar)
+void MoveForward(inout vec3 position, in vec3 forward, in float scalar)
 {
 	position += forward * scalar;
 }
@@ -224,7 +224,7 @@ void InitializeCamera(inout vec3 facingForward, inout vec3 cameraPosition, inout
 	verticalAxis = v;
 }
 
-void yaw(in double angle, inout vec3 vector, in vec3 horizontalAxis, in vec3 verticalAxis, in vec3 depthAxis)
+void yaw(in float angle, inout vec3 vector, in vec3 horizontalAxis, in vec3 verticalAxis, in vec3 depthAxis)
 {
 	// Convert angle to radians
 	angle = angle * PI / 180;
@@ -241,7 +241,7 @@ void yaw(in double angle, inout vec3 vector, in vec3 horizontalAxis, in vec3 ver
 	ApplyRotationToVector(localRotation, depthAxis);
 }
 
-void pitch(in double angle, inout vec3 vector, in vec3 horizontalAxis, in vec3 verticalAxis, in vec3 depthAxis)
+void pitch(in float angle, inout vec3 vector, in vec3 horizontalAxis, in vec3 verticalAxis, in vec3 depthAxis)
 {
 	// Convert angle to radians
 	angle = angle * PI / 180;
@@ -258,7 +258,7 @@ void pitch(in double angle, inout vec3 vector, in vec3 horizontalAxis, in vec3 v
 	ApplyRotationToVector(localRotation, depthAxis);
 }
 
-void roll(in double angle, inout vec3 vector, in vec3 horizontalAxis, in vec3 verticalAxis, in vec3 depthAxis)
+void roll(in float angle, inout vec3 vector, in vec3 horizontalAxis, in vec3 verticalAxis, in vec3 depthAxis)
 {
 	// Convert angle to radians
 	angle = angle * PI / 180;
