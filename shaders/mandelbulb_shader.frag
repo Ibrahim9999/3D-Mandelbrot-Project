@@ -40,15 +40,16 @@ vec3 nextPoint (in vec3 v, in vec3 c, in double power){
 		return vec3(x, y, z);
 	}
 	
-	double rN = pow( sqrt( xx + yy + zz ), power );
-	double nPhi =  power * atan( v.y, v.x ) ;
-	double nTheta = power * acos( v.z / sqrt( xx + yy + zz ) );
+    double r = sqrt( xx + yy + zz );
+	double rN = pow( r, power );
+	double nTheta = power * atan( v.y, v.x ) ;
+	double nPhi = power * asin( v.z / r );
 	
-	double sinNTheta = sin( nTheta);
+	double cosNPhi = cos( nPhi);
 	
-	x = sinNTheta * cos(nPhi);
-	y = sinNTheta * sin(nPhi);
-	z = cos(nTheta);
+	x = cos(nTheta) * cosNPhi * rN;
+	y = sin(nTheta) * cosNPhi * rN;
+	z = -sin(nPhi) * rN;
 	
 	return vec3(rN*x + c.x, rN*y + c.y, rN*z + c.z);
 }
