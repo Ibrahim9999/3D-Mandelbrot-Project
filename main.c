@@ -1,20 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <GL/glew.h>
 #include <GL/glut.h>
+#include "shader.h"
+#include "vector.h"
 
 #define EXIT_SUCCESS 0
 #define EXIT_ERROR 1
+
+shaderprogram mandelbulb_shader;
+vec3f fov, camerapos, cameradir, color;
+float step;
+int bail;
 
 //Render Funcion
 void render() {
     //Clear
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glBegin(GL_TRIANGLES);
-		glVertex3f(-1.0f,-1.0f, 0.0f);
-		glVertex3f( 1.0f, 0.0f, 0.0);
-		glVertex3f( 0.0f, 1.0f, 0.0);
+    glBegin(GL_QUADS);
+		glVertex3f(1.0f,1.0f, 0.0);
+		glVertex3f(1.0f, -1.0f, 0.0);
+		glVertex3f(-1.0f, -1.0f, 0.0);
+        glVertex3f(-1.0f, 1.0f, 0.0);
 	glEnd();
 
     glutSwapBuffers();
@@ -22,6 +30,17 @@ void render() {
 
 //Main
 int main(int argc, char* argv[]) {
+
+    printf("hello main\n");
+    fflush(stdout);
+
+    //Set vars
+    setFOVvec(fov, 100, 100);
+    camerapos.x=0; camerapos.y=0; camerapos.z=-4;
+    cameradir.x=0; cameradir.y=0; cameradir.z=0;
+    color.x=0; color.y=255; color.z=255;
+    step = 0.01;
+    bail = 50;
 
     //Setup window
     glutInit(&argc, argv);
@@ -32,9 +51,18 @@ int main(int argc, char* argv[]) {
 
     //Setup functions
     glutDisplayFunc(render);
-    
+
+    glewInit();
+   
+    printf("starting shaders\n");
+    fflush(stdout);
+
     //Setup shaders
-    loadShaders();
+    loadMandelbulbProgram(mandelbulb_shader, fov, camerapos, cameradir, color, step, bail);
+    printf("loaded program");
+    fflush(stdout);
+    printProgramLog(mandelbulb_shader);    
+    glUseProgram(mandelbulb_shader.prog);
 
     //Loop
     glutMainLoop();

@@ -1,12 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <GL/glew.h>
+#include <GL/glut.h>
+#include <math.h>
+#include "vector.h"
+#include "shader.h"
 
-char* loadFile(char* filename) {
-    FILE* file = fopen(filename);
-    long size = fsize(file);
-    char* text = malloc(size);
+char* loadTextFile(const char* filename) {
+    printf("loading files");
+    fflush(stdout);
 
-    if (fread(text, sizeof(char), 1000, file)) {
+    FILE* file = fopen(filename, "r");
+    long size;
+    char* text;
+    
+    fseek(file, 0, SEEK_END);
+    size = ftell(file);
+    text = (char*) malloc(size);
+    fseek(file, 0, SEEK_SET);
+
+    if (fread(text, sizeof(char), 1000, file) == 0) {
         fprintf(stderr, "cannot load file");
         exit(1);
     }
@@ -16,13 +29,109 @@ char* loadFile(char* filename) {
     return text;
 }
 
-void loadShaders(GLuint& v, GLuint& c) {
-    char *vs=NULL, *fs=NULL;
-    
-    /****
-    NEXT TODO
-    ****/
- 
+void setFOVvec(vec3f& vector, float vertFOV, float horiFOV) {
+    vector.z = cos(vertFOV/360*PI_CONST);
+    vector.y = sin(horiFOV/360*PI_CONST);
+    vector.x = cos(vertFOV/360*PI_CONST)*tan(horiFOV/360*PI_CONST);
 
-
+    v3f_normalize(vector);
 }
+
+void printProgramLog(shaderprogram& program) {
+    int length, written;
+    char* log;
+
+    glGetProgramiv(program.prog, GL_INFO_LOG_LENGTH, &length);
+
+    if (length > 0) {
+        log = (char *) malloc(length);
+        glGetProgramInfoLog(program.prog, length, &written, log);
+        printf("%s\n", log);
+        free(log);
+    }
+}
+
+void printShaderLog(GLuint shader) {
+    int length, written;
+    char* log;
+
+    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
+
+    if (length > 0) {
+        log = (char *) malloc(length);
+        glGetShaderInfoLog(shader, length, &written, log);
+        printf("%s\n", log);
+        free(log);
+    }
+}
+
+void loadShaders(shaderprogram& program, const char* vname, const char* fname) {
+    char *vs=NULL, *fs=NULL;
+    const char *cvs, *cfs;
+    
+    printf("making a shader\n");
+    fflush(stdout);
+
+    program.vert = glCreateShader(GL_VERTEX_SHADER);
+    program.frag = glCreateShader(GL_FRAGMENT_SHADER);
+
+    printf("loading the files\n");
+    fflush(stdout);
+
+    vs = loadTextFile(vname);
+    fs = loadTextFile(fname);
+
+    cvs = vs, cfs = fs;
+
+    printf("starting compile");
+    fflush(stdout);
+
+    glShaderSource(program.vert, 1, &cvs, NULL);
+    glShaderSource(program.frag, 1, &cfs, NULL);
+
+    glCompileShader(program.vert);
+    glCompileShader(program.frag);
+
+    printShaderLog(program.vert);
+    printShaderLog(program.frag);
+    
+
+    printf("compiled");
+    fflush(stdout);
+
+    program.prog = glCreateProgram();
+    glAttachShader(program.prog, program.vert);
+    glAttachShader(program.prog, program.frag);
+
+    printf("linking");
+    glLinkProgram(program.prog);
+}
+
+void loadMandelbulbVars(shaderprogram& program, vec3f& fov, vec3f& camerapos,
+    vec3f& cameradir, vec3f& color, float step, int bail) {
+    GLint fov_loc, camerapos_loc, cameradir_loc, color_loc, step_loc, bail_loc;  
+
+    fov_loc = glGetUniformLocation(program.prog, "FOV");
+    camerapos_loc = glGetUniformLocation(program.prog, "camerapos");
+    cameradir_loc = glGetUniformLocation(program.prog, "cameradir");
+    color_loc = glGetUniformLocation(program.prog, "color");
+    step_loc = glGetUniformLocation(program.prog, "step");
+    bail_loc = glGetUniformLocation(program.prog, "bail");
+
+    glUniform3f(fov_loc, fov.x, fov.y, fov.z);
+    glUniform3f(camerapos_loc, camerapos.x, camerapos.y, camerapos.z);
+    glUniform3f(cameradir_loc, cameradir.x, cameradir.y, cameradir.z);
+    glUniform3f(color_loc, color.x, color.y, color.z);
+    glUniform1f(step_loc, step);
+    glUniform1i(bail_loc, bail);
+}
+
+void loadMandelbulbProgram(shaderprogram& program, vec3f& fov, vec3f& camerapos,
+    vec3f& cameradir, vec3f& color, float step, int bail) {
+
+    loadShaders(program, "shaders/mandelbulb_shader.vert", "shaders/mandelbulb_shader.frag");
+
+    loadMandelbulbVars(program, fov, camerapos, cameradir, color, step, bail);
+}
+
+
