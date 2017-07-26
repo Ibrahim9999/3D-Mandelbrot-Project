@@ -21,8 +21,23 @@ void main() {
     else {
         direction = vec3(FOV.x, -FOV.y, FOV.z);
     }
-    
-    
+
+    double x = cameradir.x;
+    double y = cameradir.y;
+    double z = cameradir.z;
+
+    mat3 pitch =    mat3( cos(x),       0,  sin(x),
+                               0,       1,       0,
+                         -sin(x),       0,  cos(x));
+    mat3 yaw =      mat3( cos(y), -sin(y),       0,
+                          sin(y),  cos(y),       0,
+                               0,       0,       1);
+    mat3 roll =     mat3(      1,       0,       0,
+                               0,  cos(z), -sin(z),
+                               0,  sin(z),  cos(z));
+
+    mat3 transform = roll*yaw*pitch;
+    direction = transform * direction;
 }
 
 #define PI 3.1415926535897932384626433832795
