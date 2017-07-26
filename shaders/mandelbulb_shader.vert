@@ -1,4 +1,4 @@
-#version 140
+#version 130
 
 uniform vec3 FOV;
 uniform vec3 cameradir;
