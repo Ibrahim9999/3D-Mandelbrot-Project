@@ -64,7 +64,6 @@ int main(int argc, char* argv[]) {
     printf("loaded program\n");
     fflush(stdout);
     printProgramLog(mandelbulb_shader);    
-    glUseProgram(mandelbulb_shader.prog);
 
     //Loop
     glutMainLoop();
