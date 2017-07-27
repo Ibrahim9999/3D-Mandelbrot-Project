@@ -11,7 +11,7 @@
 shaderprogram mandelbulb_shader;
 vec3f fov, camerapos, cameradir, color;
 float step;
-int bail;
+int bail, power;
 
 //Render Funcion
 void render() {
@@ -41,6 +41,7 @@ int main(int argc, char* argv[]) {
     color.x=0; color.y=1.0; color.z=1.0;
     step = 0.01;
     bail = 50;
+    power = 2;
 
     //Setup window
     glutInit(&argc, argv);
@@ -58,7 +59,8 @@ int main(int argc, char* argv[]) {
     fflush(stdout);
 
     //Setup shaders
-    loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir, color, step, bail);
+    loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir, color, step,
+        bail, power);
     printf("loaded program\n");
     fflush(stdout);
     printProgramLog(mandelbulb_shader);    
