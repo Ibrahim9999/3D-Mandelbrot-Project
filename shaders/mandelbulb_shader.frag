@@ -15,23 +15,96 @@ bool equals(in float a, in float b) {
     return (abs(a-b) < epsilon);
 }
 
+// Hue: 0-1
+float GetHue(vec4 color)
+{
+	float red = color.x;
+	float green = color.y;
+	float blue = color.z;
+    float hue = 0;
+	
+	float min = min(min(red, green), blue);
+    float max = max(max(red, green), blue);
+	
+    if (mx == red)
+	{
+        hue = (green - blue) / (mx - mn);
+    }
+	else if (mx == green)
+	{
+        hue = 2 + (blue - red) / (mx - mn);
+    }
+	else
+	{
+        hue = 4 + (red - green) / (mx - mn);
+    }
+
+    hue = hue * 60;
+    if (hue < 0) hue = hue + 360;
+
+    return hue / 360;
+}
+
+void ColorToHSV(vec4 color, inout double hue, inout float saturation, inout float value)
+{
+	int mx = max(color.x, Math.Max(color.y, color.z));
+	int mn = min(color.x, Math.Min(color.y, color.z));
+
+	hue = GetHue();
+	value = max / 255d;
+	
+	if (max == 0)
+		saturation = 0;
+	else
+		saturation = 1 - (min / max);
+}
+
+// RGBA: 0-1
+vec4 ColorFromHSV(float hue, float saturation, float value)
+{
+	int hi = (floor(hue / 60)) % 6;
+	float f = hue / 60 - floor(hue / 60);
+
+	//value = value * 255;
+	int v = value;
+	int p = value * (1 - saturation);
+	int q = value * (1 - f * saturation);
+	int t = value * (1 - (1 - f) * saturation);
+	
+	if (hi == 0)
+		return vec4(v, t, p, 0);
+	if (hi == 1)
+		return vec4(q, v, p, 0);
+	if (hi == 2)
+		return vec4(p, v, t, 0);
+	if (hi == 3)
+		return vec4(p, q, v, 0);
+	if (hi == 4)
+		return vec4(t, p, v, 0);
+	
+	return vec4(v, p, q, 0);
+}
+
 vec3 nextPoint (in vec3 v, in vec3 c, in float power){
 
 	float x = 0;
 	float y = 0;
 	float z = 0;
 	
-	float xx = v.x * v.x;
-	float yy = v.y * v.y;
-	float zz = v.z * v.z;
+	float xx = v.X * v.X;
+	float yy = v.Y * v.Y;
+	float zz = v.Z * v.Z;
+	float xx_yy = xx + yy;
 	
-	if (equals(power, 1.0))
-		return v + c;
-	if (equals(power, 2.0))
+	if (power == 1)
+		return v;
+	if (power == 2)
 	{
-		x = (v.x*v.x - v.y*v.y) * (1 - (v.z*v.z) / (v.x*v.x + v.y*v.y));
-		y = 2 * v.x * v.y * (1 - (v.z*v.z) / (v.x*v.x + v.y*v.y));
-		z = -2 * v.z * sqrt(v.x*v.x + v.y*v.y);
+		float one_zz_xx_yy = 1 - zz / xx_yy;
+		
+		x = ( xx - yy ) * one_zz_xx_yy;
+        y = 2 * v.X * v.Y * one_zz_xx_yy;
+        z = -2 * v.Z * sqrt(xx+yy);
 		
 		return vec3(x, y, z) + c;
 	}
@@ -56,11 +129,11 @@ bool mandelTest(in vec3 point) {
     vec3 c = point;
 
     int i = 0;
-    while (v.x*v.x + v.y*v.y + v.z*v.z < 4.0 && i < 10) {
+    while (v.x*v.x + v.y*v.y + v.z*v.z < 4.0 && i < bail) {
         v = nextPoint(v, c, power);
         i++;
     }
-    return i >= 10;
+    return i >= bail;
 }
 
 vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in float sphereRadius) {
