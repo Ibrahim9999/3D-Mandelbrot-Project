@@ -38,6 +38,7 @@ vec4f QuatQuatAdd(vec4f a, vec4f b);
 vec4f QuatQuatSubtract(vec4f a, vec4f b);
 vec4f QuatQuationMultiply(vec4f a, vec4f b);
 vec3f QuatVecMultiply(vec4f q, vec3f v);
+vec3f QuatDoubleMultiply(vec4f q, double v);
 vec4f QuatQuatDivide(vec4f a, vec4f b);
 vec4f QuatDoubleDivide(vec4f a, double b);
 vec4f QuatInverse(vec4f q);

@@ -97,6 +97,11 @@ vec3f QuatVecMultiply(vec4f q, vec3f v)
 	return result;
 }
 
+vec3f QuatDoubleMultiply(vec4f q, double d)
+{
+	return vec4f(q.x * d, q.y * d, q.z * d, q.w * d);
+}
+
 vec4f QuatQuatDivide(vec4f a, vec4f b)
 {
 	vec4f c;
