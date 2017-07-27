@@ -20,11 +20,11 @@ void render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBegin(GL_QUADS);
-		glVertex3f(1.0f,1.0f, 0.0);
-		glVertex3f(1.0f, -1.0f, 0.0);
-		glVertex3f(-1.0f, -1.0f, 0.0);
+	glVertex3f(1.0f,1.0f, 0.0);
+	glVertex3f(1.0f, -1.0f, 0.0);
+	glVertex3f(-1.0f, -1.0f, 0.0);
         glVertex3f(-1.0f, 1.0f, 0.0);
-	glEnd();
+    glEnd();
 
     glutSwapBuffers();
 }
@@ -37,18 +37,18 @@ int main(int argc, char* argv[]) {
 
     //Set vars
     setFOVvec(&fov, 100, 100);
-    camerapos.x=0; camerapos.y=0; camerapos.z=-2;
+    camerapos.x=0; camerapos.y=0; camerapos.z=-2.01;
     cameradir.x=0; cameradir.y=0; cameradir.z=0;
     color.x=0; color.y=1.0; color.z=1.0;
-    step = 0.05;
-    bail = 10;
+    step = 0.01;
+    bail = 200;
     power = 2;
 
     //Setup window
     glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
-	glutInitWindowSize(300,300);
+	glutInitWindowSize(1000,1000);
 	glutCreateWindow("3D Mandelbulb Viewer");
 
     //Setup functions
