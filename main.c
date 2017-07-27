@@ -11,7 +11,8 @@
 shaderprogram mandelbulb_shader;
 vec3f fov, camerapos, cameradir, color;
 float step;
-int bail, power;
+int bail;
+float power;
 
 //Render Funcion
 void render() {
