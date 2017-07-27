@@ -8,15 +8,19 @@ out vec3 direction;
 void main() {
     if (gl_VertexID == 0) {
         direction = FOV;
+        gl_Position = vec4(1.0, 1.0, 0.0, 1.0);
     }
     else if (gl_VertexID == 1) {
         direction = vec3(-FOV.x, FOV.yz);
+        gl_Position = vec4(1.0, -1.0, 0.0, 1.0);
     }
     else if (gl_VertexID == 2) {
         direction = vec3(-FOV.x, -FOV.y, FOV.z);
+        gl_Position = vec4(-1.0, -1.0, 0.0, 1.0);
     }
     else {
         direction = vec3(FOV.x, -FOV.y, FOV.z);
+        gl_Position = vec4(-1.0, 1.0, 0.0, 1.0);
     }
 
     float x = cameradir.x;
