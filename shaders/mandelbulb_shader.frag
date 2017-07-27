@@ -1,5 +1,7 @@
 #version 130
 
+#define ALMOST_TWO 1.999
+
 in vec3 direction;
 
 uniform float step;
@@ -166,9 +168,9 @@ void main() {
     vec3 pos = camerapos;
     vec3 dir = normalize(direction);
 
-    vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), dir, 2.0);
+    vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), dir, ALMOST_TWO);
     //outputColor = vec4((dir + 1)/2,1.0);
-    outputColor = vec4(1.0);
+    outputColor = vec4(1.0, 1, 1, 1);
 
     if (intersection != vec3(0)) {
 
