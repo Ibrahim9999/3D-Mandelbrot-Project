@@ -173,7 +173,7 @@ void main() {
     if (intersection != vec3(0)) {
 
         pos = intersection;
-        while (!mandelTest(pos))
+        while (!mandelTest(pos) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0)
             pos = pos + step*dir;
 
         if (pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0)
