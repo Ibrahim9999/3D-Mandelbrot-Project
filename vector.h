@@ -30,6 +30,7 @@ typedef struct vector4f {
 
 float v3f_length(vec3f v);
 vec3f v3f_normalize(vec3f v);
+vec3f VecDoubleMultiply(vec3f v, double d);
 
 vec4f QuatFromDoubleVec(double d, vec3f v);
 vec4f QuatFromAxisAngle(double angle, vec3f axis);

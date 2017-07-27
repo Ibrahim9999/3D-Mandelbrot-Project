@@ -13,6 +13,11 @@ vec3f v3f_normalize(vec3f v) {
     return v;
 }
 
+vec3f VecDoubleMultiply(vec3f v, double d)
+{
+	return vec3f(v.x * d, v.y * d, v.z*d);
+}
+
 vec4f QuatFromDoubleVec(double d, vec3f v)
 {
 	vec4f q;
@@ -32,7 +37,7 @@ vec4f QuatFromAxisAngle(double angle, vec3f axis)
 	q.w = cos(angle / 2);
 	
 	
-	return new Quaternion(Math.Cos(angle/2), axis * Math.Sin(angle/2));
+	return vec4f(Math.Cos(angle/2), axis * Math.Sin(angle/2));
 }
 
 vec4f QuatQuatAdd(vec4f a, vec4f b)
