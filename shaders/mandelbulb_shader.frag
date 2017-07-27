@@ -18,110 +18,110 @@ bool equals(in float a, in float b) {
 // Hue: 0-1
 float GetHue(vec4 color)
 {
-	float red = color.x;
-	float green = color.y;
-	float blue = color.z;
+    float red = color.x;
+    float green = color.y;
+    float blue = color.z;
     float hue = 0;
-	
-	float min = min(min(red, green), blue);
+
+    float min = min(min(red, green), blue);
     float max = max(max(red, green), blue);
-	
-    if (mx == red)
-	{
-        hue = (green - blue) / (mx - mn);
+
+    if (max == red)
+    {
+        hue = (green - blue) / (max - min);
     }
-	else if (mx == green)
-	{
-        hue = 2 + (blue - red) / (mx - mn);
+    else if (max == green)
+    {
+        hue = 2 + (blue - red) / (max - min);
     }
-	else
-	{
-        hue = 4 + (red - green) / (mx - mn);
+    else
+    {
+        hue = 4 + (red - green) / (max - min);
     }
 
-    hue = hue * 60;
-    if (hue < 0) hue = hue + 360;
+    hue = hue * 60.0;
+    if (hue < 0) hue = hue + 360.0;
 
-    return hue / 360;
+    return hue / 360.0;
 }
 
-void ColorToHSV(vec4 color, inout double hue, inout float saturation, inout float value)
+void ColorToHSV(vec4 color, inout float hue, inout float saturation, inout float value)
 {
-	int mx = max(color.x, Math.Max(color.y, color.z));
-	int mn = min(color.x, Math.Min(color.y, color.z));
+    float max = max(color.x, max(color.y, color.z));
+    float min = min(color.x, min(color.y, color.z));
 
-	hue = GetHue();
-	value = max / 255d;
-	
-	if (max == 0)
-		saturation = 0;
-	else
-		saturation = 1 - (min / max);
+    hue = GetHue(color);
+    value = max / 255.0;
+
+    if (max == 0)
+        saturation = 0;
+    else
+        saturation = 1 - (min / max);
 }
 
 // RGBA: 0-1
 vec4 ColorFromHSV(float hue, float saturation, float value)
 {
-	int hi = (floor(hue / 60)) % 6;
-	float f = hue / 60 - floor(hue / 60);
+    float hi = mod(floor(hue / 60.0), 6);
+    float f = hue / 60.0 - floor(hue / 60.0);
 
-	//value = value * 255;
-	int v = value;
-	int p = value * (1 - saturation);
-	int q = value * (1 - f * saturation);
-	int t = value * (1 - (1 - f) * saturation);
-	
-	if (hi == 0)
-		return vec4(v, t, p, 0);
-	if (hi == 1)
-		return vec4(q, v, p, 0);
-	if (hi == 2)
-		return vec4(p, v, t, 0);
-	if (hi == 3)
-		return vec4(p, q, v, 0);
-	if (hi == 4)
-		return vec4(t, p, v, 0);
-	
-	return vec4(v, p, q, 0);
+    //value = value * 255;
+    float v = value;
+    float p = value * (1 - saturation);
+    float q = value * (1 - f * saturation);
+    float t = value * (1 - (1 - f) * saturation);
+
+    if (hi == 0)
+        return vec4(v, t, p, 0);
+    if (hi == 1)
+        return vec4(q, v, p, 0);
+    if (hi == 2)
+        return vec4(p, v, t, 0);
+    if (hi == 3)
+        return vec4(p, q, v, 0);
+    if (hi == 4)
+        return vec4(t, p, v, 0);
+
+    return vec4(v, p, q, 0);
 }
 
 vec3 nextPoint (in vec3 v, in vec3 c, in float power){
 
-	float x = 0;
-	float y = 0;
-	float z = 0;
-	
-	float xx = v.X * v.X;
-	float yy = v.Y * v.Y;
-	float zz = v.Z * v.Z;
-	float xx_yy = xx + yy;
-	
-	if (power == 1)
-		return v;
-	if (power == 2)
-	{
-		float one_zz_xx_yy = 1 - zz / xx_yy;
-		
-		x = ( xx - yy ) * one_zz_xx_yy;
-        y = 2 * v.X * v.Y * one_zz_xx_yy;
-        z = -2 * v.Z * sqrt(xx+yy);
-		
-		return vec3(x, y, z) + c;
-	}
-	/*
-    float r = sqrt( xx + yy + zz );
-	float rN = pow( r, power );
-	float nTheta = power * atan( v.y, v.x ) ;
-	float nPhi = power * asin( v.z / r );
-	
-	float cosNPhi = cos( nPhi);
-	
-	x = cos(nTheta) * cosNPhi * rN;
-	y = sin(nTheta) * cosNPhi * rN;
-	z = -sin(nPhi) * rN;
-	
-	return vec3(rN*x, rN*y, rN*z) + c;
-    */
+    float x = 0;
+    float y = 0;
+    float z = 0;
+
+    float xx = v.x * v.x;
+    float yy = v.y * v.y;
+    float zz = v.z * v.z;
+    float xx_yy = xx + yy;
+
+    if (equals(power, 1.0))
+        return v;
+    if (equals(power, 2.0))
+    {
+        float one_zz_xx_yy = 1 - zz / xx_yy;
+
+        x = ( xx - yy ) * one_zz_xx_yy;
+        y = 2 * v.x * v.y * one_zz_xx_yy;
+        z = -2 * v.z * sqrt(xx+yy);
+
+        return vec3(x, y, z) + c;
+    }
+    /*
+       float r = sqrt( xx + yy + zz );
+       float rN = pow( r, power );
+       float nTheta = power * atan( v.y, v.x ) ;
+       float nPhi = power * asin( v.z / r );
+
+       float cosNPhi = cos( nPhi);
+
+       x = cos(nTheta) * cosNPhi * rN;
+       y = sin(nTheta) * cosNPhi * rN;
+       z = -sin(nPhi) * rN;
+
+       return vec3(rN*x, rN*y, rN*z) + c;
+     */
 }
 
 bool mandelTest(in vec3 point) {
@@ -140,7 +140,7 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in f
 
     if (length(rayPos-spherePos) <= 2.0) return rayPos;
     vec3 offset = rayPos - spherePos;
-    
+
     float rSquared = sphereRadius*sphereRadius;
     float odot = dot(offset, rayDir);
 
@@ -153,7 +153,7 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in f
     if (aSquared > rSquared)
         return vec3(0); // No Collision
 
-    
+
     float h = sqrt(rSquared - aSquared);    // collision distance from plane
 
     vec3 collisionOffset = a - h*rayDir;
@@ -165,7 +165,7 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in f
 void main() {    
     vec3 pos = camerapos;
     vec3 dir = normalize(direction);
-    
+
     vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), dir, 2.0);
     //outputColor = vec4((dir + 1)/2,1.0);
     outputColor = vec4(1.0);
@@ -175,7 +175,7 @@ void main() {
         pos = intersection;
         while (!mandelTest(pos))
             pos = pos + step*dir;
-    
+
         if (pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0)
             outputColor = vec4(vec3(color/length(pos-camerapos)), 1.0);
 
