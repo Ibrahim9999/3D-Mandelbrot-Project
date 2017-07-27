@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
     setFOVvec(&fov, 100, 100);
     camerapos.x=0; camerapos.y=0; camerapos.z=-4;
     cameradir.x=0; cameradir.y=0; cameradir.z=0;
-    color.x=0; color.y=255; color.z=255;
+    color.x=0; color.y=1.0; color.z=1.0;
     step = 0.01;
     bail = 50;
 
