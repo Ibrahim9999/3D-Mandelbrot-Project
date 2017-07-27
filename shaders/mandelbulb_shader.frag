@@ -5,7 +5,7 @@ in vec3 direction;
 uniform float step;
 uniform float power;
 uniform int bail;
-uniform vec3 camera;
+uniform vec3 camerapos;
 uniform vec3 color;
 
 out vec4 outputColor;
@@ -26,16 +26,16 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power){
 	float zz = v.z * v.z;
 	
 	if (equals(power, 1.0))
-		return v;
+		return v + c;
 	if (equals(power, 2.0))
 	{
 		x = (v.x*v.x - v.y*v.y) * (1 - (v.z*v.z) / (v.x*v.x + v.y*v.y));
 		y = 2 * v.x * v.y * (1 - (v.z*v.z) / (v.x*v.x + v.y*v.y));
 		z = -2 * v.z * sqrt(v.x*v.x + v.y*v.y);
 		
-		return vec3(x, y, z);
+		return vec3(x, y, z) + c;
 	}
-	
+	/*
     float r = sqrt( xx + yy + zz );
 	float rN = pow( r, power );
 	float nTheta = power * atan( v.y, v.x ) ;
@@ -47,18 +47,20 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power){
 	y = sin(nTheta) * cosNPhi * rN;
 	z = -sin(nPhi) * rN;
 	
-	return vec3(rN*x + c.x, rN*y + c.y, rN*z + c.z);
+	return vec3(rN*x, rN*y, rN*z) + c;
+    */
 }
 
 bool mandelTest(in vec3 point) {
     vec3 v = point;
     vec3 c = point;
 
-    for (int i = 0; i < bail; i++) {
+    int i = 0;
+    while (v.x*v.x + v.y*v.y + v.z*v.z < 4.0 && i < 10) {
         v = nextPoint(v, c, power);
-        if (v.x*v.x + v.y*v.y + v.z*v.z > 4.0) return false;
+        i++;
     }
-    return true;
+    return i >= 10;
 }
 
 vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in float sphereRadius) {
@@ -88,18 +90,22 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in f
 }
 
 void main() {    
-    vec3 pos = camera;
+    vec3 pos = camerapos;
+    vec3 dir = normalize(direction);
     
-    vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), direction, 2.0);
-    outputColor = vec4(0);
+    vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), dir, 2.0);
+    //outputColor = vec4((dir + 1)/2,1.0);
+    outputColor = vec4(1.0);
 
     if (intersection != vec3(0)) {
 
         pos = intersection;
-        while (!mandelTest(pos) && (pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0))
-            pos = pos + step*direction;
+        while (!mandelTest(pos))
+            pos = pos + step*dir;
     
-        outputColor = vec4(vec3(color/length(pos-camera)), 0);
+        if (pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0)
+            outputColor = vec4(vec3(color/length(pos-camerapos)), 1.0);
 
     }
+
 }

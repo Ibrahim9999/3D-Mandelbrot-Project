@@ -37,18 +37,18 @@ int main(int argc, char* argv[]) {
 
     //Set vars
     setFOVvec(&fov, 100, 100);
-    camerapos.x=0; camerapos.y=0; camerapos.z=-4;
+    camerapos.x=0; camerapos.y=0; camerapos.z=-2;
     cameradir.x=0; cameradir.y=0; cameradir.z=0;
     color.x=0; color.y=1.0; color.z=1.0;
-    step = 0.01;
-    bail = 50;
+    step = 0.05;
+    bail = 10;
     power = 2;
 
     //Setup window
     glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
-	glutInitWindowSize(600,600);
+	glutInitWindowSize(300,300);
 	glutCreateWindow("3D Mandelbulb Viewer");
 
     //Setup functions
