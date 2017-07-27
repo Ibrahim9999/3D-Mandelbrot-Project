@@ -7,7 +7,7 @@
 #include "shader.h"
 
 char* loadTextFile(const char* filename) {
-    printf("loading files");
+    printf("loading files\n");
     fflush(stdout);
 
     FILE* file = fopen(filename, "r");
@@ -20,7 +20,7 @@ char* loadTextFile(const char* filename) {
     rewind(file);
 
     if (fread(text, sizeof(char), size, file) == 0) {
-        fprintf(stderr, "cannot load file");
+        fprintf(stderr, "cannot load file\n");
         exit(1);
     }
 
@@ -81,12 +81,9 @@ void loadShaders(shaderprogram *program, const char* vname, const char* fname) {
     vs = loadTextFile(vname);
     fs = loadTextFile(fname);
 
-    printf("%s\n\n\n\n", vs);
-    printf("%s\n", fs);
-
     cvs = vs, cfs = fs;
 
-    printf("starting compile");
+    printf("starting compile\n");
     fflush(stdout);
 
     glShaderSource(program->vert, 1, &cvs, NULL);
@@ -99,14 +96,14 @@ void loadShaders(shaderprogram *program, const char* vname, const char* fname) {
     printShaderLog(program->frag);
     
 
-    printf("compiled");
+    printf("compiled\n");
     fflush(stdout);
 
     program->prog = glCreateProgram();
     glAttachShader(program->prog, program->vert);
     glAttachShader(program->prog, program->frag);
 
-    printf("linking");
+    printf("linking\n");
     glLinkProgram(program->prog);
 }
 

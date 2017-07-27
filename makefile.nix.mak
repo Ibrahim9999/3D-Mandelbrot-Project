@@ -1,5 +1,5 @@
 CFLAGS=-I/usr/local/include -D_REENTRANT -g -Wall
-LIBS=-L/usr/local/lib -Wl,-rpath,/usr/local/lib -lGL -lGLU -lglut -lpthread -lm
+LIBS=-L/usr/local/lib -Wl,-rpath,/usr/local/lib -lGLEW -lGL -lGLU -lglut -lpthread -lm
 CC=gcc
 
 include makefile.vars.mak

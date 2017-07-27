@@ -8,15 +8,11 @@ uniform int bail;
 uniform vec3 camera;
 uniform vec3 color;
 
-bool mandelTest(in vec3 point) {
-    vec3 v = point;
-    vec3 c = point;
+out vec4 outputColor;
 
-    for (int i = 0; i < bail; i++) {
-        v = nextPoint(v, c, power);
-        if (v.x*v.x + v.y*v.y + v.z*v.z > 4.0) return false;
-    }
-    return true;
+bool equals(in float a, in float b) {
+    float epsilon = 0.000000001;
+    return (abs(a-b) < epsilon);
 }
 
 vec3 nextPoint (in vec3 v, in vec3 c, in float power){
@@ -54,9 +50,15 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power){
 	return vec3(rN*x + c.x, rN*y + c.y, rN*z + c.z);
 }
 
-int equals(in float a, in double b) {
-    float epsilon = 0.000000001;
-    return (abs(a-b) < epsilon);
+bool mandelTest(in vec3 point) {
+    vec3 v = point;
+    vec3 c = point;
+
+    for (int i = 0; i < bail; i++) {
+        v = nextPoint(v, c, power);
+        if (v.x*v.x + v.y*v.y + v.z*v.z > 4.0) return false;
+    }
+    return true;
 }
 
 vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in float sphereRadius) {
@@ -65,17 +67,18 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in f
     vec3 offset = rayPos - spherePos;
     
     float rSquared = sphereRadius*sphereRadius;
-    float dot = dot(offset, rayDir);
+    float odot = dot(offset, rayDir);
 
-    if (dot > 0 || dot(offset, offset) < rSquared)
+    if (odot > 0 || dot(offset, offset) < rSquared)
         return vec3(0); // No Collision
 
-    vec3 a = offset - dot * rayDir; // plane perpendicular to ray through center
-    float aSquared = a*a;
+    vec3 a = offset - odot * rayDir; // plane perpendicular to ray through center
+    float aSquared = dot(a, a);
 
-    if (aSquared > rSquared);
-        return vec3(0) // No Collision
+    if (aSquared > rSquared)
+        return vec3(0); // No Collision
 
+    
     float h = sqrt(rSquared - aSquared);    // collision distance from plane
 
     vec3 collisionOffset = a - h*rayDir;
