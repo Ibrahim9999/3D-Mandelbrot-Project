@@ -35,6 +35,8 @@ void setFOVvec(vec3f *vector, float vertFOV, float horiFOV) {
     vector->x = cos(vertFOV/360*PI_CONST)*tan(horiFOV/360*PI_CONST);
 
     *vector = v3f_normalize(*vector);
+
+    printf("************ %f, %f, %f", vector->x, vector->y, vector->z);
 }
 
 void printProgramLog(shaderprogram program) {
@@ -108,8 +110,8 @@ void loadShaders(shaderprogram *program, const char* vname, const char* fname) {
 }
 
 void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
-    vec3f cameradir, vec3f color, float step, int bail) {
-    GLint fov_loc, camerapos_loc, cameradir_loc, color_loc, step_loc, bail_loc;  
+    vec3f cameradir, vec3f color, float step, int bail, int power) {
+    GLint fov_loc, camerapos_loc, cameradir_loc, color_loc, step_loc, bail_loc, power_loc;  
 
     fov_loc = glGetUniformLocation(program.prog, "FOV");
     camerapos_loc = glGetUniformLocation(program.prog, "camerapos");
@@ -117,6 +119,9 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     color_loc = glGetUniformLocation(program.prog, "color");
     step_loc = glGetUniformLocation(program.prog, "step");
     bail_loc = glGetUniformLocation(program.prog, "bail");
+    power_loc = glGetUniformLocation(program.prog, "power");
+
+    printf("************ %f, %f, %f", fov.x, fov.y, fov.z);
 
     glUniform3f(fov_loc, fov.x, fov.y, fov.z);
     glUniform3f(camerapos_loc, camerapos.x, camerapos.y, camerapos.z);
@@ -124,14 +129,15 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     glUniform3f(color_loc, color.x, color.y, color.z);
     glUniform1f(step_loc, step);
     glUniform1i(bail_loc, bail);
+    glUniform1i(power_loc, power);
 }
 
 void loadMandelbulbProgram(shaderprogram* program, vec3f fov, vec3f camerapos,
-    vec3f cameradir, vec3f color, float step, int bail) {
+    vec3f cameradir, vec3f color, float step, int bail, int power) {
 
     loadShaders(program, "shaders/mandelbulb_shader.vert", "shaders/mandelbulb_shader.frag");
 
-    loadMandelbulbVars(*program, fov, camerapos, cameradir, color, step, bail);
+    loadMandelbulbVars(*program, fov, camerapos, cameradir, color, step, bail, power);
 }
 
 
