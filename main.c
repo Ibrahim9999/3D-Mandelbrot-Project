@@ -20,13 +20,23 @@ void render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBegin(GL_QUADS);
-	glVertex3f(1.0f,1.0f, 0.0);
+	glVertex3f(1.0f, 1.0f, 0.0);
 	glVertex3f(1.0f, -1.0f, 0.0);
 	glVertex3f(-1.0f, -1.0f, 0.0);
         glVertex3f(-1.0f, 1.0f, 0.0);
     glEnd();
 
     glutSwapBuffers();
+
+    //printf("rendered");
+}
+
+//Idle Function
+void idle() {
+    camerapos.x += 0.001;
+    if (camerapos.x > 3) camerapos.x = -3;
+    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail, power);
+    render();
 }
 
 //Main
@@ -36,23 +46,24 @@ int main(int argc, char* argv[]) {
     fflush(stdout);
 
     //Set vars
-    setFOVvec(&fov, 100, 100);
-    camerapos.x=0; camerapos.y=0; camerapos.z=-2.01;
+    setFOVvec(&fov, 50, 50);
+    camerapos.x=0; camerapos.y=0; camerapos.z=-2;
     cameradir.x=0; cameradir.y=0; cameradir.z=0;
-    color.x=0; color.y=1.0; color.z=1.0;
-    step = 0.01;
-    bail = 200;
+    color.x=0; color.y=1; color.z=1;
+    step = 0.05;
+    bail = 20;
     power = 2;
 
     //Setup window
     glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
-	glutInitWindowSize(1000,1000);
+	glutInitWindowSize(600,600);
 	glutCreateWindow("3D Mandelbulb Viewer");
 
     //Setup functions
     glutDisplayFunc(render);
+    glutIdleFunc(idle);
 
     glewInit();
    
@@ -64,7 +75,7 @@ int main(int argc, char* argv[]) {
         bail, power);
     printf("loaded program\n");
     fflush(stdout);
-    printProgramLog(mandelbulb_shader);    
+    printProgramLog(mandelbulb_shader);
 
     //Loop
     glutMainLoop();
