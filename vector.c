@@ -1,5 +1,31 @@
 #include "vector.h"
 
+void InitializeCamera(vec3f* facingForward, vec3f* cameraPosition, vec3f* depthAxis, vec3f* horizontalAxis, vec3f* verticalAxis)
+{
+	vec3f v;
+	
+	v.x = 0;
+	v.y = 0;
+	v.z = -2;
+	*cameraPosition = v;
+	
+	v.x = 0;
+	v.y = 0;
+	v.z = 1;
+	*depthAxis = v;
+	*facingForward = v;
+	
+	v.x = 1;
+	v.y = 0;
+	v.z = 0;
+	*horizontalAxis = v;
+	
+	v.x = 0;
+	v.y = 1;
+	v.z = 0;
+	*verticalAxis = v;
+}
+
 float v3f_length(vec3f v) {
     return sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
 }
@@ -212,27 +238,6 @@ void ApplyRotationToVector(vec4f rotation, vec3f* axis)
 	*axis =  QuatVecMultiply(QuatInverse(rotation), QuatVecMultiply(rotation, *axis));
 }
 
-void InitializeCamera(vec3f* facingForward, vec3f* cameraPosition, vec3f* depthAxis, vec3f* horizontalAxis, vec3f* verticalAxis)
-{
-	vec3f v;
-	
-	v.x = 0;
-	v.y = 0;
-	v.z = -4;
-	*cameraPosition = v;
-	
-	v.z = 1;
-	*depthAxis = v;
-	*facingForward = v;
-	
-	v.x = 1;
-	v.z = 0;
-	*horizontalAxis = v;
-	
-	v.x = 0;
-	v.y = 1;
-	*verticalAxis = v;
-}
 
 void Yaw(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
 {

@@ -23,9 +23,9 @@ void render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBegin(GL_QUADS);
-	glVertex3f(1.0f, 1.0f, 0.0);
-	glVertex3f(1.0f, -1.0f, 0.0);
-	glVertex3f(-1.0f, -1.0f, 0.0);
+	    glVertex3f(1.0f, 1.0f, 0.0);
+	    glVertex3f(1.0f, -1.0f, 0.0);
+	    glVertex3f(-1.0f, -1.0f, 0.0);
         glVertex3f(-1.0f, 1.0f, 0.0);
     glEnd();
 
@@ -36,6 +36,7 @@ void render() {
 
 //Idle Function
 void idle() {
+    Yaw(1, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis, &depthAxis);
     loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail, power, phi, theta, totalRotation);
     render();
 }
@@ -48,12 +49,13 @@ int main(int argc, char* argv[]) {
 
     //Set vars
     setFOVvec(&fov, 50, 50);
-    camerapos.x=0; camerapos.y=0; camerapos.z=-2;
-    cameradir.x=0; cameradir.y=0; cameradir.z=1;
+    InitializeCamera(&cameradir, &camerapos, &depthAxis, &horizontalAxis, &verticalAxis);
+    //camerapos.x=0; camerapos.y=0; camerapos.z=-2;
+    //cameradir.x=0; cameradir.y=0; cameradir.z=1;
     totalRotation.x = 0; totalRotation.y = 0; totalRotation.z = 0; totalRotation.w = 1;
     color.x=0; color.y=1; color.z=1;
     step = 0.1;
-    bail = 20;
+    bail = 4;
     power = 2;
     phi = 0;
     theta = 0;
