@@ -76,7 +76,7 @@ vec4f QuatQuatSubtract(vec4f a, vec4f b)
 	return c;
 }
 
-vec4f QuatQuationMultiply(vec4f a, vec4f b)
+vec4f QuatQuatMultiply(vec4f a, vec4f b)
 {
 	vec4f c;
 	
@@ -176,17 +176,12 @@ vec4f QuatPower(vec4f q, double p)
 	return QuatExp(QuatDoubleMultiply(QuatLn(q),p));
 }
 
-vec3 MoveForward(vec3f position, vec3f forward, double scalar)
+vec3f MoveForward(vec3f position, vec3f forward, double scalar)
 {
 	 return VecVecAdd(position, VecDoubleMultiply(forward, scalar));
 }
 
-vec3 VecFromEulerRotation(double pitch, double yaw)
-{
-	
-}
-
-void ToEuler(vec4 rotation, ref double yaw, ref double pitch, ref double roll)
+void VecToEuler(vec4f rotation, double* yaw, double* pitch, double* roll)
 {
 	double W = rotation.w;
 	double X = rotation.x;
@@ -198,7 +193,7 @@ void ToEuler(vec4 rotation, ref double yaw, ref double pitch, ref double roll)
 	// pitch (x-axis rotation)
 	double t0 = 2 * (W * X + Y * Z);
 	double t1 = 1 - 2 * (X * X + ysqr);
-	*roll = atan(t0, t1);
+	*roll = atan2(t0, t1);
 	
 	// roll (y-axis rotation)
 	t0 = 2 * (W * Y - Z * X);
@@ -209,7 +204,7 @@ void ToEuler(vec4 rotation, ref double yaw, ref double pitch, ref double roll)
 	// yaw (z-axis rotation)
 	t0 = 2 * (W * Z + X * Y);
 	t1 = 1 - 2 * (ysqr + Z * Z);  
-	*yaw = atan(t0, t1);
+	*yaw = atan2(t0, t1);
 }
 
 void ApplyRotationToVector(vec4f rotation, vec3f* axis)
@@ -227,16 +222,16 @@ void InitializeCamera(vec3f* facingForward, vec3f* cameraPosition, vec3f* depthA
 	*cameraPosition = v;
 	
 	v.z = 1;
-	depthAxis = v;
-	facingForward = v;
+	*depthAxis = v;
+	*facingForward = v;
 	
 	v.x = 1;
 	v.z = 0;
-	horizontalAxis = v;
+	*horizontalAxis = v;
 	
 	v.x = 0;
 	v.y = 1;
-	verticalAxis = v;
+	*verticalAxis = v;
 }
 
 void Yaw(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
