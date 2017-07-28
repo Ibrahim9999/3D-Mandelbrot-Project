@@ -15,7 +15,15 @@ vec3f v3f_normalize(vec3f v) {
 
 vec3f VecDoubleMultiply(vec3f v, double d)
 {
-	return vec3f(v.x * d, v.y * d, v.z*d);
+	return (vec3f){v.x * d, v.y * d, v.z*d};
+}
+
+vec3f VecVecAdd(vec3f a, vec3f b) {
+    return (vec3f){a.x + b.x, a.y + b.y, a.z + b.z};
+}
+
+vec3f VecVecSubtract(vec3f a, vec3f b) {
+    return (vec3f){a.x - b.x, a.y - b.y, a.z - b.z};
 }
 
 vec4f QuatFromDoubleVec(double d, vec3f v)
@@ -36,12 +44,12 @@ vec4f QuatFromAxisAngle(double angle, vec3f axis)
 	
 	q.w = cos(angle / 2);
 	
+    vec3f a = VecDoubleMultiply(axis, sin(angle/2));
+    q.x = a.x;
+    q.y = a.y;
+    q.z = a.z;
 	
-<<<<<<< HEAD
-	return vec4f(cos(angle/2), VecDoubleMultiply(axis, sin(angle/2)));
-=======
-	return vec4f(Math.Cos(angle/2), axis * Math.Sin(angle/2));
->>>>>>> refs/remotes/origin/master
+	return q;
 }
 
 vec4f QuatQuatAdd(vec4f a, vec4f b)
@@ -101,9 +109,9 @@ vec3f QuatVecMultiply(vec4f q, vec3f v)
 	return result;
 }
 
-vec3f QuatDoubleMultiply(vec4f q, double d)
+vec4f QuatDoubleMultiply(vec4f q, double d)
 {
-	return vec4f(q.x * d, q.y * d, q.z * d, q.w * d);
+	return (vec4f){q.x * d, q.y * d, q.z * d, q.w * d};
 }
 
 vec4f QuatQuatDivide(vec4f a, vec4f b)
@@ -170,7 +178,7 @@ vec4f QuatPower(vec4f q, double p)
 
 void MoveForward(vec3f* position, vec3f forward, double scalar)
 {
-	position += VecDoubleMultiply(forward, scalar);
+	*position = VecDoubleMultiply(forward, scalar);
 }
 
 void ApplyRotationToVector(vec4f rotation, vec3f* axis)
