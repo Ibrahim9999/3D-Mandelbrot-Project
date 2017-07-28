@@ -12,7 +12,7 @@ void main() {
     }
     else if (gl_VertexID == 1) {
         direction = vec3(-FOV.x, FOV.yz);
-        gl_Position = vec4(1.0, -1.0, 0.0, 1.0);
+        gl_Position = vec4(-1.0, 1.0, 0.0, 1.0);
     }
     else if (gl_VertexID == 2) {
         direction = vec3(-FOV.x, -FOV.y, FOV.z);
@@ -20,24 +20,24 @@ void main() {
     }
     else {
         direction = vec3(FOV.x, -FOV.y, FOV.z);
-        gl_Position = vec4(-1.0, 1.0, 0.0, 1.0);
+        gl_Position = vec4(1.0, -1.0, 0.0, 1.0);
     }
 
     float x = cameradir.x;
     float y = cameradir.y;
     float z = cameradir.z;
 
-    mat3 yaw =      mat3( cos(y),       0,  sin(y),
-                               0,       1,       0,
-                         -sin(y),       0,  cos(y));
-    mat3 roll =     mat3( cos(z), -sin(z),       0,
-                          sin(z),  cos(z),       0,
-                               0,       0,       1);
-    mat3 pitch =    mat3(      1,       0,       0,
+    mat3 pitch =    mat3(      1,       0,       0, // around x axis
                                0,  cos(x), -sin(x),
                                0,  sin(x),  cos(x));
+    mat3 yaw =      mat3( cos(y),       0,  sin(y), // around y axis
+                               0,       1,       0,
+                         -sin(y),       0,  cos(y));
+    mat3 roll =     mat3( cos(z), -sin(z),       0, // around z axis
+                          sin(z),  cos(z),       0,
+                               0,       0,       1);
 
-    mat3 transform = roll*yaw*pitch;
+    mat3 transform = roll*pitch*yaw;
     direction = transform * direction;
 }
 
