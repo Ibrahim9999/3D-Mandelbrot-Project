@@ -6,6 +6,8 @@ in vec3 direction;
 
 uniform float step;
 uniform float power;
+uniform float theta;
+uniform float phi;
 uniform int bail;
 uniform vec3 camerapos;
 uniform vec3 color;
@@ -87,7 +89,7 @@ vec4 ColorFromHSV(float hue, float saturation, float value)
     return vec4(v, p, q, 0);
 }
 
-vec3 nextPoint (in vec3 v, in vec3 c, in float power){
+vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float phi){
 
     float x = 0;
     float y = 0;
@@ -116,11 +118,11 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power){
        float nTheta = power * atan( v.y, v.x ) ;
        float nPhi = power * asin( v.z / r );
 
-       float cosNPhi = cos( nPhi);
+       float cosNPhi = cos( nPhi + phi);
 
-       x = cos(nTheta) * cosNPhi * rN;
-       y = sin(nTheta) * cosNPhi * rN;
-       z = -sin(nPhi) * rN;
+       x = cos(nTheta + theta) * cosNPhi * rN;
+       y = sin(nTheta + theta) * cosNPhi * rN;
+       z = -sin(nPhi + phi) * rN;
 
        return vec3(rN*x, rN*y, rN*z) + c;
      */
@@ -132,7 +134,7 @@ bool mandelTest(in vec3 point) {
 
     int i = 0;
     while (v.x*v.x + v.y*v.y + v.z*v.z < 4.0 && i < bail) {
-        v = nextPoint(v, c, power);
+        v = nextPoint(v, c, power, theta, phi);
         i++;
     }
     return i >= bail;
