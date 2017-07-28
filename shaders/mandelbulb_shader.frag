@@ -100,9 +100,9 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float p
     float zz = v.z * v.z;
     float xx_yy = xx + yy;
 
-    if (equals(power, 1.0))
+    if (power == 1)
         return v + c;
-    else if (equals(power, 2.0))
+    else if (power == 2)
     {
         float one_zz_xx_yy = 1 - zz / xx_yy;
 
@@ -112,7 +112,6 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float p
 
         return vec3(x, y, z) + c;
     }
-    else {
         float r = sqrt( xx + yy + zz );
         float rN = pow( r, power );
         float nTheta = power * atan( v.y, v.x ) ;
@@ -126,7 +125,6 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float p
 
         return vec3(rN*x, rN*y, rN*z) + c;
 
-    }
 }
 
 bool mandelTest(in vec3 point) {

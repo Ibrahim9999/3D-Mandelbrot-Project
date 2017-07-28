@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
     color.x=0; color.y=1; color.z=1;
     step = 0.1;
     bail = 4;
-    power = 2;
+    power = 8;
     phi = 0;
     theta = 0;
 
