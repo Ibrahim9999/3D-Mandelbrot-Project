@@ -9,7 +9,8 @@
 #define EXIT_ERROR 1
 
 shaderprogram mandelbulb_shader;
-vec3f fov, camerapos, cameradir, color;
+vec3f fov, camerapos, cameradir, color, horizontalAxis, verticalAxis, depthAxis;
+vec4f totalRotation;
 float step;
 int bail;
 float power;
@@ -35,9 +36,9 @@ void render() {
 
 //Idle Function
 void idle() {
-    camerapos.x += 0.001;
-    if (camerapos.x > 3) camerapos.x = -3;
-    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail, power, phi, theta);
+    ApplyRotationToVector(totalRotation, &cameradir);
+    Yaw(0.1, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis, &depthAxis);
+    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail, power, phi, theta, totalRotation);
     render();
 }
 
@@ -50,9 +51,10 @@ int main(int argc, char* argv[]) {
     //Set vars
     setFOVvec(&fov, 50, 50);
     camerapos.x=0; camerapos.y=0; camerapos.z=-2;
-    cameradir.x=0; cameradir.y=0; cameradir.z=0;
+    cameradir.x=0; cameradir.y=0; cameradir.z=1;
+    totalRotation.x = 0; totalRotation.y = 0; totalRotation.z = 0; totalRotation.w = 1;
     color.x=0; color.y=1; color.z=1;
-    step = 0.05;
+    step = 0.1;
     bail = 20;
     power = 2;
     phi = 0;
@@ -76,7 +78,7 @@ int main(int argc, char* argv[]) {
 
     //Setup shaders
     loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir, color, step,
-        bail, power, phi, theta);
+        bail, power, phi, theta, totalRotation);
     printf("loaded program\n");
     fflush(stdout);
     printProgramLog(mandelbulb_shader);

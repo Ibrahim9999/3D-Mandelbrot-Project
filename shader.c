@@ -110,8 +110,8 @@ void loadShaders(shaderprogram *program, const char* vname, const char* fname) {
 }
 
 void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
-    vec3f cameradir, vec3f color, float step, int bail, float power, float phi, float theta) {
-    GLint fov_loc, camerapos_loc, cameradir_loc, color_loc, step_loc, bail_loc, power_loc, phi_loc, theta_loc;
+    vec3f cameradir, vec3f color, float step, int bail, float power, float phi, float theta, vec4f totalRotation) {
+    GLint fov_loc, camerapos_loc, cameradir_loc, color_loc, step_loc, bail_loc, power_loc, phi_loc, theta_loc, totalRotation_loc;
 
     fov_loc = glGetUniformLocation(program.prog, "FOV");
     camerapos_loc = glGetUniformLocation(program.prog, "camerapos");
@@ -122,6 +122,7 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     power_loc = glGetUniformLocation(program.prog, "power");
     phi_loc = glGetUniformLocation(program.prog, "phi");
     theta_loc = glGetUniformLocation(program.prog, "theta");
+    totalRotation_loc = glGetUniformLocation(program.prog, "totalRotation");
 
     //printf("************ %f, %f, %f", fov.x, fov.y, fov.z);
 
@@ -134,16 +135,16 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     glUniform1f(power_loc, power);
     glUniform1f(phi_loc, phi);
     glUniform1f(theta_loc, theta);
+    glUniform4f(totalRotation_loc, totalRotation.x, totalRotation.y, totalRotation.z, totalRotation.w);
 }
 
 void loadMandelbulbProgram(shaderprogram* program, vec3f fov, vec3f camerapos,
-    vec3f cameradir, vec3f color, float step, int bail, float power, float phi, float theta) {
+    vec3f cameradir, vec3f color, float step, int bail, float power, float phi, float theta, vec4f totalRotation) {
 
     loadShaders(program, "shaders/mandelbulb_shader.vert", "shaders/mandelbulb_shader.frag");
 
     glUseProgram(program->prog);
 
-    loadMandelbulbVars(*program, fov, camerapos, cameradir, color, step, bail, power, phi, theta);
+    loadMandelbulbVars(*program, fov, camerapos, cameradir, color, step, bail, power, phi, theta, totalRotation);
 }
-
 
