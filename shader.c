@@ -36,7 +36,7 @@ void setFOVvec(vec3f *vector, float vertFOV, float horiFOV) {
 
     *vector = v3f_normalize(*vector);
 
-    printf("************ %f, %f, %f", vector->x, vector->y, vector->z);
+    //printf("************ %f, %f, %f", vector->x, vector->y, vector->z);
 }
 
 void printProgramLog(shaderprogram program) {
@@ -123,7 +123,7 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     phi_loc = glGetUniformLocation(program.prog, "phi");
     theta_loc = glGetUniformLocation(program.prog, "theta");
 
-    printf("************ %f, %f, %f", fov.x, fov.y, fov.z);
+    //printf("************ %f, %f, %f", fov.x, fov.y, fov.z);
 
     glUniform3f(fov_loc, fov.x, fov.y, fov.z);
     glUniform3f(camerapos_loc, camerapos.x, camerapos.y, camerapos.z);
