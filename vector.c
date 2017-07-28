@@ -176,9 +176,40 @@ vec4f QuatPower(vec4f q, double p)
 	return QuatExp(QuatDoubleMultiply(QuatLn(q),p));
 }
 
-void MoveForward(vec3f* position, vec3f forward, double scalar)
+vec3 MoveForward(vec3f position, vec3f forward, double scalar)
 {
-	*position = VecDoubleMultiply(forward, scalar);
+	 return VecVecAdd(position, VecDoubleMultiply(forward, scalar));
+}
+
+vec3 VecFromEulerRotation(double pitch, double yaw)
+{
+	
+}
+
+void ToEuler(vec4 rotation, ref double yaw, ref double pitch, ref double roll)
+{
+	double W = rotation.w;
+	double X = rotation.x;
+	double Y = rotation.y;
+	double Z = rotation.z;
+	
+	double ysqr = Y * Y;
+	
+	// pitch (x-axis rotation)
+	double t0 = 2 * (W * X + Y * Z);
+	double t1 = 1 - 2 * (X * X + ysqr);
+	*roll = atan(t0, t1);
+	
+	// roll (y-axis rotation)
+	t0 = 2 * (W * Y - Z * X);
+	t0 = t0 > 1 ? 1 : t0;
+	t0 = t0 < -1 ? -1 : t0;
+	*pitch = asin(t0);
+	
+	// yaw (z-axis rotation)
+	t0 = 2 * (W * Z + X * Y);
+	t1 = 1 - 2 * (ysqr + Z * Z);  
+	*yaw = atan(t0, t1);
 }
 
 void ApplyRotationToVector(vec4f rotation, vec3f* axis)
@@ -186,14 +217,13 @@ void ApplyRotationToVector(vec4f rotation, vec3f* axis)
 	*axis =  QuatVecMultiply(QuatInverse(rotation), QuatVecMultiply(rotation, *axis));
 }
 
-/*
 void InitializeCamera(vec3f* facingForward, vec3f* cameraPosition, vec3f* depthAxis, vec3f* horizontalAxis, vec3f* verticalAxis)
 {
 	vec3f v;
 	
 	v.x = 0;
 	v.y = 0;
-	v.z = 0;
+	v.z = -4;
 	*cameraPosition = v;
 	
 	v.z = 1;
@@ -208,15 +238,17 @@ void InitializeCamera(vec3f* facingForward, vec3f* cameraPosition, vec3f* depthA
 	v.y = 1;
 	verticalAxis = v;
 }
-*/
 
-void Yaw(double angle, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
+void Yaw(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
 {
 	// Convert angle to radians
 	angle = angle * PI / 180;
 	
 	// Generates yaw rotation terms of a quaternion
 	vec4f localRotation = QuatFromAxisAngle(angle / 2, *verticalAxis);
+	
+	// Updated total rotation with the local rotation
+	*totalRotation = QuatQuatMultiply(localRotation, *totalRotation);
 	
 	// Applies yaw rotation to the vector
 	ApplyRotationToVector(localRotation, vector);
@@ -227,13 +259,16 @@ void Yaw(double angle, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis
 	ApplyRotationToVector(localRotation, depthAxis);
 }
 
-void Pitch(double angle, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
+void Pitch(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
 {
 	// Convert angle to radians
 	angle = angle * PI / 180;
 	
 	// Applies pitch rotation to the vector
 	vec4f localRotation = QuatFromAxisAngle(angle / 2, *horizontalAxis);
+	
+	// Updated total rotation with the local rotation
+	*totalRotation = QuatQuatMultiply(localRotation, *totalRotation);
 	
 	// Applies pitch rotation to the vector
 	ApplyRotationToVector(localRotation, vector);
@@ -244,13 +279,16 @@ void Pitch(double angle, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAx
 	ApplyRotationToVector(localRotation, depthAxis);
 }
 
-void Roll(double angle, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
+void Roll(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
 {
 	// Convert angle to radians
 	angle = angle * PI / 180;
 	
 	// Applies roll rotation to the facingForward vector
 	vec4f localRotation = QuatFromAxisAngle(angle / 2, *depthAxis);
+	
+	// Updated total rotation with the local rotation
+	*totalRotation = QuatQuatMultiply(localRotation, *totalRotation);
 	
 	// Applies roll rotation to the vector
 	ApplyRotationToVector(localRotation, vector);

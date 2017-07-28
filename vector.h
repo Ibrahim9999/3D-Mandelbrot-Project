@@ -48,10 +48,12 @@ vec4f QuatExp(vec4f a);
 vec4f QuatLn(vec4f a);
 vec4f QuatPower(vec4f q, double p);
 void MoveForward(vec3f* position, vec3f forward, double scalar);
+vec3 VecFromEulerRotation(double pitch, double yaw);
+void ToEuler(vec4 rotation, ref double yaw, ref double pitch, ref double roll);
 void ApplyRotationToVector(vec4f rotation, vec3f* axis);
 void InitializeCamera(vec3f* facingForward, vec3f* cameraPosition, vec3f* depthAxis, vec3f* horizontalAxis, vec3f* verticalAxis);
-void Yaw(double angle, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
-void Pitch(double angle, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
-void Roll(double angle, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
+void Yaw(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
+void Pitch(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
+void Roll(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
 
 #endif
