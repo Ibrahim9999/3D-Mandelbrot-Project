@@ -13,6 +13,11 @@ vec3f v3f_normalize(vec3f v) {
     return v;
 }
 
+vec3f VecDoubleMultiply(vec3f v, double d)
+{
+	return vec3f(v.x * d, v.y * d, v.z*d);
+}
+
 vec4f QuatFromDoubleVec(double d, vec3f v)
 {
 	vec4f q;
@@ -32,7 +37,11 @@ vec4f QuatFromAxisAngle(double angle, vec3f axis)
 	q.w = cos(angle / 2);
 	
 	
+<<<<<<< HEAD
 	return vec4f(cos(angle/2), VecDoubleMultiply(axis, sin(angle/2)));
+=======
+	return vec4f(Math.Cos(angle/2), axis * Math.Sin(angle/2));
+>>>>>>> refs/remotes/origin/master
 }
 
 vec4f QuatQuatAdd(vec4f a, vec4f b)
@@ -90,6 +99,11 @@ vec3f QuatVecMultiply(vec4f q, vec3f v)
 	result.z = v.x * 2 * (xz - wy) + v.y * 2 * (yz + wx) + v.z * (1 - 2 * (xx + yy));
 	
 	return result;
+}
+
+vec3f QuatDoubleMultiply(vec4f q, double d)
+{
+	return vec4f(q.x * d, q.y * d, q.z * d, q.w * d);
 }
 
 vec4f QuatQuatDivide(vec4f a, vec4f b)
