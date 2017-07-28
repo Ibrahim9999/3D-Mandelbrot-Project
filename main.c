@@ -36,8 +36,6 @@ void render() {
 
 //Idle Function
 void idle() {
-    ApplyRotationToVector(totalRotation, &cameradir);
-    Yaw(0.1, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis, &depthAxis);
     loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail, power, phi, theta, totalRotation);
     render();
 }

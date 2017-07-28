@@ -101,8 +101,8 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float p
     float xx_yy = xx + yy;
 
     if (equals(power, 1.0))
-        return v;
-    if (equals(power, 2.0))
+        return v + c;
+    else if (equals(power, 2.0))
     {
         float one_zz_xx_yy = 1 - zz / xx_yy;
 
@@ -112,20 +112,21 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float p
 
         return vec3(x, y, z) + c;
     }
-    /*
-       float r = sqrt( xx + yy + zz );
-       float rN = pow( r, power );
-       float nTheta = power * atan( v.y, v.x ) ;
-       float nPhi = power * asin( v.z / r );
+    else {
+        float r = sqrt( xx + yy + zz );
+        float rN = pow( r, power );
+        float nTheta = power * atan( v.y, v.x ) ;
+        float nPhi = power * asin( v.z / r );
 
-       float cosNPhi = cos( nPhi + phi);
+        float cosNPhi = cos( nPhi + phi);
 
-       x = cos(nTheta + theta) * cosNPhi * rN;
-       y = sin(nTheta + theta) * cosNPhi * rN;
-       z = -sin(nPhi + phi) * rN;
+        x = cos(nTheta + theta) * cosNPhi * rN;
+        y = sin(nTheta + theta) * cosNPhi * rN;
+        z = -sin(nPhi + phi) * rN;
 
-       return vec3(rN*x, rN*y, rN*z) + c;
-     */
+        return vec3(rN*x, rN*y, rN*z) + c;
+
+    }
 }
 
 bool mandelTest(in vec3 point) {
@@ -181,7 +182,7 @@ void main() {
             pos = pos + step*dir;
 
         if (pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0)
-            outputColor = vec4(vec3(color/length(pos-camerapos)), 1.0);
+            outputColor = vec4((pos + vec3(2))/4/length(pos-camerapos), 1.0);
 
     }
 
