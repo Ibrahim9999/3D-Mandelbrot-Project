@@ -37,7 +37,7 @@ void render() {
 void idle() {
     camerapos.x += 0.001;
     if (camerapos.x > 3) camerapos.x = -3;
-    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail, power);
+    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail, power, phi, theta);
     render();
 }
 
