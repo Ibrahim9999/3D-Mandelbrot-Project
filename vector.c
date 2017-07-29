@@ -235,9 +235,7 @@ void VecToEuler(vec4f rotation, double* yaw, double* pitch, double* roll)
 
 void ApplyRotationToVector(vec4f rotation, vec3f* axis)
 {
-    *axis = v3f_normalize(*axis);
 	*axis =  QuatVecMultiply(QuatInverse(rotation), QuatVecMultiply(rotation, *axis));
-    *axis = v3f_normalize(*axis);
 }
 
 
