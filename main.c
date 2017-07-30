@@ -36,7 +36,8 @@ void render() {
 
 //Idle Function
 void idle() {
-    Yaw(1, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis, &depthAxis);
+power+=0.01;
+//    Yaw(1, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis, &depthAxis);
     loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail, power, phi, theta, totalRotation);
     render();
 }
@@ -56,7 +57,7 @@ int main(int argc, char* argv[]) {
     color.x=0; color.y=1; color.z=1;
     step = 0.1;
     bail = 4;
-    power = 8;
+    power = -8;
     phi = 0;
     theta = 0;
 

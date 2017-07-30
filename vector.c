@@ -6,7 +6,7 @@ void InitializeCamera(vec3f* facingForward, vec3f* cameraPosition, vec3f* depthA
 	
 	v.x = 0;
 	v.y = 0;
-	v.z = -2;
+	v.z = -5;
 	*cameraPosition = v;
 	
 	v.x = 0;
