@@ -46,11 +46,11 @@ void main() {
         gl_Position = vec4(1.0, -1.0, 0.0, 1.0);
     }
 
-    float yaw_angle = cameradir.x;
-    float pitch_angle = cameradir.y;
-    float roll_angle = cameradir.z;
+    float yaw_angle = 0.0;
+    float pitch_angle = 0.0;
+    float roll_angle = 0.0;
 
-    getEulerFromVec(totalRotation, yaw_angle, pitch_angle, roll_angle);
+    getEulerFromVec(totalRotation, roll_angle, yaw_angle, pitch_angle);
 
     mat3 pitch =    mat3(              1,                 0,                 0, // around x axis
                                        0,  cos(pitch_angle), -sin(pitch_angle),

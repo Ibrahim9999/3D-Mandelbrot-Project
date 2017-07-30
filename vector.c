@@ -202,10 +202,10 @@ vec4f QuatPower(vec4f q, double p)
 	return QuatExp(QuatDoubleMultiply(QuatLn(q),p));
 }
 
-vec3f MoveForward(vec3f position, vec3f forward, double scalar)
-{
-	 return VecVecAdd(position, VecDoubleMultiply(forward, scalar));
+vec3f MoveAlongAxis(vec3f position, vec3f axis, double scalar) {
+	 return VecVecAdd(position, VecDoubleMultiply(axis, scalar));
 }
+
 
 void VecToEuler(vec4f rotation, double* yaw, double* pitch, double* roll)
 {
