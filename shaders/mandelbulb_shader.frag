@@ -195,7 +195,7 @@ void main() {
             if (hit)
                 outputColor = vec4(0,0,0,1.0);
             else
-                outputColor = vec4(1.0)/length(lightpos - pos);
+                outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0)/length(lightpos - pos);
             //outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
         }
 
