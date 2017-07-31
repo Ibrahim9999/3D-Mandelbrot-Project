@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include "shader.h"
@@ -9,6 +10,17 @@
 #define EXIT_SUCCESS 0
 #define EXIT_ERROR 1
 
+#define true 1
+#define false 0
+
+#define MENU_FOCUS 0
+#define VIEW_FOCUS 1
+
+//Functions
+void sendKeySignals();
+
+
+//Mandelbulb shader and variables
 shaderprogram mandelbulb_shader;
 vec3f fov, camerapos, cameradir, color, horizontalAxis, verticalAxis, depthAxis;
 vec4f totalRotation;
@@ -17,6 +29,9 @@ int bail;
 float power;
 float phi;
 float theta;
+
+//State of program (view or menu)
+int userfocus = VIEW_FOCUS;
 
 //Render Funcion
 void render() {
@@ -37,11 +52,74 @@ void render() {
 
 //Idle Function
 void idle() {
-phi+=0.1;
-//    Yaw(1, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis, &depthAxis);
-    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail, power, phi, theta, totalRotation);
+    sendKeySignals();
+
+    phi+=0.1;
+    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail,
+        power, phi, theta, totalRotation);
     render();
 }
+
+//Handle mouse input
+void handleMouse(int x, int y) {
+    if (userfocus == VIEW_FOCUS) {
+        cameraMoveMouse(x, y);
+    }
+}
+
+
+
+//Handle keyboard input
+static unsigned char kbstate[256];
+static clock_t kbtime[256];
+static clock_t kblasttime[256];
+
+void clearKeyBuffer() {
+    int i = 0;
+
+    while (i < 256) {
+        kbstate[i] = false;
+        kbtime[i] = 0;
+        kblasttime[i] = 0;
+        i++;
+    }
+}
+
+void handleKeyboard(unsigned char key, int x, int y) {
+    clock_t time = clock();
+    
+    if (kbstate[key] == false) {
+        kbstate[key] = true;
+        kbtime[key] = time;
+        kblasttime[key] = time;
+    }
+}
+
+void handleKeyboardUp(unsigned char key, int x, int y) {
+    kbstate[key] = false;
+    kbtime[key] = 0;
+    kblasttime[key] = 0;
+
+    printf("%c", key);
+}
+
+void sendKeySignals() {
+    clock_t time = clock();    
+    unsigned char key;
+    
+    for (key = 0; key != 255; key++) {
+        if (kbstate[key] == true) {
+            putchar(key);
+            if (userfocus == VIEW_FOCUS) {
+                cameraMoveKeyboard(key, time-kblasttime[key]);
+                printf("HEY: %d, %d", key, (int)(time-kblasttime[key]));
+                kblasttime[key] = time;
+            }
+        }
+    }
+
+}
+
 
 //Main
 int main(int argc, char* argv[]) {
@@ -67,11 +145,17 @@ int main(int argc, char* argv[]) {
 	glutInitWindowPosition(100,100);
 	glutInitWindowSize(400,400);
 	glutCreateWindow("3D Mandelbulb Viewer");
+    
+    //Setup Input
+    glutIgnoreKeyRepeat(true);
+    clearKeyBuffer();
 
     //Setup functions
     glutDisplayFunc(render);
     glutIdleFunc(idle);
     glutMotionFunc(handleMouse);
+    glutKeyboardFunc(handleKeyboard);
+    glutKeyboardUpFunc(handleKeyboardUp);    
 
     glewInit();
    
