@@ -184,8 +184,20 @@ void main() {
             div = mandelTest(pos);
         }
 
-        if (mandelTest(pos) != vec3(0))
-            outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
+        if (mandelTest(pos) != vec3(0)) {
+            vec3 lightpos = vec3(2, 2, -3);
+            vec3 shadow = pos;
+            bool hit = false;
+            while (!hit && length(lightpos-shadow) > step) {
+                shadow += normalize(lightpos-shadow) * step;
+                if (mandelTest(shadow) != vec3(0)) hit = true;
+            }
+            if (hit)
+                outputColor = vec4(0,0,0,1.0);
+            else
+                outputColor = vec4(1.0)/length(lightpos - pos);
+            //outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
+        }
 
     }
 
