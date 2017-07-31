@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #include "shader.h"
 #include "vector.h"
+#include "camera.h"
 
 #define EXIT_SUCCESS 0
 #define EXIT_ERROR 1
@@ -36,7 +37,7 @@ void render() {
 
 //Idle Function
 void idle() {
-power+=0.01;
+phi+=0.1;
 //    Yaw(1, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis, &depthAxis);
     loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail, power, phi, theta, totalRotation);
     render();
@@ -50,14 +51,13 @@ int main(int argc, char* argv[]) {
 
     //Set vars
     setFOVvec(&fov, 50, 50);
-    InitializeCamera(&cameradir, &camerapos, &depthAxis, &horizontalAxis, &verticalAxis);
-    //camerapos.x=0; camerapos.y=0; camerapos.z=-2;
-    //cameradir.x=0; cameradir.y=0; cameradir.z=1;
+    InitializeCamera(&cameradir, &camerapos, &depthAxis, &horizontalAxis, &verticalAxis); 
+
     totalRotation.x = 0; totalRotation.y = 0; totalRotation.z = 0; totalRotation.w = 1;
     color.x=0; color.y=1; color.z=1;
-    step = 0.1;
-    bail = 4;
-    power = -8;
+    step = 0.01;
+    bail = 10;
+    power = 8;
     phi = 0;
     theta = 0;
 
@@ -71,6 +71,7 @@ int main(int argc, char* argv[]) {
     //Setup functions
     glutDisplayFunc(render);
     glutIdleFunc(idle);
+    glutMotionFunc(handleMouse);
 
     glewInit();
    

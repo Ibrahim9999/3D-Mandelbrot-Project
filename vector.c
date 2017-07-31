@@ -165,7 +165,7 @@ vec4f QuatDoubleDivide(vec4f a, double b)
 
 vec4f QuatInverse(vec4f q)
 {
-	return QuatDoubleDivide(q, q.z*q.z + q.x*q.x + q.y*q.y + q.z*q.z);
+	return QuatDoubleDivide(q, q.z*q.z + q.x*q.x + q.y*q.y + q.w*q.w);
 }
 
 vec4f QuatExp(vec4f q)

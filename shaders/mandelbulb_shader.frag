@@ -178,8 +178,8 @@ void main() {
         while (!mandelTest(pos) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0)
             pos = pos + step*dir;
 
-        if (mandelTest(pos) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0)
-            outputColor = vec4(color/-pos.z, 1.0);
+        if (mandelTest(pos))
+            outputColor = vec4(color/(pos.z+1), 1.0);
 
     }
 
