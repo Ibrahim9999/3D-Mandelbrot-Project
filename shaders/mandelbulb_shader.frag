@@ -1,6 +1,7 @@
 #version 130
 
 #define ALMOST_TWO 1.9999
+#define PI 3.1415926535897932384626433
 
 in vec3 direction;
 
@@ -126,7 +127,7 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float p
 
 }
 
-bool mandelTest(in vec3 point) {
+vec3 mandelTest(in vec3 point) {
     vec3 v = point;
     vec3 c = point;
 
@@ -135,7 +136,9 @@ bool mandelTest(in vec3 point) {
         v = nextPoint(v, c, power, theta, phi);
         i++;
     }
-    return i >= bail;
+    if (i >= bail)
+        return v;
+    return vec3(0);
 }
 
 vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in float sphereRadius) {
@@ -175,11 +178,14 @@ void main() {
     if (intersection != vec3(0)) {
 
         pos = intersection;
-        while (!mandelTest(pos) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0)
+        vec3 div = mandelTest(pos);
+        while (div == vec3(0) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0) {
             pos = pos + step*dir;
+            div = mandelTest(pos);
+        }
 
-        if (mandelTest(pos))
-            outputColor = vec4(color/(pos.z+1), 1.0);
+        if (mandelTest(pos) != vec3(0))
+            outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
 
     }
 
