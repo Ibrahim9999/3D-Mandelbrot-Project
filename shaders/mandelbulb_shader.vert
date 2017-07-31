@@ -28,6 +28,49 @@ void getEulerFromVec(in vec4 rotation, inout float yaw, inout float pitch, inout
     yaw = atan(t0, t1);
 }
 
+vec4 QuatInverse(in vec4 q)
+{
+    return q / (q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
+}
+
+vec4 QuatQuatMultiply(in vec4 a, in vec4 b)
+{
+    vec4 c;
+    
+    c.w = a.w*b.w - a.x*b.x - a.y*b.y - a.z*a.z;
+    c.x = a.w*b.x + a.x*b.w + a.y*b.z - a.z*a.y;
+    c.y = a.w*b.y - a.x*b.z + a.y*b.w + a.z*a.x;
+    c.z = a.w*b.z + a.x*b.y - a.y*b.x + a.z*a.w;
+    
+    return c;
+}
+
+vec3 QuatVecMultiply(in vec4 q, in vec3 v)
+{
+    float xx = q.x*q.x;
+    float yy = q.y*q.y;
+    float zz = q.z*q.z;
+    float xy = q.x*q.y;
+    float xz = q.x*q.z;
+    float yz = q.y*q.z;
+    float wx = q.w*q.x;
+    float wy = q.w*q.y;
+    float wz = q.w*q.z;
+    
+    vec3 result;
+    
+    result.x = v.x * (1 - 2 * (yy + zz)) + v.y * 2 * (xy - wz) + v.z * 2 * (xz + wy);
+    result.y = v.x * 2 * (xy + wz) + v.y * (1 - (2 * (xx + zz))) + v.z * 2 * (yz - wx);
+    result.z = v.x * 2 * (xz - wy) + v.y * 2 * (yz + wx) + v.z * (1 - 2 * (xx + yy));
+    
+    return result;
+}
+
+void ApplyRotationToVector(in vec4 rotation, inout vec3 axis)
+{
+    axis = QuatVecMultiply(QuatInverse(rotation), QuatVecMultiply(rotation, axis));
+}
+
 void main() {
     if (gl_VertexID == 0) {
         direction = FOV;
@@ -65,5 +108,7 @@ void main() {
                                         0,                0,               1);
 
     mat3 transform = roll*pitch*yaw;
-    direction = transform * direction;
+    //direction = transform * direction;
+    
+    ApplyRotationToVector(totalRotation, direction);
 }
