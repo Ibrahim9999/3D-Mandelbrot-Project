@@ -22,6 +22,7 @@ void sendKeySignals();
 
 //Mandelbulb shader and variables
 shaderprogram mandelbulb_shader;
+vec2f resolution;
 vec3f fov, camerapos, cameradir, color, horizontalAxis, verticalAxis, depthAxis;
 vec4f totalRotation;
 float step;
@@ -56,7 +57,7 @@ void idle() {
 
     //phi+=.01;
     loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail,
-        power, phi, theta, totalRotation);
+        power, phi, theta, totalRotation, resolution);
     render();
 }
 
@@ -138,12 +139,13 @@ int main(int argc, char* argv[]) {
     power = 10;
     phi = 0;
     theta = 0;
+    resolution.x = 400; resolution.y = 400;
 
     //Setup window
     glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
-	glutInitWindowSize(400,400);
+	glutInitWindowSize(resolution.x, resolution.y);
 	glutCreateWindow("3D Mandelbulb Viewer");
     
     //Setup Input
@@ -164,7 +166,7 @@ int main(int argc, char* argv[]) {
 
     //Setup shaders
     loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir, color, step,
-        bail, power, phi, theta, totalRotation);
+        bail, power, phi, theta, totalRotation, resolution);
     printf("loaded program\n");
     fflush(stdout);
     printProgramLog(mandelbulb_shader);

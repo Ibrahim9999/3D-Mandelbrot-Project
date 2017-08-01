@@ -12,6 +12,8 @@ uniform float phi;
 uniform int bail;
 uniform vec3 camerapos;
 uniform vec3 color;
+uniform vec3 FOV;
+uniform vec2 resolution;
 
 out vec4 outputColor;
 
@@ -100,7 +102,7 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float p
     float yy = v.y * v.y;
     float zz = v.z * v.z;
     float xx_yy = xx + yy;
-    
+
     if (false)
         return v + c;
     else if (false)
@@ -170,35 +172,50 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in f
 void main() {    
     vec3 pos = camerapos;
     vec3 dir = normalize(direction);
+    vec3 off = (FOV/vec3(resolution.xy/2, 0.0))/2;
+    outputColor = vec4(0);
 
-    vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), dir, ALMOST_TWO);
-    //outputColor = vec4((dir + 1)/2,1.0);
-    outputColor = vec4(1.0, 1, 1, 1);
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
 
-    if (intersection != vec3(0)) {
+            vec3 aa_dir = dir;
+            aa_dir += vec3(i, j, 0.0) * off;
+            aa_dir = normalize(aa_dir);
 
-        pos = intersection;
-        vec3 div = mandelTest(pos);
-        while (div == vec3(0) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0) {
-            pos = pos + step*dir;
-            div = mandelTest(pos);
-        }
+            vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), aa_dir, ALMOST_TWO);
+            //outputColor = vec4((aa_dir + 1)/2,1.0);
+            //outputColor = vec4(1.0);
 
-        if (mandelTest(pos) != vec3(0)) {
-            vec3 lightpos = vec3(-2, -2, -2);
-            vec3 shadow = pos;
-            float intensity = 4.00;
-            while (intensity >= 0 && length(lightpos-shadow) > step) {
-                shadow += normalize(lightpos-shadow) * step;
-                if (mandelTest(shadow) != vec3(0))
-                    intensity -= 10*step;
-                else
-                    intensity -= 1*step;
+            if (intersection != vec3(0)) {
+
+                pos = intersection;
+                vec3 div = mandelTest(pos);
+                while (div == vec3(0) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0) {
+                    pos = pos + step*aa_dir;
+                    div = mandelTest(pos);
+                }
+
+                if (mandelTest(pos) != vec3(0)) {
+                    vec3 lightpos = vec3(-2, -2, -2);
+                    vec3 shadow = pos;
+                    float intensity = 4.00;
+                    while (intensity >= 0 && length(lightpos-shadow) > step) {
+                        shadow += normalize(lightpos-shadow) * step;
+                        if (mandelTest(shadow) != vec3(0)) {
+                            intensity -= 10*step;
+                            continue;
+                        }
+                        intensity -= 1*step;
+                    }
+                    outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*intensity, vec4(0.0), vec4(1.0));
+                    continue;
+                    //outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
+                }
+
             }
-            outputColor = clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*intensity, vec4(0.0), vec4(1.0));
-            //outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
+            outputColor += vec4(1.0);
         }
-
     }
+    outputColor /= 9;
 
 }
