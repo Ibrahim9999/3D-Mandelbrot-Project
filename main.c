@@ -52,11 +52,6 @@ void render() {
 
 //Idle Function
 void idle() {
-    printf("*********************************\n");
-    printf("cameradir: %f,%f,%f\n", cameradir.x, cameradir.y, cameradir.z);
-    printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
-    printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
-    printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
 
 
     sendKeySignals();
@@ -118,6 +113,12 @@ void sendKeySignals() {
         if (kbstate[key] == true) {
             putchar(key);
             if (userfocus == VIEW_FOCUS) {
+                printf("*********************************\n");
+                printf("cameradir: %f,%f,%f\n", cameradir.x, cameradir.y, cameradir.z);
+                printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
+                printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
+                printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
+
                 cameraMoveKeyboard(key, time-kblasttime[key]);
                 //printf("HEY: %d, %d", key, (int)(time-kblasttime[key]));
                 kblasttime[key] = time;
