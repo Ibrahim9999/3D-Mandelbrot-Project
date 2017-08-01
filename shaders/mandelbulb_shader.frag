@@ -185,9 +185,9 @@ void main() {
         }
 
         if (mandelTest(pos) != vec3(0)) {
-            vec3 lightpos = vec3(2, 2, -3);
+            vec3 lightpos = vec3(-2, -2, -2);
             vec3 shadow = pos;
-            float intensity = 5.00;
+            float intensity = 4.00;
             while (intensity >= 0 && length(lightpos-shadow) > step) {
                 shadow += normalize(lightpos-shadow) * step;
                 if (mandelTest(shadow) != vec3(0))

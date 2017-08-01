@@ -9,6 +9,9 @@
 extern vec4f totalRotation;
 extern vec3f cameradir, horizontalAxis, verticalAxis, depthAxis;
 extern vec3f camerapos;
+extern int bail;
+extern float power;
+extern float step;
 
 static int oldMouseX = -1, oldMouseY = -1;
 
@@ -20,8 +23,8 @@ void cameraMoveMouse(int x, int y) {
 
     //Rotate if not first click
     if (oldMouseX != -1 && oldMouseY != -1) {
-        Yaw(oldMouseX-x, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis, &depthAxis);
-        Pitch(oldMouseY-y, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis,
+        Yaw((oldMouseX-x)*ANGLE_PER_PIXEL, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis, &depthAxis);
+        Pitch((oldMouseY-y)*ANGLE_PER_PIXEL, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis,
             &depthAxis);
     }
 
@@ -31,35 +34,79 @@ void cameraMoveMouse(int x, int y) {
 
 //Move camera based on keyboard
 void cameraMoveKeyboard(char key, clock_t time_held) {
-    //Roll
-    if (key == 'q') {
-        Roll((float)time_held*ROTATE_SPEED, &totalRotation, &cameradir, &horizontalAxis,
-            &verticalAxis, &depthAxis);
-    }
-    else if (key == 'e') {
-        Roll(-time_held*ROTATE_SPEED, &totalRotation, &cameradir, &horizontalAxis,
-            &verticalAxis, &depthAxis);
-    }
+	if (key == 'b')
+		if (bail > -1)
+			bail -= 1;
+	if (key == 'v')
+		if (bail < 1000)
+			bail += 1;
+	if (key == 'p')
+		power += .01;
+	if (key == 'o')
+		power -= .01;
+	if (key == 'x')
+		if (step < 2)
+			step += .0001;
+	if (key == 'c')
+		if (step > .0001)
+			step -= .0001;
+	
+    //Rotations
+	if (key == 'q') {
+		Roll((float).1*time_held*ANGLE_PER_PIXEL, &totalRotation, &cameradir, &horizontalAxis,
+			&verticalAxis, &depthAxis);
+	}
+	else if (key == 'e') {
+		Roll(-(float).1*time_held*ANGLE_PER_PIXEL, &totalRotation, &cameradir, &horizontalAxis,
+			&verticalAxis, &depthAxis);
+	}
+	else if (key == 'k') {
+		Yaw((float).1*time_held*ANGLE_PER_PIXEL, &totalRotation, &cameradir, &horizontalAxis,
+			&verticalAxis, &depthAxis);
+	}
+	else if (key == 'h') {
+		Yaw(-(float).1*time_held*ANGLE_PER_PIXEL, &totalRotation, &cameradir, &horizontalAxis,
+			&verticalAxis, &depthAxis);
+	}
+	else if (key == 'j') {
+		Pitch((float).1*time_held*ANGLE_PER_PIXEL, &totalRotation, &cameradir, &horizontalAxis,
+			&verticalAxis, &depthAxis);
+	}
+	else if (key == 'u') {
+		Pitch(-(float).1*time_held*ANGLE_PER_PIXEL, &totalRotation, &cameradir, &horizontalAxis,
+			&verticalAxis, &depthAxis);
+	}
     //Move
-    else if (key == 'w') {
-        camerapos.x += depthAxis.x*time_held/10000;
-        camerapos.y += depthAxis.y*time_held/10000;
-        camerapos.z += depthAxis.z*time_held/10000;
+    if (key == 'w') {
+        camerapos.x += verticalAxis.x*time_held/10000;
+        camerapos.y += verticalAxis.y*time_held/10000;
+        camerapos.z += verticalAxis.z*time_held/10000;
     }
     else if (key == 's') {
-        camerapos.x -= depthAxis.x*time_held/10000;
-        camerapos.y -= depthAxis.y*time_held/10000;
-        camerapos.z -= depthAxis.z*time_held/10000;
+        camerapos.x -= verticalAxis.x*time_held/10000;
+        camerapos.y -= verticalAxis.y*time_held/10000;
+        camerapos.z -= verticalAxis.z*time_held/10000;
     }
-    else if (key == 'a') {
-        camerapos.x -= horizontalAxis.x*time_held/10000;
-        camerapos.y -= horizontalAxis.y*time_held/10000;
-        camerapos.z -= horizontalAxis.z*time_held/10000;
-    }
-    else if (key == 'd') {
-        camerapos.x += horizontalAxis.x*time_held/10000;
-        camerapos.y += horizontalAxis.y*time_held/10000;
-        camerapos.z += horizontalAxis.z*time_held/10000;
-    }
+	else if (key == 'a') {
+		camerapos.x -= horizontalAxis.x*time_held / 10000;
+		camerapos.y -= horizontalAxis.y*time_held / 10000;
+		camerapos.z -= horizontalAxis.z*time_held / 10000;
+	}
+	else if (key == 'd') {
+		camerapos.x += horizontalAxis.x*time_held / 10000;
+		camerapos.y += horizontalAxis.y*time_held / 10000;
+		camerapos.z += horizontalAxis.z*time_held / 10000;
+	}
+	// Zoom
+	if (key == 'r') {
+		camerapos.x += depthAxis.x*time_held / 10000;
+		camerapos.y += depthAxis.y*time_held / 10000;
+		camerapos.z += depthAxis.z*time_held / 10000;
+	}
+	else if (key == 'f') {
+		camerapos.x -= depthAxis.x*time_held / 10000;
+		camerapos.y -= depthAxis.y*time_held / 10000;
+		camerapos.z -= depthAxis.z*time_held / 10000;
+	}
     
 }

@@ -54,7 +54,7 @@ void render() {
 void idle() {
     sendKeySignals();
 
-    phi+=0.1;
+    //phi+=.01;
     loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail,
         power, phi, theta, totalRotation);
     render();
@@ -112,7 +112,7 @@ void sendKeySignals() {
             putchar(key);
             if (userfocus == VIEW_FOCUS) {
                 cameraMoveKeyboard(key, time-kblasttime[key]);
-                printf("HEY: %d, %d", key, (int)(time-kblasttime[key]));
+                //printf("HEY: %d, %d", key, (int)(time-kblasttime[key]));
                 kblasttime[key] = time;
             }
         }
@@ -135,7 +135,7 @@ int main(int argc, char* argv[]) {
     color.x=0; color.y=1; color.z=1;
     step = 0.01;
     bail = 10;
-    power = 8;
+    power = 10;
     phi = 0;
     theta = 0;
 
