@@ -142,7 +142,7 @@ int main(int argc, char* argv[]) {
     color.x=0; color.y=1; color.z=1;
     step = 0.01;
     bail = 10;
-    power = 1;
+    power = 2;
     phi = 0;
     theta = 0;
 
