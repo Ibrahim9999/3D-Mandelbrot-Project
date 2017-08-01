@@ -62,9 +62,6 @@ void render() {
 //Idle Function
 void idle() {
     sendKeySignals();
-
-    //phi+=0.1;
-    //theta+=0.1;
     loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail,
         power, phi, theta, totalRotation);
     glutPostRedisplay();
@@ -163,7 +160,7 @@ int main(int argc, char* argv[]) {
     color.x=0; color.y=1; color.z=1;
     step = 0.01;
     bail = 10;
-    power = 8;
+    power = 10;
     phi = 0;
     theta = 0;
 

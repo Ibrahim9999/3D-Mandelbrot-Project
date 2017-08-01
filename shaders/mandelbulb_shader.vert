@@ -7,10 +7,10 @@ uniform vec4 totalRotation;
 out vec3 direction;
 
 void getEulerFromVec(in vec4 rotation, inout float yaw, inout float pitch, inout float roll) {
-    float w = rotation.w;
     float x = rotation.x;
     float y = rotation.y;
     float z = rotation.z;
+    float w = rotation.w;
 
     float ySquared = y*y;
 
