@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include <math.h>
+#include <string.h>
 #include "vector.h"
 #include "shader.h"
 
@@ -25,6 +26,11 @@ char* loadTextFile(const char* filename) {
     }
 
     text[size] = '\0';
+
+    char* ch;
+    while ((ch = strchr(text, '\r'))) {
+        text[ch-text+1] = ' ';
+    }
 
     fclose(file);
 
