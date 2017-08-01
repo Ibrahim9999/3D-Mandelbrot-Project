@@ -24,6 +24,8 @@ char* loadTextFile(const char* filename) {
         exit(1);
     }
 
+    text[size] = '\0';
+
     fclose(file);
 
     return text;
