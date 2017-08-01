@@ -178,6 +178,8 @@ void main() {
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
 
+            if (!(i == 0 || j == 0)) continue;
+
             vec3 aa_dir = dir;
             aa_dir += vec3(i, j, 0.0) * off;
             aa_dir = normalize(aa_dir);
@@ -207,7 +209,7 @@ void main() {
                         }
                         intensity -= 1*step;
                     }
-                    outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*intensity, vec4(0.0), vec4(1.0));
+                    outputColor += clamp(vec4(color, 0.0)*intensity, vec4(0.0), vec4(1.0));
                     continue;
                     //outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
                 }
@@ -216,6 +218,6 @@ void main() {
             outputColor += vec4(1.0);
         }
     }
-    outputColor /= 9;
+    outputColor /= 5;
 
 }
