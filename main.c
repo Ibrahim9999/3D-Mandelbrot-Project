@@ -53,6 +53,12 @@ void render() {
 
 //Idle Function
 void idle() {
+    printf("*********************************\n");
+    printf("cameradir: %f,%f,%f\n", cameradir.x, cameradir.y, cameradir.z);
+    printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
+    printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
+    printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
+    
     sendKeySignals();
 
     //phi+=.01;
@@ -101,7 +107,7 @@ void handleKeyboardUp(unsigned char key, int x, int y) {
     kbtime[key] = 0;
     kblasttime[key] = 0;
 
-    printf("%c", key);
+    //printf("%c", key);
 }
 
 void sendKeySignals() {
@@ -125,7 +131,7 @@ void sendKeySignals() {
 //Main
 int main(int argc, char* argv[]) {
 
-    printf("hello main\n");
+    //printf("hello main\n");
     fflush(stdout);
 
     //Set vars
@@ -161,13 +167,13 @@ int main(int argc, char* argv[]) {
 
     glewInit();
    
-    printf("starting shaders\n");
+    //printf("starting shaders\n");
     fflush(stdout);
 
     //Setup shaders
     loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir, color, step,
         bail, power, phi, theta, totalRotation, resolution);
-    printf("loaded program\n");
+    //printf("loaded program\n");
     fflush(stdout);
     printProgramLog(mandelbulb_shader);
 
