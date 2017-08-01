@@ -52,6 +52,13 @@ void render() {
 
 //Idle Function
 void idle() {
+    printf("*********************************\n");
+    printf("cameradir: %f,%f,%f\n", cameradir.x, cameradir.y, cameradir.z);
+    printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
+    printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
+    printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
+
+
     sendKeySignals();
 
     //phi+=.01;
@@ -100,7 +107,7 @@ void handleKeyboardUp(unsigned char key, int x, int y) {
     kbtime[key] = 0;
     kblasttime[key] = 0;
 
-    printf("%c", key);
+    //printf("%c", key);
 }
 
 void sendKeySignals() {
