@@ -178,6 +178,8 @@ void main() {
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
 
+            if (abs(i+j) != 1) continue;
+
             vec3 aa_dir = dir;
             aa_dir += vec3(i, j, 0.0) * off;
             aa_dir = normalize(aa_dir);
@@ -216,6 +218,6 @@ void main() {
             outputColor += vec4(1.0);
         }
     }
-    outputColor /= 9;
+    outputColor /= 5;
 
 }
