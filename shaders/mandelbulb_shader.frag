@@ -209,7 +209,7 @@ void main() {
                         }
                         intensity -= 1*step;
                     }
-                    outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*intensity, vec4(0.0), vec4(1.0));
+                    outputColor += clamp(vec4(color, 0.0)*intensity, vec4(0.0), vec4(1.0));
                     continue;
                     //outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
                 }
