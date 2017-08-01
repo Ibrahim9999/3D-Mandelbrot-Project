@@ -23,10 +23,10 @@ bool equals(in float a, in float b) {
 // Hue: 0-1
 float GetHue(vec4 color)
 {
+    float hue = 0;
     float red = color.x;
     float green = color.y;
     float blue = color.z;
-    float hue = 0;
 
     float min = min(min(red, green), blue);
     float max = max(max(red, green), blue);
