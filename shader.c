@@ -38,16 +38,13 @@ char* loadTextFile(const char* filename) {
 }
 
 void setFOVvec(vec3f *vector, float vertFOV, float horiFOV) {
-    float tan_h = tan(horiFOV/360*PI_CONST);
-    float tan_v = tan(vertFOV/360*PI_CONST);
+    vector->z = cos(vertFOV/360*PI_CONST);
+    vector->y = sin(horiFOV/360*PI_CONST);
+    vector->x = cos(vertFOV/360*PI_CONST)*tan(horiFOV/360*PI_CONST);
 
-    vector->z = sqrt(1/(tan_h*tan_h+tan_v*tan_v+1));
-    vector->y = vector->z*tan_v;
-    vector->x = vector->z*tan_h;
-
-    printf("************ %f, %f, %f", vector->x, vector->y, vector->z);
-    
     *vector = v3f_normalize(*vector);
+
+    //printf("************ %f, %f, %f", vector->x, vector->y, vector->z);
 }
 
 void printProgramLog(shaderprogram program) {

@@ -16,11 +16,6 @@
 #define MENU_FOCUS 0
 #define VIEW_FOCUS 1
 
-#define START_HEIGHT 400
-#define START_WIDTH 400
-
-#define START_FOV 50.0
-
 //Functions
 void sendKeySignals();
 
@@ -34,10 +29,6 @@ int bail;
 float power;
 float phi;
 float theta;
-
-//Camera variables
-float vfov, hfov;
-float cameradist;
 
 //State of program (view or menu)
 int userfocus = VIEW_FOCUS;
@@ -62,9 +53,11 @@ void render() {
 //Idle Function
 void idle() {
     sendKeySignals();
+
+    //phi+=.01;
     loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail,
         power, phi, theta, totalRotation);
-    glutPostRedisplay();
+    render();
 }
 
 //Handle mouse input
@@ -128,22 +121,6 @@ void sendKeySignals() {
 }
 
 
-void handleResolution(int w, int h) {
-    //printf("nw: %d", w);
-    //printf("HEY: %f\n", hfov);
-    //printf("dist %f\n", cameradist);
-
-    //Set viewport
-    glViewport(0, 0, w, h);
-
-    hfov = atan(w/(2*cameradist))/(2*PI_CONST)*720; 
-    vfov = atan(h/(2*cameradist))/(2*PI_CONST)*720;
-    //printf("newfov: %f\n", hfov);
-
-    setFOVvec(&fov, vfov, hfov);
-    //printf("nvec: %f, %f, %f\n", fov.x, fov.y, fov.z);
-}
-
 //Main
 int main(int argc, char* argv[]) {
 
@@ -151,16 +128,14 @@ int main(int argc, char* argv[]) {
     fflush(stdout);
 
     //Set vars
-    hfov = vfov = START_FOV;
-    cameradist = START_WIDTH/(2*tan(START_FOV/360*PI_CONST));
-    setFOVvec(&fov, vfov, hfov);
+    setFOVvec(&fov, 57, 57);
     InitializeCamera(&cameradir, &camerapos, &depthAxis, &horizontalAxis, &verticalAxis); 
 
     totalRotation.x = 0; totalRotation.y = 0; totalRotation.z = 0; totalRotation.w = 1;
     color.x=0; color.y=1; color.z=1;
     step = 0.01;
     bail = 10;
-    power = 10;
+    power = 1;
     phi = 0;
     theta = 0;
 
@@ -168,7 +143,7 @@ int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
-	glutInitWindowSize(START_WIDTH,START_HEIGHT);
+	glutInitWindowSize(400,400);
 	glutCreateWindow("3D Mandelbulb Viewer");
     
     //Setup Input
@@ -180,8 +155,7 @@ int main(int argc, char* argv[]) {
     glutIdleFunc(idle);
     glutMotionFunc(handleMouse);
     glutKeyboardFunc(handleKeyboard);
-    glutKeyboardUpFunc(handleKeyboardUp);
-    glutReshapeFunc(handleResolution);
+    glutKeyboardUpFunc(handleKeyboardUp);    
 
     glewInit();
    

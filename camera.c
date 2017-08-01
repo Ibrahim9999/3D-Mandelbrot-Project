@@ -12,6 +12,8 @@ extern vec3f camerapos;
 extern int bail;
 extern float power;
 extern float step;
+extern float theta;
+extern float phi;
 
 static int oldMouseX = -1, oldMouseY = -1;
 
@@ -34,6 +36,14 @@ void cameraMoveMouse(int x, int y) {
 
 //Move camera based on keyboard
 void cameraMoveKeyboard(char key, clock_t time_held) {
+	if (key == 'n')
+		phi -= .01;
+	if (key == 'm')
+		phi += .01;
+	if (key == ',')
+		theta -= .01;
+	if (key == '.')
+		theta += .01;
 	if (key == 'b')
 		if (bail > -1)
 			bail -= 1;
