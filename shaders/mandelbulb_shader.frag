@@ -191,9 +191,9 @@ void main() {
             while (intensity >= 0 && length(lightpos-shadow) > step) {
                 shadow += normalize(lightpos-shadow) * step;
                 if (mandelTest(shadow) != vec3(0))
-                    intensity -= 0.1;
+                    intensity -= 10*step;
                 else
-                    intensity -= 0.01;
+                    intensity -= 1*step;
             }
             outputColor = clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*intensity, vec4(0.0), vec4(1.0));
             //outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
