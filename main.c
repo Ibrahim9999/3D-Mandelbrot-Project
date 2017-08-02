@@ -127,7 +127,7 @@ void sendKeySignals() {
             printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
             printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
             if (userfocus == VIEW_FOCUS) {
-                cameraMoveKeyboard(key, time-kblasttime[key]);
+                cameraMoveKeyboard(key, (float)(time-kblasttime[key])/CLOCKS_PER_SEC);
                 //printf("HEY: %d, %d", key, (int)(time-kblasttime[key]));
                 kblasttime[key] = time;
             }

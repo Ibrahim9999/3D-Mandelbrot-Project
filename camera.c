@@ -3,8 +3,14 @@
 #include <time.h>
 #include <stdlib.h>
 
-#define ANGLE_PER_CLOCK 1
-#define UNIT_PER_CLOCK .01
+#define ANGLE_PER_SEC 1000
+#define DIST_PER_SEC 10
+#define BAIL_PER_SEC 5
+#define STEP_PER_SEC 0.1
+#define POWER_PER_SEC 1;
+#define PHI_PER_SEC 0.1;
+#define THETA_PER_SEC 0.1;
+#define ANGLE_PER_PIXEL 0.5
 
 extern vec4f totalRotation;
 extern vec3f cameradir, horizontalAxis, verticalAxis, depthAxis;
@@ -25,8 +31,8 @@ void cameraMoveMouse(int x, int y) {
 
     //Rotate if not first click
     if (oldMouseX != -1 && oldMouseY != -1) {
-        Yaw((oldMouseX-x)*ANGLE_PER_CLOCK, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis, &depthAxis);
-        Pitch((oldMouseY-y)*ANGLE_PER_CLOCK, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis,
+        Yaw((oldMouseX-x)*ANGLE_PER_PIXEL, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis, &depthAxis);
+        Pitch((oldMouseY-y)*ANGLE_PER_PIXEL, &totalRotation, &cameradir, &horizontalAxis, &verticalAxis,
             &depthAxis);
     }
 
@@ -35,7 +41,7 @@ void cameraMoveMouse(int x, int y) {
 }
 
 //Move camera based on keyboard
-void cameraMoveKeyboard(char key, clock_t time_held)
+void cameraMoveKeyboard(char key, float time)
 {
 	printf("*********************************\n");
 	printf("totalRotation: %f, <%f,%f,%f>\n", totalRotation.w, totalRotation.x, totalRotation.y, totalRotation.z);
@@ -52,61 +58,61 @@ void cameraMoveKeyboard(char key, clock_t time_held)
 	printf("unitScalar: %f\n", unitScalar);
 	if (key == 'b')
 		if (bail > -1)
-			bail -= 1;
+			bail -= time*BAIL_PER_SEC;
 	if (key == 'v')
 		if (bail < 1000)
-			bail += 1;
+			bail += time*BAIL_PER_SEC;
 	if (key == 'x')
 		if (step < 2)
-			step += .0001;
+			step += time*STEP_PER_SEC;
 	if (key == 'c')
 		if (step > .0001)
-			step -= .0001;
+			step -= time*STEP_PER_SEC;
 	if (key == 'p')
-		power += UNIT_PER_CLOCK;
+		power += time*POWER_PER_SEC;
 	if (key == 'o')
-		power -= UNIT_PER_CLOCK;
+		power -= time*POWER_PER_SEC;
 	if (key == 'n')
-		phi -= ANGLE_PER_CLOCK;
+		phi -= time*PHI_PER_SEC;
 	if (key == 'm')
-		phi += ANGLE_PER_CLOCK;
+		phi += time*PHI_PER_SEC;
 	if (key == ',')
-		theta -= ANGLE_PER_CLOCK;
+		theta -= time*THETA_PER_SEC;
 	if (key == '.')
-		theta += ANGLE_PER_CLOCK;
+		theta += time*THETA_PER_SEC;
 	
     //Rotations
 	if (key == 'q')
-		Roll(-ANGLE_PER_CLOCK, &totalRotation, &cameradir, &horizontalAxis,
+		Roll(-time*ANGLE_PER_SEC, &totalRotation, &cameradir, &horizontalAxis,
 			&verticalAxis, &depthAxis);
 	else if (key == 'e')
-		Roll(ANGLE_PER_CLOCK, &totalRotation, &cameradir, &horizontalAxis,
+		Roll(time*ANGLE_PER_SEC, &totalRotation, &cameradir, &horizontalAxis,
 			&verticalAxis, &depthAxis);
 	else if (key == 'k')
-		Yaw(-ANGLE_PER_CLOCK, &totalRotation, &cameradir, &horizontalAxis,
+		Yaw(-time*ANGLE_PER_SEC, &totalRotation, &cameradir, &horizontalAxis,
 			&verticalAxis, &depthAxis);
 	else if (key == 'h')
-		Yaw(ANGLE_PER_CLOCK, &totalRotation, &cameradir, &horizontalAxis,
+		Yaw(time*ANGLE_PER_SEC, &totalRotation, &cameradir, &horizontalAxis,
 			&verticalAxis, &depthAxis);
 	else if (key == 'j')
-		Pitch(-ANGLE_PER_CLOCK, &totalRotation, &cameradir, &horizontalAxis,
+		Pitch(-time*ANGLE_PER_SEC, &totalRotation, &cameradir, &horizontalAxis,
 			&verticalAxis, &depthAxis);
 	else if (key == 'u')
-		Pitch(ANGLE_PER_CLOCK, &totalRotation, &cameradir, &horizontalAxis,
+		Pitch(time*ANGLE_PER_SEC, &totalRotation, &cameradir, &horizontalAxis,
 			&verticalAxis, &depthAxis);
 	
     //Move
     if (key == 'w')
-		camerapos = MoveAlongAxis(camerapos, verticalAxis, UNIT_PER_CLOCK);
+		camerapos = MoveAlongAxis(camerapos, verticalAxis, time*DIST_PER_SEC);
     else if (key == 's')
-		camerapos = MoveAlongAxis(camerapos, verticalAxis, -UNIT_PER_CLOCK);
+		camerapos = MoveAlongAxis(camerapos, verticalAxis, -time*DIST_PER_SEC);
 	else if (key == 'a')
-		camerapos = MoveAlongAxis(camerapos, horizontalAxis, UNIT_PER_CLOCK);
+		camerapos = MoveAlongAxis(camerapos, horizontalAxis, time*DIST_PER_SEC);
 	else if (key == 'd')
-		camerapos = MoveAlongAxis(camerapos, horizontalAxis, -UNIT_PER_CLOCK);
+		camerapos = MoveAlongAxis(camerapos, horizontalAxis, -time*DIST_PER_SEC);
 	// Zoom
 	if (key == 'r')
-		camerapos = MoveAlongAxis(camerapos, depthAxis, UNIT_PER_CLOCK);
+		camerapos = MoveAlongAxis(camerapos, depthAxis, time*DIST_PER_SEC);
 	else if (key == 'f')
-		camerapos = MoveAlongAxis(camerapos, depthAxis, -UNIT_PER_CLOCK);
+		camerapos = MoveAlongAxis(camerapos, depthAxis, -time*DIST_PER_SEC);
 }
