@@ -15,6 +15,8 @@ uniform vec3 color;
 uniform vec3 FOV;
 uniform vec2 resolution;
 uniform int multisampling;
+uniform vec3 lightpos;
+uniform float intensity;
 
 out vec4 outputColor;
 
@@ -209,18 +211,17 @@ void main() {
                 }
 
                 if (mandelTest(pos) != vec3(0)) {
-                    vec3 lightpos = vec3(-2, -2, -2);
+                    float cur_intensity = intensity;
                     vec3 shadow = pos;
-                    float intensity = 4.00;
-                    while (intensity >= 0 && length(lightpos-shadow) > step) {
+                    while (cur_intensity >= 0 && length(lightpos-shadow) > step) {
                         shadow += normalize(lightpos-shadow) * step;
                         if (mandelTest(shadow) != vec3(0)) {
-                            intensity -= 10*step;
+                            cur_intensity -= 10*step;
                             continue;
                         }
-                        intensity -= 1*step;
+                        cur_intensity -= 1*step;
                     }
-                    outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*intensity, vec4(0.0), vec4(1.0));
+                    outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*cur_intensity, vec4(0.0), vec4(1.0));
                     continue;
                 }
             }
