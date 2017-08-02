@@ -52,13 +52,13 @@ void render() {
 
 //Idle Function
 void idle() {
-
-
     sendKeySignals();
 
     //phi+=.01;
-    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail,
+	power = 10;
+    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, horizontalAxis, verticalAxis, depthAxis, color, step , bail,
         power, phi, theta, totalRotation);
+
     render();
 }
 
@@ -68,7 +68,6 @@ void handleMouse(int x, int y) {
         cameraMoveMouse(x, y);
     }
 }
-
 
 
 //Handle keyboard input
@@ -113,12 +112,6 @@ void sendKeySignals() {
         if (kbstate[key] == true) {
             putchar(key);
             if (userfocus == VIEW_FOCUS) {
-                printf("*********************************\n");
-                printf("cameradir: %f,%f,%f\n", cameradir.x, cameradir.y, cameradir.z);
-                printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
-                printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
-                printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
-
                 cameraMoveKeyboard(key, time-kblasttime[key]);
                 //printf("HEY: %d, %d", key, (int)(time-kblasttime[key]));
                 kblasttime[key] = time;
@@ -127,7 +120,6 @@ void sendKeySignals() {
     }
 
 }
-
 
 //Main
 int main(int argc, char* argv[]) {
@@ -171,8 +163,9 @@ int main(int argc, char* argv[]) {
     fflush(stdout);
 
     //Setup shaders
-    loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir, color, step,
-        bail, power, phi, theta, totalRotation);
+    loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir,
+		horizontalAxis, verticalAxis, depthAxis, color, step, bail, power,
+		phi, theta, totalRotation);
     printf("loaded program\n");
     fflush(stdout);
     printProgramLog(mandelbulb_shader);
