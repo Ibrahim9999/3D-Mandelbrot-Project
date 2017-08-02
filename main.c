@@ -23,7 +23,7 @@
 
 //Functions
 void sendKeySignals();
-
+void printMonitors();
 
 //Mandelbulb shader and variables
 shaderprogram mandelbulb_shader;
@@ -43,8 +43,13 @@ float cameradist;
 //State of program (view or menu)
 int userfocus = VIEW_FOCUS;
 
+//Timer
+float lastframe;
+float lastlastframe;
+
 //Render Funcion
-void render() {
+void render() {    
+
     //Clear
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -56,8 +61,12 @@ void render() {
     glEnd();
 
     glutSwapBuffers();
+    glFinish();
 
-    //printf("rendered");
+    lastlastframe = lastframe;
+    lastframe = glutGet(GLUT_ELAPSED_TIME);
+
+    printMonitors();
 }
 
 //Idle Function
@@ -157,6 +166,45 @@ void handleResolution(int w, int h) {
     //printf("nvec: %f, %f, %f\n", fov.x, fov.y, fov.z);
 }
 
+void printMonitors() {
+    char string[80];    
+    float fps = 1000/(lastframe-lastlastframe);
+    
+    strcpy(string, "FPS:");
+
+    sprintf(string+4, "%f", fps);
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();             
+    glLoadIdentity();   
+    int w = glutGet( GLUT_WINDOW_WIDTH );
+    int h = glutGet( GLUT_WINDOW_HEIGHT );
+    glOrtho( 0, w, 0, h, -1, 1 );
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable( GL_DEPTH_TEST ); 
+
+    glColor3f(1, 0, 0);
+
+    glRasterPos2i(20, 20);
+    void *font = GLUT_BITMAP_HELVETICA_18; 
+    for (char* c=string; *c != '\0'; c++) 
+    {
+        glutBitmapCharacter(font, *c); 
+    }
+
+    glEnable (GL_DEPTH_TEST);  
+
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();  
+
+}
+
 //Main
 int main(int argc, char* argv[]) {
 
@@ -173,7 +221,7 @@ int main(int argc, char* argv[]) {
     color.x=0; color.y=1; color.z=1;
     step = 0.01;
     bail = 10;
-    multisampling=4;
+    multisampling=1;
     power = 10;
     phi = 0;
     theta = 0;

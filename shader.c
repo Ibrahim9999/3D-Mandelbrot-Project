@@ -38,9 +38,12 @@ char* loadTextFile(const char* filename) {
 }
 
 void setFOVvec(vec3f *vector, float vertFOV, float horiFOV) {
-    vector->z = cos(vertFOV/360*PI_CONST);
-    vector->y = sin(horiFOV/360*PI_CONST);
-    vector->x = cos(vertFOV/360*PI_CONST)*tan(horiFOV/360*PI_CONST);
+    float tan_h = tan(horiFOV/360*PI_CONST);
+    float tan_v = tan(vertFOV/360*PI_CONST);
+
+    vector->z = sqrt(1/(tan_h*tan_h+tan_v*tan_v+1));
+    vector->y = vector->z*tan_v;
+    vector->x = vector->z*tan_h;
 
     *vector = v3f_normalize(*vector);
 
