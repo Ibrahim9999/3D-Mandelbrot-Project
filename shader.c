@@ -54,7 +54,8 @@ void printProgramLog(shaderprogram program) {
     glGetProgramiv(program.prog, GL_INFO_LOG_LENGTH, &length);
 
     if (length > 0) {
-        log = (char *) malloc(length);
+        log = (char *) malloc(length+1);
+        log[length] = '\0';
         glGetProgramInfoLog(program.prog, length, &written, log);
         printf("%s\n", log);
         free(log);
@@ -68,7 +69,8 @@ void printShaderLog(GLuint shader) {
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
 
     if (length > 0) {
-        log = (char *) malloc(length);
+        log = (char *) malloc(length+1);
+        log[length] = '\0';
         glGetShaderInfoLog(shader, length, &written, log);
         printf("%s\n", log);
         free(log);
@@ -118,8 +120,11 @@ void loadShaders(shaderprogram *program, const char* vname, const char* fname) {
 }
 
 void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
-    vec3f cameradir, vec3f color, float step, int bail, float power, float phi, float theta, vec4f totalRotation, vec2f resolution) {
-    GLint fov_loc, camerapos_loc, cameradir_loc, color_loc, step_loc, bail_loc, power_loc, phi_loc, theta_loc, totalRotation_loc, resolution_loc;
+    vec3f cameradir, vec3f color, float step, int bail, float power, float phi,
+    float theta, vec4f totalRotation, vec2f resolution, int multisampling) {
+
+    GLint fov_loc, camerapos_loc, cameradir_loc, color_loc, step_loc,
+            bail_loc, power_loc, phi_loc, theta_loc, totalRotation_loc, resolution_loc, multisampling_loc;
 
     fov_loc = glGetUniformLocation(program.prog, "FOV");
     camerapos_loc = glGetUniformLocation(program.prog, "camerapos");
@@ -132,6 +137,7 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     theta_loc = glGetUniformLocation(program.prog, "theta");
     totalRotation_loc = glGetUniformLocation(program.prog, "totalRotation");
     resolution_loc = glGetUniformLocation(program.prog, "resolution");
+    multisampling_loc = glGetUniformLocation(program.prog, "multisampling");
 
     //printf("************ %f, %f, %f", fov.x, fov.y, fov.z);
 
@@ -146,15 +152,17 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     glUniform1f(theta_loc, theta);
     glUniform4f(totalRotation_loc, totalRotation.x, totalRotation.y, totalRotation.z, totalRotation.w);
     glUniform2f(resolution_loc, resolution.x, resolution.y);
+    glUniform1i(multisampling_loc, multisampling);
 }
 
 void loadMandelbulbProgram(shaderprogram* program, vec3f fov, vec3f camerapos,
-    vec3f cameradir, vec3f color, float step, int bail, float power, float phi, float theta, vec4f totalRotation, vec2f resolution) {
+    vec3f cameradir, vec3f color, float step, int bail, float power, float phi, float theta, vec4f totalRotation, vec2f resolution, int multisampling) {
 
     loadShaders(program, "shaders/mandelbulb_shader.vert", "shaders/mandelbulb_shader.frag");
 
     glUseProgram(program->prog);
 
-    loadMandelbulbVars(*program, fov, camerapos, cameradir, color, step, bail, power, phi, theta, totalRotation, resolution);
+    loadMandelbulbVars(*program, fov, camerapos, cameradir, color, step, bail,
+            power, phi, theta, totalRotation, resolution, multisampling);
 }
 

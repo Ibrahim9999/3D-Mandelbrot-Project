@@ -14,6 +14,7 @@ uniform vec3 camerapos;
 uniform vec3 color;
 uniform vec3 FOV;
 uniform vec2 resolution;
+uniform int multisampling;
 
 out vec4 outputColor;
 
@@ -172,13 +173,13 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in f
 void main() {    
     vec3 pos = camerapos;
     vec3 dir = normalize(direction);
-    vec3 off = (FOV/vec3(resolution.xy/2, 0.0))/2;
+    vec3 off = (FOV/vec3(resolution.xy/2, 0.0))/multisampling;
     outputColor = vec4(0);
 
-    for (int i = -1; i <= 1; i++) {
-        for (int j = -1; j <= 1; j++) {
+    for (int i = -(multisampling/2); i <= multisampling/2; i++) {
+        for (int j = -(multisampling/2); j <= multisampling/2; j++) {
 
-            if (!(i == 0 || j == 0)) continue;
+            if (multisampling % 2 == 0 && (i == 0 || j == 0)) continue;
 
             vec3 aa_dir = dir;
             aa_dir += vec3(i, j, 0.0) * off;
@@ -210,14 +211,14 @@ void main() {
                         intensity -= 1*step;
                     }
                     outputColor += clamp(vec4(color, 0.0)*intensity, vec4(0.0), vec4(1.0));
+                    //outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/2/PI*360, 1.0, 1.0)*intensity, vec4(0.0), vec4(1.0));
                     continue;
-                    //outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
                 }
 
             }
             outputColor += vec4(1.0);
         }
     }
-    outputColor /= 5;
+    outputColor /= multisampling*multisampling;
 
 }
