@@ -41,15 +41,24 @@ vec3f v3f_normalize(vec3f v) {
 
 vec3f VecDoubleMultiply(vec3f v, double d)
 {
-	return (vec3f){v.x * d, v.y * d, v.z*d};
+    v.x *= d;
+    v.y *= d;
+    v.z *= d;
+	return v;
 }
 
 vec3f VecVecAdd(vec3f a, vec3f b) {
-    return (vec3f){a.x + b.x, a.y + b.y, a.z + b.z};
+    a.x += b.x;
+    a.y += b.y;
+    a.z += b.z;
+    return a;
 }
 
 vec3f VecVecSubtract(vec3f a, vec3f b) {
-    return (vec3f){a.x - b.x, a.y - b.y, a.z - b.z};
+    a.x -= b.x;
+    a.y -= b.y;
+    a.z -= b.z;
+    return a;
 }
 
 vec4f QuatFromDoubleVec(double d, vec3f v)
