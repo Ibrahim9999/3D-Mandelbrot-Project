@@ -16,8 +16,10 @@ void setFOVvec(vec3f *vector, float vertFOV, float horiFOV);
 void loadShaders(shaderprogram *program, const char* vname, const char* fname);
 void printProgramLog(shaderprogram program);
 void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos, vec3f camerdir,
-    vec3f color, float step, int bail, float power, float phi, float theta, vec4f totalRotation, vec2f resolution);
+    vec3f color, float step, int bail, float power, float phi, float theta,
+    vec4f totalRotation, vec2f resolution, int multisampling);
 void loadMandelbulbProgram(shaderprogram *program, vec3f fov, vec3f camerapos,
-    vec3f cameradir, vec3f color, float step, int bail, float power, float phi, float theta, vec4f totalRotation, vec2f resolution);
+    vec3f cameradir, vec3f color, float step, int bail, float power,
+    float phi, float theta, vec4f totalRotation, vec2f resolution, int multisampling);
 
 #endif

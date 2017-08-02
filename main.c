@@ -26,7 +26,7 @@ vec2f resolution;
 vec3f fov, camerapos, cameradir, color, horizontalAxis, verticalAxis, depthAxis;
 vec4f totalRotation;
 float step;
-int bail;
+int bail, multisampling;
 float power;
 float phi;
 float theta;
@@ -62,8 +62,9 @@ void idle() {
     sendKeySignals();
 
     //phi+=.01;
-    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color, step , bail,
-        power, phi, theta, totalRotation, resolution);
+    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color,
+            step, bail, power, phi, theta, totalRotation, resolution,
+            multisampling);
     render();
 }
 
@@ -142,6 +143,7 @@ int main(int argc, char* argv[]) {
     color.x=0; color.y=1; color.z=1;
     step = 0.01;
     bail = 10;
+    multisampling=4;
     power = 10;
     phi = 0;
     theta = 0;
@@ -171,8 +173,9 @@ int main(int argc, char* argv[]) {
     fflush(stdout);
 
     //Setup shaders
-    loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir, color, step,
-        bail, power, phi, theta, totalRotation, resolution);
+    loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir, color,
+            step, bail, power, phi, theta, totalRotation, resolution,
+            multisampling);
     //printf("loaded program\n");
     fflush(stdout);
     printProgramLog(mandelbulb_shader);
