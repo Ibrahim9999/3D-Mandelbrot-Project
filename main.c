@@ -16,6 +16,11 @@
 #define MENU_FOCUS 0
 #define VIEW_FOCUS 1
 
+#define START_HEIGHT 400
+#define START_WIDTH 400
+
+#define START_FOV 50.0
+
 //Functions
 void sendKeySignals();
 
@@ -30,6 +35,10 @@ int bail, multisampling;
 float power;
 float phi;
 float theta;
+
+//Camera variables
+float vfov, hfov;
+float cameradist;
 
 //State of program (view or menu)
 int userfocus = VIEW_FOCUS;
@@ -61,10 +70,10 @@ void idle() {
     
     sendKeySignals();
 
+
     //phi+=.01;
-    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, color,
-            step, bail, power, phi, theta, totalRotation, resolution,
-            multisampling);
+    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, horizontalAxis, verticalAxis, depthAxis, color, step , bail,
+        power, phi, theta, totalRotation, resolution, multisampling);
     render();
 }
 
@@ -74,7 +83,6 @@ void handleMouse(int x, int y) {
         cameraMoveMouse(x, y);
     }
 }
-
 
 
 //Handle keyboard input
@@ -118,8 +126,13 @@ void sendKeySignals() {
     for (key = 0; key != 255; key++) {
         if (kbstate[key] == true) {
             putchar(key);
+            printf("*********************************\n");
+            printf("cameradir: %f,%f,%f\n", cameradir.x, cameradir.y, cameradir.z);
+            printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
+            printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
+            printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
             if (userfocus == VIEW_FOCUS) {
-                cameraMoveKeyboard(key, time-kblasttime[key]);
+                cameraMoveKeyboard(key, (float)(time-kblasttime[key])/CLOCKS_PER_SEC);
                 //printf("HEY: %d, %d", key, (int)(time-kblasttime[key]));
                 kblasttime[key] = time;
             }
@@ -128,6 +141,21 @@ void sendKeySignals() {
 
 }
 
+void handleResolution(int w, int h) {
+    //printf("nw: %d", w);
+    //printf("HEY: %f\n", hfov);
+    //printf("dist %f\n", cameradist);
+
+    //Set viewport
+    glViewport(0, 0, w, h);
+
+    hfov = atan(w/(2*cameradist))/(2*PI_CONST)*720; 
+    vfov = atan(h/(2*cameradist))/(2*PI_CONST)*720;
+    //printf("newfov: %f\n", hfov);
+
+    setFOVvec(&fov, vfov, hfov);
+    //printf("nvec: %f, %f, %f\n", fov.x, fov.y, fov.z);
+}
 
 //Main
 int main(int argc, char* argv[]) {
@@ -136,7 +164,9 @@ int main(int argc, char* argv[]) {
     fflush(stdout);
 
     //Set vars
-    setFOVvec(&fov, 50, 50);
+    hfov = vfov = START_FOV;
+    cameradist = START_WIDTH/(2*tan(START_FOV/360*PI_CONST));
+    setFOVvec(&fov, vfov, hfov);
     InitializeCamera(&cameradir, &camerapos, &depthAxis, &horizontalAxis, &verticalAxis); 
 
     totalRotation.x = 0; totalRotation.y = 0; totalRotation.z = 0; totalRotation.w = 1;
@@ -147,7 +177,7 @@ int main(int argc, char* argv[]) {
     power = 10;
     phi = 0;
     theta = 0;
-    resolution.x = 400; resolution.y = 400;
+    resolution.x = START_WIDTH; resolution.y = START_HEIGHT;
 
     //Setup window
     glutInit(&argc, argv);
@@ -165,7 +195,8 @@ int main(int argc, char* argv[]) {
     glutIdleFunc(idle);
     glutMotionFunc(handleMouse);
     glutKeyboardFunc(handleKeyboard);
-    glutKeyboardUpFunc(handleKeyboardUp);    
+    glutKeyboardUpFunc(handleKeyboardUp);
+    glutReshapeFunc(handleResolution);
 
     glewInit();
    
@@ -173,10 +204,10 @@ int main(int argc, char* argv[]) {
     fflush(stdout);
 
     //Setup shaders
-    loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir, color,
-            step, bail, power, phi, theta, totalRotation, resolution,
-            multisampling);
-    //printf("loaded program\n");
+    loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir,
+		horizontalAxis, verticalAxis, depthAxis, color, step, bail, power,
+		phi, theta, totalRotation, resolution, multisampling);
+    printf("loaded program\n");
     fflush(stdout);
     printProgramLog(mandelbulb_shader);
 

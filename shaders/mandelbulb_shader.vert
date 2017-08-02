@@ -2,6 +2,9 @@
 
 uniform vec3 FOV;
 uniform vec3 cameradir;
+uniform vec3 horizontalAxis;
+uniform vec3 verticalAxis;
+uniform vec3 depthAxis;
 uniform vec4 totalRotation;
 
 out vec3 direction;
@@ -26,6 +29,20 @@ void getEulerFromVec(in vec4 rotation, inout float yaw, inout float pitch, inout
     t0 = 2 * (w * z + x * y);
     t1 = 1 - 2 * (ySquared + z * z);
     yaw = atan(t0, t1);
+}
+
+vec4 QuatFromAxisAngle(in float angle, in vec3 axis)
+{
+	vec4 q;
+	
+	q.w = cos(angle / 2.0);
+	
+    vec3 a = axis * sin(angle/2);
+    q.x = a.x;
+    q.y = a.y;
+    q.z = a.z;
+	
+	return q;
 }
 
 vec4 QuatInverse(in vec4 q)
@@ -77,7 +94,7 @@ void main() {
         gl_Position = vec4(1.0, 1.0, 0.0, 1.0);
     }
     else if (gl_VertexID == 1) {
-        direction = vec3(-FOV.x, FOV.yz);
+        direction = vec3(-FOV.x, FOV.y, FOV.z);
         gl_Position = vec4(-1.0, 1.0, 0.0, 1.0);
     }
     else if (gl_VertexID == 2) {
@@ -108,7 +125,15 @@ void main() {
                                         0,                0,               1);
 
     mat3 transform = roll*pitch*yaw;
-    //direction = transform * direction;
+    direction = transform * direction;
     
-    ApplyRotationToVector(totalRotation, direction);
+    //ApplyRotationToVector(q, direction);
+	
+	//ApplyRotationToVector(QuatFromAxisAngle( yaw_angle/2, verticalAxis ), direction);
+	//ApplyRotationToVector(QuatFromAxisAngle( pitch_angle/2, horizontalAxis ), direction);
+	//ApplyRotationToVector(QuatFromAxisAngle( roll_angle/2, depthAxis ), direction);
+	
+	//ApplyRotationToVector(QuatFromAxisAngle( yaw_angle/2, vec3(0,1,0) ), direction);
+	//ApplyRotationToVector(QuatFromAxisAngle( pitch_angle/2, vec3(1,0,0) ), direction);
+	//ApplyRotationToVector(QuatFromAxisAngle( roll_angle/2, vec3(0,0,1) ), direction);
 }

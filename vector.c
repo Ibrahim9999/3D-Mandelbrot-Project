@@ -102,39 +102,6 @@ vec4f QuatQuatSubtract(vec4f a, vec4f b)
 	return c;
 }
 
-vec4f QuatQuatMultiply(vec4f a, vec4f b)
-{
-	vec4f c;
-	
-	c.w = a.w*b.w - a.x*b.x - a.y*b.y - a.z*b.z;
-	c.x = a.w*b.x + a.x*b.w + a.y*b.z - a.z*b.y;
-	c.y = a.w*b.y - a.x*b.z + a.y*b.w + a.z*b.x;
-	c.z = a.w*b.z + a.x*b.y - a.y*b.x + a.z*b.w;
-	
-	return c;
-}
-
-vec3f QuatVecMultiply(vec4f q, vec3f v)
-{
-	double xx = q.x * q.x;
-	double yy = q.y * q.y;
-	double zz = q.z * q.z;
-	double xy = q.x * q.y;
-	double xz = q.x * q.z;
-	double yz = q.y * q.z;
-	double wx = q.w * q.x;
-	double wy = q.w * q.y;
-	double wz = q.w * q.z;
-	
-	vec3f result;
-	
-	result.x = v.x * (1 - 2 * (yy + zz)) + v.y * 2 * (xy - wz) + v.z * 2 * (xz + wy);
-	result.y = v.x * 2 * (xy + wz) + v.y * (1 - 2 * (xx + zz)) + v.z * 2 * (yz - wx);
-	result.z = v.x * 2 * (xz - wy) + v.y * 2 * (yz + wx) + v.z * (1 - 2 * (xx + yy));
-	
-	return result;
-}
-
 vec4f QuatDoubleMultiply(vec4f q, double d)
 {
 	return (vec4f){q.x * d, q.y * d, q.z * d, q.w * d};
@@ -231,6 +198,39 @@ void VecToEuler(vec4f rotation, double* yaw, double* pitch, double* roll)
 	t0 = 2 * (W * Z + X * Y);
 	t1 = 1 - 2 * (ysqr + Z * Z);  
 	*yaw = atan2(t0, t1);
+}
+
+vec4f QuatQuatMultiply(vec4f a, vec4f b)
+{
+	vec4f c;
+	
+	c.w = a.w*b.w - a.x*b.x - a.y*b.y - a.z*b.z;
+	c.x = a.w*b.x + a.x*b.w + a.y*b.z - a.z*b.y;
+	c.y = a.w*b.y - a.x*b.z + a.y*b.w + a.z*b.x;
+	c.z = a.w*b.z + a.x*b.y - a.y*b.x + a.z*b.w;
+	
+	return c;
+}
+
+vec3f QuatVecMultiply(vec4f q, vec3f v)
+{
+	long double xx = q.x * q.x;
+	long double yy = q.y * q.y;
+	long double zz = q.z * q.z;
+	long double xy = q.x * q.y;
+	long double xz = q.x * q.z;
+	long double yz = q.y * q.z;
+	long double wx = q.w * q.x;
+	long double wy = q.w * q.y;
+	long double wz = q.w * q.z;
+	
+	vec3f result;
+	
+	result.x = v.x * (1 - 2 * (yy + zz)) + v.y * 2 * (xy - wz) + v.z * 2 * (xz + wy);
+	result.y = v.x * 2 * (xy + wz) + v.y * (1 - 2 * (xx + zz)) + v.z * 2 * (yz - wx);
+	result.z = v.x * 2 * (xz - wy) + v.y * 2 * (yz + wx) + v.z * (1 - 2 * (xx + yy));
+	
+	return result;
 }
 
 void ApplyRotationToVector(vec4f rotation, vec3f* axis)

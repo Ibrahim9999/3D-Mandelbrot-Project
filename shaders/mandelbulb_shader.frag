@@ -93,8 +93,27 @@ vec4 ColorFromHSV(float hue, float saturation, float value)
     return vec4(v, p, q, 0);
 }
 
-vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float phi){
+vec3 TriplexPower( in vec3 v, in float power)
+{
+	float x = 0;
+    float y = 0;
+    float z = 0;
+    
+    float r = sqrt( v.x * v.x + v.y * v.y + v.z * v.z );
+    float rN = pow( r, power );
+    float nTheta = power * atan( v.y, v.x ) ;
+    float nPhi = power * asin( v.z / r );
 
+    float cosNPhi = cos( nPhi + phi);
+    x = cos(nTheta + theta) * cosNPhi * rN;
+    y = sin(nTheta + theta) * cosNPhi * rN;
+    z = -sin(nPhi + phi) * rN;
+
+    return vec3(rN*x, rN*y, rN*z);
+}
+
+vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float phi)
+{
     float x = 0;
     float y = 0;
     float z = 0;
@@ -116,32 +135,9 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float p
 
         return vec3(x, y, z) + c;
     }
-    float r = sqrt( xx + yy + zz );
-    float rN = pow( r, power );
-    float nTheta = power * atan( v.y, v.x ) ;
-    float nPhi = power * asin( v.z / r );
 
-    float cosNPhi = cos( nPhi + phi);
-    x = cos(nTheta + theta) * cosNPhi * rN;
-    y = sin(nTheta + theta) * cosNPhi * rN;
-    z = -sin(nPhi + phi) * rN;
-
-    return vec3(rN*x, rN*y, rN*z) + c;
-
-}
-
-vec3 mandelTest(in vec3 point) {
-    vec3 v = point;
-    vec3 c = point;
-
-    int i = 0;
-    while (v.x*v.x + v.y*v.y + v.z*v.z < 4.0 && i < bail) {
-        v = nextPoint(v, c, power, theta, phi);
-        i++;
-    }
-    if (i >= bail)
-        return v;
-    return vec3(0);
+    return TriplexPower(v, power) + c;
+	//return TriplexPower(v, power) + TriplexPower(c, power);
 }
 
 vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in float sphereRadius) {
@@ -168,6 +164,20 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in f
     vec3 intersection = spherePos+collisionOffset;
 
     return intersection;
+}
+
+vec3 mandelTest(in vec3 point) {
+    vec3 v = point;
+    vec3 c = point;
+	
+    int i = 0;
+    while (v.x*v.x + v.y*v.y + v.z*v.z < 4.0 && i < bail) {
+        v = nextPoint(v, c, power, theta, phi);
+        i++;
+    }
+    if (i >= bail)
+        return v;
+    return vec3(0);
 }
 
 void main() {    
@@ -210,10 +220,9 @@ void main() {
                         }
                         intensity -= 1*step;
                     }
-                    outputColor += clamp(vec4(color, 0.0)*intensity, vec4(0.0), vec4(1.0));
+                    outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*intensity, vec4(0.0), vec4(1.0));
                     continue;
                 }
-
             }
             outputColor += vec4(1.0);
         }
