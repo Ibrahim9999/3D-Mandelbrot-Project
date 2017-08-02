@@ -27,10 +27,11 @@ void sendKeySignals();
 
 //Mandelbulb shader and variables
 shaderprogram mandelbulb_shader;
+vec2f resolution;
 vec3f fov, camerapos, cameradir, color, horizontalAxis, verticalAxis, depthAxis;
 vec4f totalRotation;
 float step;
-int bail;
+int bail, multisampling;
 float power;
 float phi;
 float theta;
@@ -61,14 +62,18 @@ void render() {
 
 //Idle Function
 void idle() {
+    printf("*********************************\n");
+    printf("cameradir: %f,%f,%f\n", cameradir.x, cameradir.y, cameradir.z);
+    printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
+    printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
+    printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
+    
     sendKeySignals();
 
 
     //phi+=.01;
-	power = 10;
     loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, horizontalAxis, verticalAxis, depthAxis, color, step , bail,
-        power, phi, theta, totalRotation);
-
+        power, phi, theta, totalRotation, resolution, multisampling);
     render();
 }
 
@@ -111,7 +116,7 @@ void handleKeyboardUp(unsigned char key, int x, int y) {
     kbtime[key] = 0;
     kblasttime[key] = 0;
 
-    printf("%c", key);
+    //printf("%c", key);
 }
 
 void sendKeySignals() {
@@ -155,7 +160,7 @@ void handleResolution(int w, int h) {
 //Main
 int main(int argc, char* argv[]) {
 
-    printf("hello main\n");
+    //printf("hello main\n");
     fflush(stdout);
 
     //Set vars
@@ -168,15 +173,17 @@ int main(int argc, char* argv[]) {
     color.x=0; color.y=1; color.z=1;
     step = 0.01;
     bail = 10;
+    multisampling=4;
     power = 10;
     phi = 0;
     theta = 0;
+    resolution.x = START_WIDTH; resolution.y = START_HEIGHT;
 
     //Setup window
     glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
-	glutInitWindowSize(START_WIDTH,START_HEIGHT);
+	glutInitWindowSize(resolution.x, resolution.y);
 	glutCreateWindow("3D Mandelbulb Viewer");
     
     //Setup Input
@@ -193,13 +200,13 @@ int main(int argc, char* argv[]) {
 
     glewInit();
    
-    printf("starting shaders\n");
+    //printf("starting shaders\n");
     fflush(stdout);
 
     //Setup shaders
     loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir,
 		horizontalAxis, verticalAxis, depthAxis, color, step, bail, power,
-		phi, theta, totalRotation);
+		phi, theta, totalRotation, resolution, multisampling);
     printf("loaded program\n");
     fflush(stdout);
     printProgramLog(mandelbulb_shader);

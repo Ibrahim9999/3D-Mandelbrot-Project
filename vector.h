@@ -16,6 +16,10 @@
  *
  */
 
+typedef struct vector2f {
+    double x;
+    double y;
+} vec2f;
 typedef struct vector3f {
     double x;
     double y;
