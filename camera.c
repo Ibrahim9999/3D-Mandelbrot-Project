@@ -12,7 +12,7 @@
 #define PHI_SHIFT_PER_SEC 1
 #define THETA_SHIFT_PER_SEC 1
 #define LIGHT_SHIFT_PER_SEC 1
-#define LIGHT_INTENSITY_PER_SEC .1
+#define LIGHT_INTENSITY_PER_SEC 1
 #define ANGLE_PER_PIXEL 0.5
 
 extern vec4f totalRotation;
@@ -84,6 +84,7 @@ void cameraMoveKeyboard(char key, float time)
 	printf("time: %f\n", time);
 	printf("camerapos: %f,%f,%f\n", camerapos.x, camerapos.y, camerapos.z);
 	printf("lightpos: %f,%f,%f\n", lightpos.x, lightpos.y, lightpos.z);
+	printf("intensity: %f\n", intensity);
 	printf("power: %f\n", power);
 	printf("phi: %f\n", phi);
 	printf("theta: %f\n", theta);

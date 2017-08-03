@@ -186,7 +186,6 @@ void main() {
     vec3 pos = camerapos;
     vec3 dir = normalize(direction);
 
-	/*
     vec3 off = (FOV/vec3(resolution.xy/2, 0.0))/multisampling;
     outputColor = vec4(0);
 
@@ -232,7 +231,7 @@ void main() {
     }
     outputColor /= multisampling*multisampling;
 
-	*/
+    /*
 
 	vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), dir, ALMOST_TWO);
     //outputColor = vec4((dir + 1)/2,1.0);
@@ -262,5 +261,7 @@ void main() {
         }
 
     }
+
+    */
 
 }
