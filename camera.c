@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define ANGLE_PER_SEC 10
+#define ANGLE_PER_SEC 45
 #define DIST_PER_SEC 1
 #define BAIL_PER_SEC 1
 #define STEP_PER_SEC .001

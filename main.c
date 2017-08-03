@@ -81,8 +81,8 @@ void handleMouse(int x, int y) {
 
 //Handle keyboard input
 static unsigned char kbstate[256];
-static clock_t kbtime[256];
-static clock_t kblasttime[256];
+static float kbtime[256];
+static float kblasttime[256];
 
 void clearKeyBuffer() {
     int i = 0;
@@ -96,12 +96,12 @@ void clearKeyBuffer() {
 }
 
 void handleKeyboard(unsigned char key, int x, int y) {
-    clock_t time = clock();
+    float current = glutGet(GLUT_ELAPSED_TIME);
     
     if (kbstate[key] == false) {
         kbstate[key] = true;
-        kbtime[key] = time;
-        kblasttime[key] = time;
+        kbtime[key] = current;
+        kblasttime[key] = current;
     }
 }
 
@@ -114,16 +114,16 @@ void handleKeyboardUp(unsigned char key, int x, int y) {
 }
 
 void sendKeySignals() {
-    clock_t time = clock();    
+    float current = glutGet(GLUT_ELAPSED_TIME);
     unsigned char key;
     
     for (key = 0; key != 255; key++) {
         if (kbstate[key] == true) {
             putchar(key);
             if (userfocus == VIEW_FOCUS) {
-                cameraMoveKeyboard(key, (float)(time-kblasttime[key])/CLOCKS_PER_SEC);
+                cameraMoveKeyboard(key, (float)(current-kblasttime[key])/1000);
                 //printf("HEY: %d, %d", key, (int)(time-kblasttime[key]));
-                kblasttime[key] = time;
+                kblasttime[key] = current;
             }
         }
     }
