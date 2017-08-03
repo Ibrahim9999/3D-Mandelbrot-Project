@@ -144,6 +144,9 @@ void handleResolution(int w, int h) {
 
     setFOVvec(&fov, vfov, hfov);
     //printf("nvec: %f, %f, %f\n", fov.x, fov.y, fov.z);
+	
+    resolution.x = w; resolution.y = h;
+
 }
 
 void printMonitors() {
