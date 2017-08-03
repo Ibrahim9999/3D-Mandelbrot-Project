@@ -28,7 +28,7 @@ void printMonitors();
 //Mandelbulb shader and variables
 shaderprogram mandelbulb_shader;
 vec2f resolution;
-vec3f fov, camerapos, cameradir, color, horizontalAxis, verticalAxis, depthAxis, lightpos;
+vec3f fov, camerapos, color, horizontalAxis, verticalAxis, depthAxis, lightpos;
 vec4f totalRotation;
 float step;
 int bail, multisampling;
@@ -172,7 +172,7 @@ void printMonitors() {
     void *font = GLUT_BITMAP_HELVETICA_18;
     for (char* c=string; *c != '\0'; c++) 
     {
-        //glutBitmapCharacter(font, *c); 
+        //glutBitmapCharacter(font, *c);
     }
 	
     glEnable (GL_DEPTH_TEST);  
@@ -205,8 +205,7 @@ int main(int argc, char* argv[]) {
     hfov = vfov = START_FOV;
     cameradist = START_WIDTH/(2*tan(START_FOV/360*PI_CONST));
     setFOVvec(&fov, vfov, hfov);
-    InitializeCamera(&cameradir, &camerapos, &depthAxis, &horizontalAxis,
-		&verticalAxis); 
+    InitializeCamera(&camerapos, &depthAxis, &horizontalAxis, &verticalAxis);
 
     totalRotation.x = 0;
 	totalRotation.y = 0;
@@ -214,8 +213,10 @@ int main(int argc, char* argv[]) {
 	totalRotation.w = 1;
 
     color.x=0; color.y=1; color.z=1;
-
-    lightpos.x=1.0; lightpos.y=1.0; lightpos.z=-4;
+	
+    lightpos.x= -0.178390;
+	lightpos.y = -2.660062;
+	lightpos.z = -0.930965;
 
     step = 0.01;
     bail = 10;

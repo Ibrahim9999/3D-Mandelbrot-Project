@@ -1,31 +1,5 @@
 #include "vector.h"
 
-void InitializeCamera(vec3f* facingForward, vec3f* cameraPosition, vec3f* depthAxis, vec3f* horizontalAxis, vec3f* verticalAxis)
-{
-	vec3f v;
-	
-	v.x = 0;
-	v.y = 0;
-	v.z = -4;
-	*cameraPosition = v;
-	
-	v.x = 0;
-	v.y = 0;
-	v.z = 1;
-	*depthAxis = v;
-	*facingForward = v;
-	
-	v.x = 1;
-	v.y = 0;
-	v.z = 0;
-	*horizontalAxis = v;
-	
-	v.x = 0;
-	v.y = 1;
-	v.z = 0;
-	*verticalAxis = v;
-}
-
 float v3f_length(vec3f v) {
     return sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
 }
@@ -182,7 +156,6 @@ vec3f MoveAlongAxis(vec3f position, vec3f axis, double scalar) {
 	 return VecVecAdd(position, VecDoubleMultiply(axis, scalar));
 }
 
-
 void VecToEuler(vec4f rotation, double* yaw, double* pitch, double* roll)
 {
 	double W = rotation.w;
@@ -247,7 +220,7 @@ void ApplyRotationToVector(vec4f rotation, vec3f* axis)
 	*axis =  QuatVecMultiply(QuatInverse(rotation), QuatVecMultiply(rotation, *axis));
 }
 
-void Yaw(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
+void Yaw(double angle, vec4f* totalRotation, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
 {
 	// Convert angle to radians
 	angle = angle * PI / 180;
@@ -259,7 +232,7 @@ void Yaw(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxi
 	*totalRotation = QuatQuatMultiply(localRotation, *totalRotation);
 
 	// Applies yaw rotation to the vector
-	ApplyRotationToVector(localRotation, vector);
+	//ApplyRotationToVector(localRotation, vector);
 
 	// Applies rotation to the unused rotation axis so future
 	// rotations will be relative to the vector
@@ -267,7 +240,7 @@ void Yaw(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxi
 	ApplyRotationToVector(localRotation, depthAxis);
 }
 
-void Pitch(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
+void Pitch(double angle, vec4f* totalRotation, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
 {
 	// Convert angle to radians
 	angle = angle * PI / 180;
@@ -279,7 +252,7 @@ void Pitch(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalA
 	*totalRotation = QuatQuatMultiply(localRotation, *totalRotation);
 
 	// Applies pitch rotation to the vector
-	ApplyRotationToVector(localRotation, vector);
+	//ApplyRotationToVector(localRotation, vector);
 
 	// Applies rotation to the unused rotation axis so future
 	// rotations will be relative to the vector
@@ -287,7 +260,7 @@ void Pitch(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalA
 	ApplyRotationToVector(localRotation, depthAxis);
 }
 
-void Roll(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
+void Roll(double angle, vec4f* totalRotation, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
 {
 	// Convert angle to radians
 	angle = angle * PI / 180;
@@ -299,99 +272,10 @@ void Roll(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAx
 	*totalRotation = QuatQuatMultiply(localRotation, *totalRotation);
 
 	// Applies roll rotation to the vector
-	ApplyRotationToVector(localRotation, vector);
+	//ApplyRotationToVector(localRotation, vector);
 
 	// Applies rotation to the unused rotation axis so future
 	// rotations will be relative to the vector
 	ApplyRotationToVector(localRotation, horizontalAxis);
 	ApplyRotationToVector(localRotation, verticalAxis);
 }
-
-/*
-void Yaw(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
-{
-	vec3f right = { 1.0,0.0,0.0 };
-	vec3f up = { 0.0, 1.0, 0.0 };
-	vec3f in = { 0.0, 0.0, 1.0 };
-
-	// Convert angle to radians
-	angle = angle * PI / 180;
-
-	// Applies pitch rotation to the vector
-	vec4f localRotation = QuatFromAxisAngle(angle / 2, *verticalAxis);
-
-	// Updated total rotation with the local rotation
-	*totalRotation = QuatQuatMultiply(localRotation, *totalRotation);
-
-	// Applies pitch rotation to the vector
-	ApplyRotationToVector(localRotation, vector);
-
-	// Applies rotation to the unused rotation axis so future
-	// rotations will be relative to the vector
-	ApplyRotationToVector(localRotation, &right);
-	ApplyRotationToVector(localRotation, &up);
-	ApplyRotationToVector(localRotation, &in);
-
-	*horizontalAxis = right;
-	*verticalAxis = up;
-	*depthAxis = in;
-}
-
-void Pitch(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
-{
-	vec3f right = { 1.0,0.0,0.0 };
-	vec3f up = { 0.0, 1.0, 0.0 };
-	vec3f in = { 0.0, 0.0, 1.0 };
-
-	// Convert angle to radians
-	angle = angle * PI / 180;
-	
-	// Applies pitch rotation to the vector
-	vec4f localRotation = QuatFromAxisAngle(angle / 2, *horizontalAxis);
-	
-	// Updated total rotation with the local rotation
-	*totalRotation = QuatQuatMultiply(localRotation, *totalRotation);
-	
-	// Applies pitch rotation to the vector
-	ApplyRotationToVector(localRotation, vector);
-	
-	// Applies rotation to the unused rotation axis so future
-	// rotations will be relative to the vector
-	ApplyRotationToVector(localRotation, &right);
-	ApplyRotationToVector(localRotation, &up);
-	ApplyRotationToVector(localRotation, &in);
-
-	*horizontalAxis = right;
-	*verticalAxis = up;
-	*depthAxis = in;
-}
-
-void Roll(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
-{
-	vec3f right = { 1.0,0.0,0.0 };
-	vec3f up = { 0.0, 1.0, 0.0 };
-	vec3f in = { 0.0, 0.0, 1.0 };
-
-	// Convert angle to radians
-	angle = angle * PI / 180;
-
-	// Applies pitch rotation to the vector
-	vec4f localRotation = QuatFromAxisAngle(angle / 2, *depthAxis);
-
-	// Updated total rotation with the local rotation
-	*totalRotation = QuatQuatMultiply(localRotation, *totalRotation);
-
-	// Applies pitch rotation to the vector
-	ApplyRotationToVector(localRotation, vector);
-
-	// Applies rotation to the unused rotation axis so future
-	// rotations will be relative to the vector
-	ApplyRotationToVector(localRotation, &right);
-	ApplyRotationToVector(localRotation, &up);
-	ApplyRotationToVector(localRotation, &in);
-
-	*horizontalAxis = right;
-	*verticalAxis = up;
-	*depthAxis = in;
-}
-*/

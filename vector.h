@@ -42,7 +42,7 @@ vec4f QuatFromDoubleVec(double d, vec3f v);
 vec4f QuatFromAxisAngle(double angle, vec3f axis);
 vec4f QuatQuatAdd(vec4f a, vec4f b);
 vec4f QuatQuatSubtract(vec4f a, vec4f b);
-vec4f QuatQuationMultiply(vec4f a, vec4f b);
+vec4f QuatQuatMultiply(vec4f a, vec4f b);
 vec3f QuatVecMultiply(vec4f q, vec3f v);
 vec4f QuatDoubleMultiply(vec4f q, double v);
 vec4f QuatQuatDivide(vec4f a, vec4f b);
@@ -54,9 +54,8 @@ vec4f QuatPower(vec4f q, double p);
 vec3f MoveAlongAxis(vec3f position, vec3f axis, double scalar);
 void VecToEuler(vec4f rotation, double* yaw, double* pitch, double* roll);
 void ApplyRotationToVector(vec4f rotation, vec3f* axis);
-void InitializeCamera(vec3f* facingForward, vec3f* cameraPosition, vec3f* depthAxis, vec3f* horizontalAxis, vec3f* verticalAxis);
-void Yaw(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
-void Pitch(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
-void Roll(double angle, vec4f* totalRotation, vec3f* vector, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
+void Yaw(double angle, vec4f* totalRotation, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
+void Pitch(double angle, vec4f* totalRotation, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
+void Roll(double angle, vec4f* totalRotation, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
 
 #endif
