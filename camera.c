@@ -2,6 +2,7 @@
 #include "vector.h"
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define ANGLE_PER_SEC 10
 #define DIST_PER_SEC 1
@@ -87,7 +88,7 @@ void cameraMoveKeyboard(char key, float time)
 	printf("phi: %f\n", phi);
 	printf("theta: %f\n", theta);
 	printf("step: %f\n", step);
-	printf("bail: %f\n", bail);
+	printf("bail: %d\n", bail);
 	//printf("bail: %f, %d, %d, %f\n", time, BAIL_PER_SEC, time*BAIL_PER_SEC, time*BAIL_PER_SEC);
 
 	/*

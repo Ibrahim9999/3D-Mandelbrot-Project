@@ -157,7 +157,7 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     glUniform1f(theta_loc, theta);
     glUniform4f(totalRotation_loc, totalRotation.x, totalRotation.y, totalRotation.z, totalRotation.w);
     glUniform2f(resolution_loc, resolution.x, resolution.y);
-    //glUniform1i(multisampling_loc, multisampling);
+    glUniform1i(multisampling_loc, multisampling);
     glUniform3f(lightpos_loc, lightpos.x, lightpos.y, lightpos.z);
     glUniform1f(intensity_loc, intensity);
 }
