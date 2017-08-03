@@ -1,65 +1,13 @@
 #version 130
 
 uniform vec3 FOV;
-uniform vec3 cameradir;
-uniform vec3 horizontalAxis;
-uniform vec3 verticalAxis;
-uniform vec3 depthAxis;
 uniform vec4 totalRotation;
 
 out vec3 direction;
 
-void getEulerFromVec(in vec4 rotation, inout float yaw, inout float pitch, inout float roll) {
-    float x = rotation.x;
-    float y = rotation.y;
-    float z = rotation.z;
-    float w = rotation.w;
-
-    float ySquared = y*y;
-
-    float t0 = 2 * (w * x + y * z);
-    float t1 = 1 - 2 * (x * x + ySquared);
-    roll = atan(t0, t1);
-
-    t0 = 2 * (w * y - z * x);
-    clamp(t0, -1, 1);
-    
-    pitch = asin(t0);
-
-    t0 = 2 * (w * z + x * y);
-    t1 = 1 - 2 * (ySquared + z * z);
-    yaw = atan(t0, t1);
-}
-
-vec4 QuatFromAxisAngle(in float angle, in vec3 axis)
-{
-	vec4 q;
-	
-	q.w = cos(angle / 2.0);
-	
-    vec3 a = axis * sin(angle/2);
-    q.x = a.x;
-    q.y = a.y;
-    q.z = a.z;
-	
-	return q;
-}
-
 vec4 QuatInverse(in vec4 q)
 {
     return q / (q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
-}
-
-vec4 QuatQuatMultiply(in vec4 a, in vec4 b)
-{
-    vec4 c;
-    
-    c.w = a.w*b.w - a.x*b.x - a.y*b.y - a.z*a.z;
-    c.x = a.w*b.x + a.x*b.w + a.y*b.z - a.z*a.y;
-    c.y = a.w*b.y - a.x*b.z + a.y*b.w + a.z*a.x;
-    c.z = a.w*b.z + a.x*b.y - a.y*b.x + a.z*a.w;
-    
-    return c;
 }
 
 vec3 QuatVecMultiply(in vec4 q, in vec3 v)
@@ -106,34 +54,11 @@ void main() {
         gl_Position = vec4(1.0, -1.0, 0.0, 1.0);
     }
 
-    float yaw_angle = 0.0;
-    float pitch_angle = 0.0;
-    float roll_angle = 0.0;
+    float magnitude = sqrt(direction.x*direction.x + direction.y*direction.y + direction.z*direction.z);
 
-    getEulerFromVec(totalRotation, roll_angle, yaw_angle, pitch_angle);
+	direction.x /= magnitude;
+	direction.y /= magnitude;
+	direction.y /= magnitude;
 
-    mat3 pitch =    mat3(              1,                 0,                 0, // around x axis
-                                       0,  cos(pitch_angle), -sin(pitch_angle),
-                                       0,  sin(pitch_angle),  cos(pitch_angle));
-
-    mat3 yaw =      mat3( cos(yaw_angle),                 0,  sin(yaw_angle), // around y axis
-                                       0,                 1,               0,
-                         -sin(yaw_angle),                 0,  cos(yaw_angle));
-
-    mat3 roll =     mat3( cos(roll_angle), -sin(roll_angle),               0, // around z axis
-                          sin(roll_angle),  cos(roll_angle),               0,
-                                        0,                0,               1);
-
-    mat3 transform = roll*pitch*yaw;
-    direction = transform * direction;
-    
-    //ApplyRotationToVector(q, direction);
-	
-	//ApplyRotationToVector(QuatFromAxisAngle( yaw_angle/2, verticalAxis ), direction);
-	//ApplyRotationToVector(QuatFromAxisAngle( pitch_angle/2, horizontalAxis ), direction);
-	//ApplyRotationToVector(QuatFromAxisAngle( roll_angle/2, depthAxis ), direction);
-	
-	//ApplyRotationToVector(QuatFromAxisAngle( yaw_angle/2, vec3(0,1,0) ), direction);
-	//ApplyRotationToVector(QuatFromAxisAngle( pitch_angle/2, vec3(1,0,0) ), direction);
-	//ApplyRotationToVector(QuatFromAxisAngle( roll_angle/2, vec3(0,0,1) ), direction);
+    ApplyRotationToVector(totalRotation, direction);
 }

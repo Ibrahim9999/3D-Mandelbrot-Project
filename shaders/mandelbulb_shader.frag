@@ -185,6 +185,8 @@ vec3 mandelTest(in vec3 point) {
 void main() {    
     vec3 pos = camerapos;
     vec3 dir = normalize(direction);
+
+	/*
     vec3 off = (FOV/vec3(resolution.xy/2, 0.0))/multisampling;
     outputColor = vec4(0);
 
@@ -229,5 +231,36 @@ void main() {
         }
     }
     outputColor /= multisampling*multisampling;
+
+	*/
+
+	vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), dir, ALMOST_TWO);
+    //outputColor = vec4((dir + 1)/2,1.0);
+    outputColor = vec4(1.0, 1, 1, 1);
+
+    if (intersection != vec3(0)) {
+
+        pos = intersection;
+        vec3 div = mandelTest(pos);
+        while (div == vec3(0) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0) {
+            pos = pos + step*dir;
+            div = mandelTest(pos);
+        }
+
+        if (mandelTest(pos) != vec3(0)) {
+            vec3 shadow = pos;
+            float intensity = 4.50;
+            while (intensity >= 0 && length(lightpos-shadow) > step) {
+                shadow += normalize(lightpos-shadow) * step;
+                if (mandelTest(shadow) != vec3(0))
+                    intensity -= 10*step;
+                else
+                    intensity -= 1*step;
+            }
+            outputColor = clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*intensity, vec4(0.0), vec4(1.0));
+            //outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
+        }
+
+    }
 
 }

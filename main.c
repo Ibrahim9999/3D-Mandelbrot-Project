@@ -70,23 +70,6 @@ void render() {
     printMonitors();
 }
 
-//Idle Function
-void idle() {
-    printf("*********************************\n");
-    printf("cameradir: %f,%f,%f\n", cameradir.x, cameradir.y, cameradir.z);
-    printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
-    printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
-    printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
-    
-    sendKeySignals();
-
-
-    //phi+=.01;
-    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, cameradir, horizontalAxis, verticalAxis, depthAxis, color, step , bail,
-        power, phi, theta, totalRotation, resolution, multisampling, lightpos, intensity);
-    render();
-}
-
 //Handle mouse input
 void handleMouse(int x, int y) {
     if (userfocus == VIEW_FOCUS) {
@@ -136,11 +119,6 @@ void sendKeySignals() {
     for (key = 0; key != 255; key++) {
         if (kbstate[key] == true) {
             putchar(key);
-            printf("*********************************\n");
-            printf("cameradir: %f,%f,%f\n", cameradir.x, cameradir.y, cameradir.z);
-            printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
-            printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
-            printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
             if (userfocus == VIEW_FOCUS) {
                 cameraMoveKeyboard(key, (float)(time-kblasttime[key])/CLOCKS_PER_SEC);
                 //printf("HEY: %d, %d", key, (int)(time-kblasttime[key]));
@@ -169,41 +147,52 @@ void handleResolution(int w, int h) {
 
 void printMonitors() {
     char string[80];    
-    float fps = 1000/(lastframe-lastlastframe);
+    float fps = 1000/(lastframe-lastlastframe);//printf("HERE"); for (unsigned int hj = 0; hj < 999999999999999; hj++) {}
     
     strcpy(string, "FPS:");
-
+	
     sprintf(string+4, "%f", fps);
-
+	
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();             
     glLoadIdentity();   
     int w = glutGet( GLUT_WINDOW_WIDTH );
     int h = glutGet( GLUT_WINDOW_HEIGHT );
     glOrtho( 0, w, 0, h, -1, 1 );
-
+	
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-
+	
     glDisable( GL_DEPTH_TEST ); 
-
+	
     glColor3f(1, 0, 0);
-
+	
     glRasterPos2i(20, 20);
-    void *font = GLUT_BITMAP_HELVETICA_18; 
+    void *font = GLUT_BITMAP_HELVETICA_18;
     for (char* c=string; *c != '\0'; c++) 
     {
-        glutBitmapCharacter(font, *c); 
+        //glutBitmapCharacter(font, *c); 
     }
-
+	
     glEnable (GL_DEPTH_TEST);  
 
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();  
+	
+}
 
+//Idle Function
+void idle() {
+	sendKeySignals();
+
+	//phi+=.01;
+	loadMandelbulbVars(mandelbulb_shader, fov, camerapos, color, step, bail,
+		power, phi, theta, totalRotation, resolution, multisampling, lightpos,
+		intensity);
+	render();
 }
 
 //Main
@@ -216,11 +205,18 @@ int main(int argc, char* argv[]) {
     hfov = vfov = START_FOV;
     cameradist = START_WIDTH/(2*tan(START_FOV/360*PI_CONST));
     setFOVvec(&fov, vfov, hfov);
-    InitializeCamera(&cameradir, &camerapos, &depthAxis, &horizontalAxis, &verticalAxis); 
+    InitializeCamera(&cameradir, &camerapos, &depthAxis, &horizontalAxis,
+		&verticalAxis); 
 
-    totalRotation.x = 0; totalRotation.y = 0; totalRotation.z = 0; totalRotation.w = 1;
+    totalRotation.x = 0;
+	totalRotation.y = 0;
+	totalRotation.z = 0;
+	totalRotation.w = 1;
+
     color.x=0; color.y=1; color.z=1;
+
     lightpos.x=1.0; lightpos.y=1.0; lightpos.z=-4;
+
     step = 0.01;
     bail = 10;
     multisampling=1;
@@ -255,10 +251,12 @@ int main(int argc, char* argv[]) {
     fflush(stdout);
 
     //Setup shaders
-    loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, cameradir,
-		horizontalAxis, verticalAxis, depthAxis, color, step, bail, power,
-		phi, theta, totalRotation, resolution, multisampling, lightpos, intensity);
+    loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, color, step,
+		bail, power, phi, theta, totalRotation, resolution, multisampling,
+		lightpos, intensity);
+
     printf("loaded program\n");
+
     fflush(stdout);
     printProgramLog(mandelbulb_shader);
 
