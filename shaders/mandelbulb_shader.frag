@@ -125,9 +125,9 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float p
     float zz = v.z * v.z;
     float xx_yy = xx + yy;
 
-    if (false)
+    if (power == 1.0)
         return v + c;
-    else if (false)
+    else if (power == 2.0)
     {
         float one_zz_xx_yy = 1 - zz / xx_yy;
 
@@ -186,7 +186,7 @@ void main() {
     vec3 pos = camerapos;
     vec3 dir = normalize(direction);
 
-	
+	/*
     vec3 off = (FOV/vec3(resolution.xy/2, 0.0))/multisampling;
     outputColor = vec4(0);
 
@@ -232,8 +232,8 @@ void main() {
     }
     outputColor /= multisampling*multisampling;
 
-	
-	/*
+	*/
+
 	vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), dir, ALMOST_TWO);
     //outputColor = vec4((dir + 1)/2,1.0);
     outputColor = vec4(1.0, 1, 1, 1);
@@ -262,5 +262,5 @@ void main() {
         }
 
     }
-	*/
+
 }
