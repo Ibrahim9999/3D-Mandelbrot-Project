@@ -6,6 +6,6 @@
 
 void InitializeCamera(vec3f* cameraPosition, vec3f* depthAxis, vec3f* horizontalAxis, vec3f* verticalAxis);
 void cameraMoveMouse(int x, int y);
-void cameraMoveKeyboard(int key, int modmask);
+void cameraMoveKeyboard(int key, int shift, int ctrl, int alt);
 
 #endif

@@ -78,16 +78,16 @@ void cameraMoveMouse(int x, int y) {
 }
 
 //Move camera based on keyboard
-void cameraMoveKeyboard(int key, int modmask) {
+void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
 
     float mod = 1;
     float modmod = 1;
 
-    if (GLUT_ACTIVE_ALT & modmask == GLUT_ACTIVE_ALT)
+    if (alt)
         modmod*=MODCOEF;
-    if (GLUT_ACTIVE_SHIFT & modmask == GLUT_ACTIVE_SHIFT)
+    if (shift)
         mod*=MAGMOD*modmod;
-    if (GLUT_ACTIVE_CTRL & modmask == GLUT_ACTIVE_CTRL)
+    if (ctrl)
         mod*=MINMOD/modmod;
 
 	printf("*********************************\n");
@@ -96,7 +96,6 @@ void cameraMoveKeyboard(int key, int modmask) {
 	printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
 	printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
 	printf("****\n");
-	printf("time: %f\n", time);
 	printf("camerapos: %f,%f,%f\n", camerapos.x, camerapos.y, camerapos.z);
 	printf("lightpos: %f,%f,%f\n", lightpos.x, lightpos.y, lightpos.z);
 	printf("power: %f\n", power);

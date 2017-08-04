@@ -83,7 +83,7 @@ void handleMouse(int x, int y) {
 
 
 //Handle keyboard input
-static unsigned int kbinputbuffer[KEYBUFFERLEN*2];
+static unsigned int kbinputbuffer[KEYBUFFERLEN*4];
 static int kbinputlen = 0;
 
 void clearKeyBuffer() {
@@ -91,7 +91,7 @@ void clearKeyBuffer() {
 
     int i = 0;
 
-    while (i < 256) {
+    while (i < KEYBUFFERLEN*4) {
         kbinputbuffer[i] = false;
         i++;
     }
@@ -99,25 +99,31 @@ void clearKeyBuffer() {
     
 void handleKeyboard(unsigned char key, int x, int y) {
     if (kbinputlen <= KEYBUFFERLEN) {
-        char shift=false, ctrl=false, alt=false;
+        int shift=false, ctrl=false, alt=false;
         //printf("****************%d", key);       
         int mods = glutGetModifiers();
 
-        if (mods & GLUT_ACTIVE_SHIFT == GLUT_ACTIVE_SHIFT)
-            shift = true;
-        if (mods & GLUT_ACTIVE_CTRL == GLUT_ACTIVE_CTRL)
-            ctrl = true;
-        if (mods & GLUT_ACTIVE_ALT == GLUT_ACTIVE_ALT)
-            alt = true;
+        if ((mods & GLUT_ACTIVE_SHIFT) == GLUT_ACTIVE_SHIFT) {
+            shift = true; putchar('S');
+        }
+        if ((mods & GLUT_ACTIVE_CTRL) == GLUT_ACTIVE_CTRL) {
+            ctrl = true; putchar('C');
+        }
+        if ((mods & GLUT_ACTIVE_ALT) == GLUT_ACTIVE_ALT) {
+            alt = true; putchar('A');
+        }
 
-        if (ctrl && isalpha(key))
-            key = key+96;
+        if (ctrl == true) {
+            key = key-1+'a';
+        }
+        else if (shift == true  && isalpha(key)) {
+            key = key- 'A' + 'a';
+        }
 
-        if (key >= 'A' && key <= 'Z')
-            key = key-'A'+'a';
-
-        kbinputbuffer[2*kbinputlen] = key;
-        kbinputbuffer[2*kbinputlen+1] = glutGetModifiers();
+        kbinputbuffer[4*kbinputlen] = key;
+        kbinputbuffer[4*kbinputlen+1] = shift;
+        kbinputbuffer[4*kbinputlen+2] = ctrl;
+        kbinputbuffer[4*kbinputlen+3] = alt;
         kbinputlen++;
     }
 }
@@ -130,9 +136,10 @@ void sendKeySignals() {
     int key;
 
     for (key = 0; key != kbinputlen; key++) {
-            putchar(kbinputbuffer[key*2]);
+            putchar(kbinputbuffer[key*4]);
             if (userfocus == VIEW_FOCUS) {
-                cameraMoveKeyboard(kbinputbuffer[key*2], kbinputbuffer[key*2+1]);
+                cameraMoveKeyboard(kbinputbuffer[key*4], kbinputbuffer[key*4+1],
+                    kbinputbuffer[key*4+2], kbinputbuffer[key*4+3]);
                 glutPostRedisplay();
             }
     }
