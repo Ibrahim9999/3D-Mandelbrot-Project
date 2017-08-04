@@ -206,9 +206,27 @@ void main() {
 
                 pos = intersection;
                 vec3 div = mandelTest(pos);
+                /*
                 while (div == vec3(0) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0) {
                     pos = pos + step*aa_dir;
                     div = mandelTest(pos);
+                }
+                */
+                vec3 lastpos = pos;
+                float cur_step = step*64;
+                while (cur_step >= step) {
+                    pos += cur_step*aa_dir;
+                    div = mandelTest(pos);
+                    if (div != vec3(0)) {
+                        if (cur_step <= step) break;
+                        pos -= cur_step*aa_dir;
+                        lastpos = pos;
+                        cur_step /= 4;
+                    }
+                    else if (pos.x*pos.x + pos.y*pos.y + pos.z*pos.z > 4.0) {
+                        pos = lastpos;
+                        cur_step /= 4;
+                    }
                 }
 
                 if (mandelTest(pos) != vec3(0)) {
@@ -230,38 +248,5 @@ void main() {
         }
     }
     outputColor /= multisampling*multisampling;
-
-    /*
-
-	vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), dir, ALMOST_TWO);
-    //outputColor = vec4((dir + 1)/2,1.0);
-    outputColor = vec4(1.0, 1, 1, 1);
-
-    if (intersection != vec3(0)) {
-
-        pos = intersection;
-        vec3 div = mandelTest(pos);
-        while (div == vec3(0) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0) {
-            pos = pos + step*dir;
-            div = mandelTest(pos);
-        }
-
-        if (mandelTest(pos) != vec3(0)) {
-            vec3 shadow = pos;
-            float intensity = 4.50;
-            while (intensity >= 0 && length(lightpos-shadow) > step) {
-                shadow += normalize(lightpos-shadow) * step;
-                if (mandelTest(shadow) != vec3(0))
-                    intensity -= 10*step;
-                else
-                    intensity -= 1*step;
-            }
-            outputColor = clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*intensity, vec4(0.0), vec4(1.0));
-            //outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
-        }
-
-    }
-
-    */
 
 }
