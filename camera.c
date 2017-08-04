@@ -90,7 +90,8 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
     if (ctrl)
         mod*=MINMOD/modmod;
 
-	printf("*********************************\n");
+
+    printf("*********************************\n");
 	printf("totalRotation: %f, <%f,%f,%f>\n", totalRotation.w, totalRotation.x, totalRotation.y, totalRotation.z);
 	printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
 	printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
