@@ -3,17 +3,22 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <GL/glut.h>
 
-#define ANGLE_PER_SEC 45
-#define DIST_PER_SEC 1
-#define BAIL_PER_SEC 1
-#define STEP_PER_SEC .001
-#define POWER_PER_SEC 1
-#define PHI_SHIFT_PER_SEC 1
-#define THETA_SHIFT_PER_SEC 1
-#define LIGHT_SHIFT_PER_SEC 1
-#define LIGHT_INTENSITY_PER_SEC 1
+#define D_ANGLE 1
+#define D_CAMERA_DIST 0.05
+#define D_BAIL 1
+#define D_STEP .001
+#define D_POWER 1
+#define D_PHI 1
+#define D_THETA 1
+#define D_LIGHT_DIST 1
+#define D_LIGHT_INTENSITY .1
 #define ANGLE_PER_PIXEL 0.5
+
+#define MAGMOD 10
+#define MINMOD 0.1
+#define MODCOEF 10
 
 extern vec4f totalRotation;
 extern vec3f camerapos;
@@ -73,18 +78,26 @@ void cameraMoveMouse(int x, int y) {
 }
 
 //Move camera based on keyboard
-void cameraMoveKeyboard(char key, float time)
-{
+void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
+
+    float mod = 1;
+    float modmod = 1;
+
+    if (alt)
+        modmod*=MODCOEF;
+    if (shift)
+        mod*=MAGMOD*modmod;
+    if (ctrl)
+        mod*=MINMOD/modmod;
+
 	printf("*********************************\n");
 	printf("totalRotation: %f, <%f,%f,%f>\n", totalRotation.w, totalRotation.x, totalRotation.y, totalRotation.z);
 	printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
 	printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
 	printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
 	printf("****\n");
-	printf("time: %f\n", time);
 	printf("camerapos: %f,%f,%f\n", camerapos.x, camerapos.y, camerapos.z);
 	printf("lightpos: %f,%f,%f\n", lightpos.x, lightpos.y, lightpos.z);
-	printf("intensity: %f\n", intensity);
 	printf("power: %f\n", power);
 	printf("phi: %f\n", phi);
 	printf("theta: %f\n", theta);
@@ -105,83 +118,83 @@ void cameraMoveKeyboard(char key, float time)
 	*/
 
 	if (key == 'c')
-		bail -= time*BAIL_PER_SEC;
+		bail -= D_BAIL*mod;
 	else if (key == 'v')
-		bail += round(/*time**/BAIL_PER_SEC); // += DOES NOT WORK WITH TIME, POSSIBLE FLOATING POINT ERROR?
+		bail += D_BAIL*mod;
 
 	if (key == 'z')
-		step += time*STEP_PER_SEC;
+		step += D_STEP*mod;
 	else if (key == 'x')
-		step -= time*STEP_PER_SEC;
+		step -= D_STEP*mod;
 
 	if (key == 'p')
-		power += time*POWER_PER_SEC;
+		power += D_POWER*mod;
 	else if (key == 'o')
-		power -= time*POWER_PER_SEC;
+		power -= D_POWER*mod;
 
 	else if (key == '7')
-		phi -= time*PHI_SHIFT_PER_SEC;
+		phi -= D_PHI*mod;
 	else if (key == '8')
-		phi += time*PHI_SHIFT_PER_SEC;
+		phi += D_PHI*mod;
 
 	else if (key == '9')
-		theta -= time*THETA_SHIFT_PER_SEC;
+		theta -= D_THETA*mod;
 	else if (key == '0')
-		theta += time*THETA_SHIFT_PER_SEC;
+		theta += D_THETA*mod;
 
 	//Pointlight
 	if (key == 't')
-		lightpos.x -= time*LIGHT_SHIFT_PER_SEC;
+		lightpos.x -= D_LIGHT_DIST*mod;
 	else if (key == 'y')
-		lightpos.x += time*LIGHT_SHIFT_PER_SEC;
+		lightpos.x += D_LIGHT_DIST*mod;
 	if (key == 'g')
-		lightpos.y -= time*LIGHT_SHIFT_PER_SEC;
+		lightpos.y -= D_LIGHT_DIST*mod;
 	else if (key == 'h')
-		lightpos.y += time*LIGHT_SHIFT_PER_SEC;
+		lightpos.y += D_LIGHT_DIST*mod;
 	if (key == 'b')
-		lightpos.z -= time*LIGHT_SHIFT_PER_SEC;
+		lightpos.z -= D_LIGHT_DIST*mod;
 	else if (key == 'n')
-		lightpos.z += time*LIGHT_SHIFT_PER_SEC;
+		lightpos.z += D_LIGHT_DIST*mod;
 
 
 	if (key == 'u')
-		intensity -= time*LIGHT_INTENSITY_PER_SEC;
+		intensity -= D_LIGHT_INTENSITY*mod;
 	else if (key == 'm')
-		intensity += time*LIGHT_INTENSITY_PER_SEC; // += DOES NOT WORK, POSSIBLE FLOATING POINT ERROR?
+		intensity += D_LIGHT_INTENSITY*mod; // += DOES NOT WORK, POSSIBLE FLOATING POINT ERROR?
 
 	//Rotations
 	else if (key == 'q')
-		Roll(-time*ANGLE_PER_SEC, &totalRotation, &horizontalAxis,
+		Roll(-D_ANGLE*mod, &totalRotation, &horizontalAxis,
 			&verticalAxis, &depthAxis);
 	else if (key == 'e')
-		Roll(time*ANGLE_PER_SEC, &totalRotation, &horizontalAxis,
+		Roll(D_ANGLE*mod, &totalRotation, &horizontalAxis,
 			&verticalAxis, &depthAxis);
 	else if (key == 'l')
-		Yaw(-time*ANGLE_PER_SEC, &totalRotation, &horizontalAxis,
+		Yaw(-D_ANGLE*mod, &totalRotation, &horizontalAxis,
 			&verticalAxis, &depthAxis);
 	else if (key == 'j')
-		Yaw(time*ANGLE_PER_SEC, &totalRotation, &horizontalAxis,
+		Yaw(D_ANGLE*mod, &totalRotation, &horizontalAxis,
 			&verticalAxis, &depthAxis);
 	else if (key == 'k')
-		Pitch(-time*ANGLE_PER_SEC, &totalRotation, &horizontalAxis,
+		Pitch(-D_ANGLE*mod, &totalRotation, &horizontalAxis,
 			&verticalAxis, &depthAxis);
 	else if (key == 'i')
-		Pitch(time*ANGLE_PER_SEC, &totalRotation, &horizontalAxis,
+		Pitch(mod*D_ANGLE, &totalRotation, &horizontalAxis,
 			&verticalAxis, &depthAxis);
 
 	//Move
 	else if (key == 'w')
-		camerapos = MoveAlongAxis(camerapos, verticalAxis, -time*DIST_PER_SEC);
+		camerapos = MoveAlongAxis(camerapos, verticalAxis, -D_CAMERA_DIST*mod);
 	else if (key == 's')
-		camerapos = MoveAlongAxis(camerapos, verticalAxis, time*DIST_PER_SEC);
+		camerapos = MoveAlongAxis(camerapos, verticalAxis, D_CAMERA_DIST*mod);
 	else if (key == 'a')
-		camerapos = MoveAlongAxis(camerapos, horizontalAxis, time*DIST_PER_SEC);
+		camerapos = MoveAlongAxis(camerapos, horizontalAxis, D_CAMERA_DIST*mod);
 	else if (key == 'd')
-		camerapos = MoveAlongAxis(camerapos, horizontalAxis, -time*DIST_PER_SEC);
+		camerapos = MoveAlongAxis(camerapos, horizontalAxis, -D_CAMERA_DIST*mod);
 
 	// Zoom
 	else if (key == 'r')
-		camerapos = MoveAlongAxis(camerapos, depthAxis, time*DIST_PER_SEC);
+		camerapos = MoveAlongAxis(camerapos, depthAxis, D_CAMERA_DIST*mod);
 	else if (key == 'f')
-		camerapos = MoveAlongAxis(camerapos, depthAxis, -time*DIST_PER_SEC);
+		camerapos = MoveAlongAxis(camerapos, depthAxis, -D_CAMERA_DIST*mod);
 }

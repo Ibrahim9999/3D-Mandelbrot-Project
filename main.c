@@ -4,6 +4,7 @@
 #include <time.h>
 #include <GL/glew.h>
 #include <GL/glut.h>
+#include <ctype.h>
 #include "shader.h"
 #include "vector.h"
 #include "camera.h"
@@ -21,6 +22,8 @@
 #define START_WIDTH 400
 
 #define START_FOV 50.0
+
+#define KEYBUFFERLEN 256
 
 //Functions
 void sendKeySignals();
@@ -80,54 +83,68 @@ void handleMouse(int x, int y) {
 
 
 //Handle keyboard input
-static unsigned char kbstate[256];
-static float kbtime[256];
-static float kblasttime[256];
+static unsigned int kbinputbuffer[KEYBUFFERLEN*4];
+static int kbinputlen = 0;
 
 void clearKeyBuffer() {
+    kbinputlen = 0;
+
     int i = 0;
 
-    while (i < 256) {
-        kbstate[i] = false;
-        kbtime[i] = 0;
-        kblasttime[i] = 0;
+    while (i < KEYBUFFERLEN*4) {
+        kbinputbuffer[i] = false;
         i++;
     }
 }
-
-void handleKeyboard(unsigned char key, int x, int y) {
-    float current = glutGet(GLUT_ELAPSED_TIME);
     
-    if (kbstate[key] == false) {
-        kbstate[key] = true;
-        kbtime[key] = current;
-        kblasttime[key] = current;
+void handleKeyboard(unsigned char key, int x, int y) {
+    if (kbinputlen <= KEYBUFFERLEN) {
+        int shift=false, ctrl=false, alt=false;
+        //printf("****************%d", key);       
+        int mods = glutGetModifiers();
+
+        if ((mods & GLUT_ACTIVE_SHIFT) == GLUT_ACTIVE_SHIFT) {
+            shift = true; putchar('S');
+        }
+        if ((mods & GLUT_ACTIVE_CTRL) == GLUT_ACTIVE_CTRL) {
+            ctrl = true; putchar('C');
+        }
+        if ((mods & GLUT_ACTIVE_ALT) == GLUT_ACTIVE_ALT) {
+            alt = true; putchar('A');
+        }
+
+        if (ctrl == true) {
+            key = key-1+'a';
+        }
+        else if (shift == true  && isalpha(key)) {
+            key = key- 'A' + 'a';
+        }
+
+        kbinputbuffer[4*kbinputlen] = key;
+        kbinputbuffer[4*kbinputlen+1] = shift;
+        kbinputbuffer[4*kbinputlen+2] = ctrl;
+        kbinputbuffer[4*kbinputlen+3] = alt;
+        kbinputlen++;
     }
 }
 
 void handleKeyboardUp(unsigned char key, int x, int y) {
-    kbstate[key] = false;
-    kbtime[key] = 0;
-    kblasttime[key] = 0;
-
-    //printf("%c", key);
+    
 }
 
 void sendKeySignals() {
-    float current = glutGet(GLUT_ELAPSED_TIME);
-    unsigned char key;
-    
-    for (key = 0; key != 255; key++) {
-        if (kbstate[key] == true) {
-            putchar(key);
+    int key;
+
+    for (key = 0; key != kbinputlen; key++) {
+            putchar(kbinputbuffer[key*4]);
             if (userfocus == VIEW_FOCUS) {
-                cameraMoveKeyboard(key, (float)(current-kblasttime[key])/1000);
-                //printf("HEY: %d, %d", key, (int)(time-kblasttime[key]));
-                kblasttime[key] = current;
+                cameraMoveKeyboard(kbinputbuffer[key*4], kbinputbuffer[key*4+1],
+                    kbinputbuffer[key*4+2], kbinputbuffer[key*4+3]);
+                glutPostRedisplay();
             }
-        }
     }
 
+    clearKeyBuffer();
 }
 
 void handleResolution(int w, int h) {
@@ -176,7 +193,7 @@ void printMonitors() {
     void *font = GLUT_BITMAP_HELVETICA_18;
     for (char* c=string; *c != '\0'; c++) 
     {
-        //glutBitmapCharacter(font, *c);
+        glutBitmapCharacter(font, *c);
     }
 	
     glEnable (GL_DEPTH_TEST);  
@@ -196,7 +213,6 @@ void idle() {
 	loadMandelbulbVars(mandelbulb_shader, fov, camerapos, color, step, bail,
 		power, phi, theta, totalRotation, resolution, multisampling, lightpos,
 		intensity);
-	render();
 }
 
 //Main
@@ -239,7 +255,7 @@ int main(int argc, char* argv[]) {
 	glutCreateWindow("3D Mandelbulb Viewer");
     
     //Setup Input
-    glutIgnoreKeyRepeat(true);
+    //glutIgnoreKeyRepeat(true);
     clearKeyBuffer();
 
     //Setup functions
