@@ -198,13 +198,13 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
 
 	//Move
 	else if (key == 'w')
-		camerapos = MoveAlongAxis(camerapos, verticalAxis, -D_CAMERA_DIST*mod);
-	else if (key == 's')
 		camerapos = MoveAlongAxis(camerapos, verticalAxis, D_CAMERA_DIST*mod);
+	else if (key == 's')
+		camerapos = MoveAlongAxis(camerapos, verticalAxis, -D_CAMERA_DIST*mod);
 	else if (key == 'a')
-		camerapos = MoveAlongAxis(camerapos, horizontalAxis, D_CAMERA_DIST*mod);
-	else if (key == 'd')
 		camerapos = MoveAlongAxis(camerapos, horizontalAxis, -D_CAMERA_DIST*mod);
+	else if (key == 'd')
+		camerapos = MoveAlongAxis(camerapos, horizontalAxis, D_CAMERA_DIST*mod);
 
 	// Zoom
 	else if (key == 'r')
