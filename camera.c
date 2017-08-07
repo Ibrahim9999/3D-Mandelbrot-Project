@@ -220,7 +220,6 @@ void screenshot(char* filename, int width, int height) {
     GLuint texture;
     GLuint fb=0, rb;
     FILE *file;
-    int pixel;
     GLubyte *data;
     vec2f oldres;
     
@@ -244,13 +243,12 @@ void screenshot(char* filename, int width, int height) {
 
     oldres = resolution;
     resolution.x = width, resolution.y = height;
-    changeFOVscale(&vfov, &hfov, width, height, cameradist);
+    changeFOVscale(&vfov, &hfov, width, height);
     setFOVvec(&fov, vfov, hfov);
     updateMandelbulbVars();
 
     draw();
 
-    pixel = width * height;;
     data = malloc(width * height * 3);
 
     glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, width, height, 0);
@@ -277,10 +275,7 @@ void screenshot(char* filename, int width, int height) {
     file = fopen(filename, "w");
     fprintf(file, "P6\n%d %d\n255\n", width, height);
     
-    while (pixel) {
-        fwrite(data+pixel*3, sizeof(GLubyte), 3, file);
-        pixel--;
-    }
+    fwrite(data, sizeof(GLubyte)*3, width*height, file);
 
     fclose(file);
 

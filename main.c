@@ -18,14 +18,13 @@ void draw() {
 void render() {    
 
     draw();
-
-    glutSwapBuffers();
-    glFinish();
-
     lastlastframe = lastframe;
     lastframe = glutGet(GLUT_ELAPSED_TIME);
 
     printMonitors();
+
+    glutSwapBuffers();
+    glFinish();
 }
 
 //Handle mouse input
@@ -46,8 +45,7 @@ void clearKeyBuffer() {
     int i = 0;
 
     while (i < KEYBUFFERLEN*4) {
-        kbinputbuffer[i] = false;
-        i++;
+        kbinputbuffer[i++] = false;
     }
 }
     
@@ -95,6 +93,7 @@ void sendKeySignals() {
                 cameraMoveKeyboard(kbinputbuffer[key*4], kbinputbuffer[key*4+1],
                     kbinputbuffer[key*4+2], kbinputbuffer[key*4+3]);
                 glutPostRedisplay();
+                glutSwapBuffers();
             }
     }
 
