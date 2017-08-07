@@ -154,7 +154,7 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     glUniform1i(multisampling_loc, multisampling);
     glUniform3f(lightpos_loc, lightpos.x, lightpos.y, lightpos.z);
     glUniform1f(intensity_loc, intensity);
-	glUniform3f(depthAxis_loc, horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
+	glUniform3f(horizontalAxis_loc, horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
 	glUniform3f(verticalAxis_loc, verticalAxis.x, verticalAxis.y, verticalAxis.z);
 	glUniform3f(depthAxis_loc, depthAxis.x, depthAxis.y, depthAxis.z);
 	glUniform1f(wVar_loc, wVar);

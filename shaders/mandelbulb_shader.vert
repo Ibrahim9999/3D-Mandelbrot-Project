@@ -59,7 +59,7 @@ void main() {
 
 	vec3 p = vec3 (0,0,0);
 	
-	p = MoveAlongAxis(p, vec3 (1,0,0), direction.x);
+	p = MoveAlongAxis(p, horizontalAxis, direction.x);
 	p = MoveAlongAxis(p, verticalAxis, direction.y);
 	p = MoveAlongAxis(p, depthAxis, direction.z);
 

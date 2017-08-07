@@ -214,8 +214,6 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
 
     else if (key == '1')
         screenshot("screenshot.ppm", 1024, 1024);
-
-    //glutPostRedisplay();
 }
 
 void screenshot(char* filename, int width, int height) {
@@ -252,6 +250,7 @@ void screenshot(char* filename, int width, int height) {
 
     draw();
 
+    pixel = width * height;;
     data = malloc(width * height * 3);
 
     glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, width, height, 0);
@@ -278,7 +277,10 @@ void screenshot(char* filename, int width, int height) {
     file = fopen(filename, "w");
     fprintf(file, "P6\n%d %d\n255\n", width, height);
     
-    fwrite(data, sizeof(GLubyte)*3, width*height, file);
+    while (pixel) {
+        fwrite(data+pixel*3, sizeof(GLubyte), 3, file);
+        pixel--;
+    }
 
     fclose(file);
 
