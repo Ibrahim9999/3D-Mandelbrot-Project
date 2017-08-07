@@ -1,8 +1,10 @@
 #include "camera.h"
 #include "vector.h"
 #include <time.h>
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <GL/glew.h>
 #include <GL/glut.h>
 
 #define D_ANGLE 1
@@ -32,6 +34,17 @@ extern float step;
 extern float theta;
 extern float phi;
 extern float intensity;
+extern vec2f resolution;
+
+extern int multisampling;
+
+extern vec3f fov;
+extern float hfov, vfov;
+extern float cameradist;
+
+extern void draw();
+extern void render();
+extern void updateMandelbulbVars();
 
 static int oldMouseX = -1, oldMouseY = -1;
 
@@ -198,4 +211,103 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
 		camerapos = MoveAlongAxis(camerapos, depthAxis, D_CAMERA_DIST*mod);
 	else if (key == 'f')
 		camerapos = MoveAlongAxis(camerapos, depthAxis, -D_CAMERA_DIST*mod);
+
+    else if (key == '1')
+        screenshot("screenshot.ppm", 1024, 1024);
+}
+
+void screenshot(char* filename, int width, int height) {
+    GLuint texture;
+    GLuint fb=0, rb;
+    FILE *file;
+    int pixel;
+    GLubyte *data;
+    vec2f oldres;
+    
+    multisampling = 4;
+
+    glGenFramebuffers(1, &fb);
+    glBindFramebuffer(GL_FRAMEBUFFER, fb);
+
+    glGenRenderbuffers(1, &rb);
+    glBindRenderbuffer(GL_RENDERBUFFER, rb);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA4, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rb);
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+        GL_UNSIGNED_BYTE, 0);
+   
+    glViewport(0, 0, width, height);
+    glScissor(0, 0, width, height);
+
+    oldres = resolution;
+    resolution.x = width, resolution.y = height;
+    changeFOVscale(&vfov, &hfov, width, height, cameradist);
+    setFOVvec(&fov, vfov, hfov);
+    updateMandelbulbVars();
+
+    draw();
+
+    pixel = width * height;;
+    data = malloc(width * height * 3);
+
+    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, width, height, 0);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    //glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    //Dispose of texture, framebuffer
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDeleteTextures(1, &texture);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &fb);
+    glDeleteRenderbuffers(1, &rb);
+
+    multisampling = 1;
+    resolution = oldres;
+    glClear(GL_COLOR_BUFFER_BIT);
+    glViewport(0, 0, resolution.x, resolution.y);
+    glScissor(0, 0, resolution.x, resolution.y);
+    changeFOV(&vfov, &hfov, resolution.x, resolution.y, cameradist);
+    setFOVvec(&fov, vfov, hfov);
+    updateMandelbulbVars();
+
+    file = fopen(filename, "w");
+    fprintf(file, "P6\n%d %d\n255\n", width, height);
+    
+    while (pixel) {
+        fwrite(data+pixel*3, sizeof(GLubyte), 3, file);
+        pixel--;
+    }
+
+    fclose(file);
+
+    render();
+}
+
+void setFOVvec(vec3f* vector, float vertFOV, float horiFOV) {
+    float tan_h = tan(horiFOV/360*PI);
+    float tan_v = tan(vertFOV/360*PI);
+
+    vector->z = sqrt(1/(tan_h*tan_h+tan_v*tan_v+1));
+    vector->y = vector->z*tan_v;
+    vector->x = vector->z*tan_h;
+
+    *vector = v3f_normalize(*vector);
+}
+
+void changeFOV(float *vfov, float *hfov, int w, int h, float cameradist) {
+    *hfov = atan(w/(2*cameradist))/(2*PI)*720;
+    *vfov = atan(h/(2*cameradist))/(2*PI)*720;
+}
+
+void changeFOVscale(float *vfov, float* hfov, int w, int h) {
+    if (w > h) {
+       *hfov = *vfov; 
+    }
+    else {
+        *vfov = *hfov;
+    }   
 }

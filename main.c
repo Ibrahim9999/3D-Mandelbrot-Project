@@ -1,17 +1,23 @@
 #include "main.h"
 
-//Render Funcion
-void render() {    
-
+//Render quad
+void draw() {
     //Clear
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
+    //Draw quad over screen
     glBegin(GL_QUADS);
 	    glVertex3f(1.0f, 1.0f, 0.0);
 	    glVertex3f(1.0f, -1.0f, 0.0);
 	    glVertex3f(-1.0f, -1.0f, 0.0);
         glVertex3f(-1.0f, 1.0f, 0.0);
     glEnd();
+}
+
+//Render Funcion
+void render() {    
+
+    draw();
 
     glutSwapBuffers();
     glFinish();
@@ -96,28 +102,22 @@ void sendKeySignals() {
 }
 
 void handleResolution(int w, int h) {
-    //printf("nw: %d", w);
-    //printf("HEY: %f\n", hfov);
-    //printf("dist %f\n", cameradist);
-
     //Set viewport
     glViewport(0, 0, w, h);
 
-    hfov = atan(w/(2*cameradist))/(2*PI_CONST)*720; 
-    vfov = atan(h/(2*cameradist))/(2*PI_CONST)*720;
+    changeFOV(&vfov, &hfov, w, h, cameradist);
     //printf("newfov: %f\n", hfov);
 
     setFOVvec(&fov, vfov, hfov);
-    //printf("nvec: %f, %f, %f\n", fov.x, fov.y, fov.z);
+    printf("nvec: %f, %f, %f\n", fov.x, fov.y, fov.z);
 	
     resolution.x = w; resolution.y = h;
-
 }
 
 void printMonitors() {
     char string[80];    
-    float fps = 1000/(lastframe-lastlastframe);//printf("HERE"); for (unsigned int hj = 0; hj < 999999999999999; hj++) {}
-    
+    float fps = 1000/(lastframe-lastlastframe);
+
     strcpy(string, "FPS:");
 	
     sprintf(string+4, "%f", fps);
@@ -131,9 +131,7 @@ void printMonitors() {
 	
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    glLoadIdentity();
-	
-    glDisable( GL_DEPTH_TEST ); 
+    glLoadIdentity(); 
 	
     glColor3f(1, 0, 0);
 	
@@ -141,10 +139,8 @@ void printMonitors() {
     void *font = GLUT_BITMAP_HELVETICA_18;
     for (char* c=string; *c != '\0'; c++) 
     {
-        glutBitmapCharacter(font, *c);
+        //glutBitmapCharacter(font, *c);
     }
-	
-    glEnable (GL_DEPTH_TEST);  
 
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
@@ -153,14 +149,17 @@ void printMonitors() {
 	
 }
 
+//Update shader variables
+void updateMandelbulbVars() {
+    loadMandelbulbVars(mandelbulb_shader, fov, camerapos, color, step, bail,
+        power, phi, theta, totalRotation, resolution, multisampling, lightpos,
+        intensity);
+}
+
 //Idle Function
 void idle() {
 	sendKeySignals();
-
-	//phi+=.01;
-	loadMandelbulbVars(mandelbulb_shader, fov, camerapos, color, step, bail,
-		power, phi, theta, totalRotation, resolution, multisampling, lightpos,
-		intensity);
+    updateMandelbulbVars();
 }
 
 //Main
@@ -197,7 +196,7 @@ int main(int argc, char* argv[]) {
 
     //Setup window
     glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
 	glutInitWindowSize(resolution.x, resolution.y);
 	glutCreateWindow("3D Mandelbulb Viewer");

@@ -18,7 +18,7 @@ uniform int multisampling;
 uniform vec3 lightpos;
 uniform float intensity;
 
-out vec4 outputColor;
+out vec3 outputColor;
 
 bool equals(in float a, in float b) {
     float epsilon = 0.000000001;
@@ -26,7 +26,7 @@ bool equals(in float a, in float b) {
 }
 
 // Hue: 0-1
-float GetHue(vec4 color)
+float GetHue(vec3 color)
 {
     float hue = 0;
     float red = color.x;
@@ -55,7 +55,7 @@ float GetHue(vec4 color)
     return hue / 360.0;
 }
 
-void ColorToHSV(vec4 color, inout float hue, inout float saturation, inout float value)
+void ColorToHSV(vec3 color, inout float hue, inout float saturation, inout float value)
 {
     float max = max(color.x, max(color.y, color.z));
     float min = min(color.x, min(color.y, color.z));
@@ -70,7 +70,7 @@ void ColorToHSV(vec4 color, inout float hue, inout float saturation, inout float
 }
 
 // RGBA: 0-1
-vec4 ColorFromHSV(float hue, float saturation, float value)
+vec3 ColorFromHSV(float hue, float saturation, float value)
 {
     float hi = mod(floor(hue / 60.0), 6);
     float f = hue / 60.0 - floor(hue / 60.0);
@@ -82,17 +82,17 @@ vec4 ColorFromHSV(float hue, float saturation, float value)
     float t = value * (1 - (1 - f) * saturation);
 
     if (hi == 0)
-        return vec4(v, t, p, 0);
+        return vec3(v, t, p);
     if (hi == 1)
-        return vec4(q, v, p, 0);
+        return vec3(q, v, p);
     if (hi == 2)
-        return vec4(p, v, t, 0);
+        return vec3(p, v, t);
     if (hi == 3)
-        return vec4(p, q, v, 0);
+        return vec3(p, q, v);
     if (hi == 4)
-        return vec4(t, p, v, 0);
+        return vec3(t, p, v);
 
-    return vec4(v, p, q, 0);
+    return vec3(v, p, q);
 }
 
 vec3 TriplexPower( in vec3 v, in float power)
@@ -187,7 +187,7 @@ void main() {
     vec3 dir = normalize(direction);
 
     vec3 off = (FOV/vec3(resolution.xy/2, 0.0))/multisampling;
-    outputColor = vec4(0);
+    outputColor = vec3(0);
 
     for (int i = -(multisampling/2); i <= multisampling/2; i++) {
         for (int j = -(multisampling/2); j <= multisampling/2; j++) {
@@ -222,11 +222,12 @@ void main() {
                         }
                         cur_intensity -= 1*step;
                     }
-                    outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*cur_intensity, vec4(0.0), vec4(1.0));
+                    outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
+                    //outputColor += clamp(vec3(color*cur_intensity), vec3(0.0), vec3(1.0));
                     continue;
                 }
             }
-            outputColor += vec4(1.0);
+            outputColor += vec3(1.0);
         }
     }
     outputColor /= multisampling*multisampling;
@@ -235,7 +236,7 @@ void main() {
 
 	vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), dir, ALMOST_TWO);
     //outputColor = vec4((dir + 1)/2,1.0);
-    outputColor = vec4(1.0, 1, 1, 1);
+    outputColor = vec3(1.0, 1, 1);
 
     if (intersection != vec3(0)) {
 
@@ -256,7 +257,7 @@ void main() {
                 else
                     intensity -= 1*step;
             }
-            outputColor = clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*intensity, vec4(0.0), vec4(1.0));
+            outputColor = clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*intensity, vec3(0.0), vec3(1.0));
             //outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
         }
 

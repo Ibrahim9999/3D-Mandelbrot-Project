@@ -12,7 +12,6 @@ typedef struct shaderprogram_struct {
 } shaderprogram;
 
 char* loadTextFile(const char* filename);
-void setFOVvec(vec3f *vector, float vertFOV, float horiFOV);
 void loadShaders(shaderprogram *program, const char* vname, const char* fname);
 void printProgramLog(shaderprogram program);
 void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
