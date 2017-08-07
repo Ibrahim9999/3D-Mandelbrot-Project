@@ -113,11 +113,13 @@ void loadShaders(shaderprogram *program, const char* vname, const char* fname) {
 void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     vec3f color, float step, int bail, float power, float phi, float theta,
 	vec4f totalRotation, vec2f resolution, int multisampling, vec3f lightpos,
-	float intensity) {
+	float intensity, vec3f horizontalAxis, vec3f verticalAxis, vec3f depthAxis,
+	float wVar) {
     
-	  GLint fov_loc, camerapos_loc, color_loc, step_loc, bail_loc, power_loc,
-		  phi_loc, theta_loc, totalRotation_loc, resolution_loc,
-		  multisampling_loc, lightpos_loc, intensity_loc;
+	GLint fov_loc, camerapos_loc, color_loc, step_loc, bail_loc, power_loc,
+		phi_loc, theta_loc, totalRotation_loc, resolution_loc,
+		multisampling_loc, lightpos_loc, intensity_loc, horizontalAxis_loc,
+		verticalAxis_loc, depthAxis_loc, wVar_loc;
 
     fov_loc = glGetUniformLocation(program.prog, "FOV");
     camerapos_loc = glGetUniformLocation(program.prog, "camerapos");
@@ -132,6 +134,10 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     multisampling_loc = glGetUniformLocation(program.prog, "multisampling");
     lightpos_loc = glGetUniformLocation(program.prog, "lightpos");
     intensity_loc = glGetUniformLocation(program.prog, "intensity");
+	horizontalAxis_loc = glGetUniformLocation(program.prog, "horizontalAxis");
+	verticalAxis_loc = glGetUniformLocation(program.prog, "verticalAxis");
+	depthAxis_loc = glGetUniformLocation(program.prog, "depthAxis");
+	wVar_loc = glGetUniformLocation(program.prog, "wVar");
 
     //printf("************ %f, %f, %f", fov.x, fov.y, fov.z);
 
@@ -148,17 +154,22 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     glUniform1i(multisampling_loc, multisampling);
     glUniform3f(lightpos_loc, lightpos.x, lightpos.y, lightpos.z);
     glUniform1f(intensity_loc, intensity);
+	glUniform3f(depthAxis_loc, horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
+	glUniform3f(verticalAxis_loc, verticalAxis.x, verticalAxis.y, verticalAxis.z);
+	glUniform3f(depthAxis_loc, depthAxis.x, depthAxis.y, depthAxis.z);
+	glUniform1f(wVar_loc, wVar);
 }
 
 void loadMandelbulbProgram(shaderprogram* program, vec3f fov, vec3f camerapos,
     vec3f color, float step, int bail, float power, float phi, float theta,
 	vec4f totalRotation, vec2f resolution, int multisampling, vec3f lightpos,
-	float intensity) {
+	float intensity, vec3f horizontalAxis, vec3f verticalAxis, vec3f depthAxis,
+	float wVar) {
 
     loadShaders(program, "shaders/mandelbulb_shader.vert", "shaders/mandelbulb_shader.frag");
 
     glUseProgram(program->prog);
 
-    loadMandelbulbVars(*program, fov, camerapos, color, step, bail, power, phi, theta, totalRotation, resolution, multisampling, lightpos, intensity);
+    loadMandelbulbVars(*program, fov, camerapos, color, step, bail, power, phi, theta, totalRotation, resolution, multisampling, lightpos, intensity, horizontalAxis, verticalAxis, depthAxis, wVar);
 }
 

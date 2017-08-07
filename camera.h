@@ -10,5 +10,6 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt);
 void screenshot(char* filename, int width, int height);
 void setFOVvec(vec3f* fov, float vertFOV, float horiFOV);
 void changeFOV(float* vfov, float* hfov, int w, int h, float cameradist);
+void changeFOVscale(float *vfov, float* hfov, int w, int h);
 
 #endif

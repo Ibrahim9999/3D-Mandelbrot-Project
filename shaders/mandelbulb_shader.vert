@@ -1,39 +1,33 @@
 #version 130
 
 uniform vec3 FOV;
+uniform vec3 horizontalAxis;
+uniform vec3 verticalAxis;
+uniform vec3 depthAxis;
 uniform vec4 totalRotation;
 
 out vec3 direction;
 
-vec4 QuatInverse(in vec4 q)
+vec3 VecDoubleMultiply(in vec3 v, in float d)
 {
-    return q / (q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
+    v.x *= d;
+    v.y *= d;
+    v.z *= d;
+
+	return v;
 }
 
-vec3 QuatVecMultiply(in vec4 q, in vec3 v)
-{
-    float xx = q.x*q.x;
-    float yy = q.y*q.y;
-    float zz = q.z*q.z;
-    float xy = q.x*q.y;
-    float xz = q.x*q.z;
-    float yz = q.y*q.z;
-    float wx = q.w*q.x;
-    float wy = q.w*q.y;
-    float wz = q.w*q.z;
-    
-    vec3 result;
-    
-    result.x = v.x * (1 - 2 * (yy + zz)) + v.y * 2 * (xy - wz) + v.z * 2 * (xz + wy);
-    result.y = v.x * 2 * (xy + wz) + v.y * (1 - (2 * (xx + zz))) + v.z * 2 * (yz - wx);
-    result.z = v.x * 2 * (xz - wy) + v.y * 2 * (yz + wx) + v.z * (1 - 2 * (xx + yy));
-    
-    return result;
+vec3 VecVecAdd(in vec3 a, in vec3 b) {
+    a.x += b.x;
+    a.y += b.y;
+    a.z += b.z;
+
+    return a;
 }
 
-void ApplyRotationToVector(in vec4 rotation, inout vec3 axis)
+vec3 MoveAlongAxis(in vec3 position, in vec3 axis, in float scalar)
 {
-    axis = QuatVecMultiply(QuatInverse(rotation), QuatVecMultiply(rotation, axis));
+	 return VecVecAdd(position, VecDoubleMultiply(axis, scalar));
 }
 
 void main() {
@@ -53,7 +47,7 @@ void main() {
         direction = vec3(FOV.x, -FOV.y, FOV.z);
         gl_Position = vec4(1.0, -1.0, 0.0, 1.0);
     }
-
+	/*
     float magnitude = sqrt(direction.x*direction.x + direction.y*direction.y + direction.z*direction.z);
 
 	direction.x /= magnitude;
@@ -61,4 +55,13 @@ void main() {
 	direction.y /= magnitude;
 
     ApplyRotationToVector(totalRotation, direction);
+	*/
+
+	vec3 p = vec3 (0,0,0);
+	
+	p = MoveAlongAxis(p, vec3 (1,0,0), direction.x);
+	p = MoveAlongAxis(p, verticalAxis, direction.y);
+	p = MoveAlongAxis(p, depthAxis, direction.z);
+
+	direction = p;
 }

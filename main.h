@@ -47,6 +47,7 @@ float power;
 float phi;
 float theta;
 float intensity;
+float wVar;
 
 //Camera variables
 float vfov, hfov;
