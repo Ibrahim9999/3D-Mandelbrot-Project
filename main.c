@@ -92,8 +92,6 @@ void sendKeySignals() {
             if (userfocus == VIEW_FOCUS) {
                 cameraMoveKeyboard(kbinputbuffer[key*4], kbinputbuffer[key*4+1],
                     kbinputbuffer[key*4+2], kbinputbuffer[key*4+3]);
-                glutPostRedisplay();
-                glutSwapBuffers();
             }
     }
 
@@ -159,6 +157,7 @@ void updateMandelbulbVars() {
 void idle() {
 	sendKeySignals();
     updateMandelbulbVars();
+    glutPostRedisplay();
 }
 
 //Main
@@ -214,7 +213,7 @@ int main(int argc, char* argv[]) {
     glutReshapeFunc(handleResolution);
 
     glewInit();
-   
+
     //printf("starting shaders\n");
     fflush(stdout);
 
