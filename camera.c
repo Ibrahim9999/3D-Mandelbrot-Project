@@ -77,19 +77,19 @@ void InitializeCamera(vec3f* cameraPosition, vec3f* horizontalAxis, vec3f* verti
 	v.z = 0;
 	*centerPosition = v;
 
-	v.x = -1;
+	v.x = 1;
 	v.y = 0;
 	v.z = 0;
 	*centerHAxis = v;
 
 	v.x = 0;
-	v.y = -1;
+	v.y = 1;
 	v.z = 0;
 	*centerVAxis = v;
 
 	v.x = 0;
 	v.y = 0;
-	v.z = -1;
+	v.z = 1;
 	*centerDAxis = v;
 }
 
@@ -101,10 +101,15 @@ void cameraMoveMouse(int x, int y) {
 
     //Rotate if not first click
     if (oldMouseX != -1 && oldMouseY != -1) {
-        Yaw((oldMouseX-x)*ANGLE_PER_PIXEL, &horizontalAxis, &verticalAxis, &depthAxis);
-        Pitch((oldMouseY-y)*ANGLE_PER_PIXEL, &horizontalAxis, &verticalAxis,
+        Yaw((x-oldMouseX)*ANGLE_PER_PIXEL, &horizontalAxis, &verticalAxis,
+			&depthAxis);
+        Pitch((y-oldMouseY)*ANGLE_PER_PIXEL, &horizontalAxis, &verticalAxis,
             &depthAxis);
+
+		camerapos = VecDoubleMultiply(depthAxis, -v3f_length(camerapos));
     }
+
+	glutPostRedisplay();
 
     oldMouseX = x;
     oldMouseY = y;
@@ -188,26 +193,18 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
 	if (key == 'l')
 	{
 		Yaw(D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
-
-		camerapos = VecDoubleMultiply(depthAxis, -v3f_length(camerapos));
 	}
 	else if (key == 'j')
 	{
 		Yaw(-D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
-
-		camerapos = VecDoubleMultiply(depthAxis, -v3f_length(camerapos));
 	}
 	if (key == 'k')
 	{
 		Pitch(D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
-
-		camerapos = VecDoubleMultiply(depthAxis, -v3f_length(camerapos));
 	}
 	else if (key == 'i')
 	{
 		Pitch(-D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
-
-		camerapos = VecDoubleMultiply(depthAxis, -v3f_length(camerapos));
 	}
 	if (key == 'q')
 	{
