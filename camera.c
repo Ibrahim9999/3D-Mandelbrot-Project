@@ -77,19 +77,19 @@ void InitializeCamera(vec3f* cameraPosition, vec3f* horizontalAxis, vec3f* verti
 	v.z = 0;
 	*centerPosition = v;
 
-	v.x = -1;
+	v.x = 1;
 	v.y = 0;
 	v.z = 0;
 	*centerHAxis = v;
 
 	v.x = 0;
-	v.y = -1;
+	v.y = 1;
 	v.z = 0;
 	*centerVAxis = v;
 
 	v.x = 0;
 	v.y = 0;
-	v.z = -1;
+	v.z = 1;
 	*centerDAxis = v;
 }
 

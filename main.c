@@ -136,7 +136,7 @@ void printMonitors() {
     void *font = GLUT_BITMAP_HELVETICA_18;
     for (char* c=string; *c != '\0'; c++) 
     {
-        glutBitmapCharacter(font, *c);
+        //glutBitmapCharacter(font, *c);
     }
 
     glMatrixMode(GL_MODELVIEW);
@@ -150,7 +150,7 @@ void printMonitors() {
 void updateMandelbulbVars() {
     loadMandelbulbVars(mandelbulb_shader, fov, camerapos, color, step, bail,
 		power, phi, theta, resolution, multisampling, lightpos, intensity,
-		horizontalAxis, verticalAxis, depthAxis, wVar);
+		horizontalAxis, verticalAxis, depthAxis, wVar, orbittrap);
 }
 
 //Idle Function
@@ -242,7 +242,7 @@ int main(int argc, char* argv[]) {
     //Setup shaders
     loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, color, step,
 		bail, power, phi, theta, resolution, multisampling, lightpos, intensity,
-		horizontalAxis, verticalAxis, depthAxis, wVar);
+		horizontalAxis, verticalAxis, depthAxis, wVar, orbittrap);
 
     printf("loaded program\n");
 

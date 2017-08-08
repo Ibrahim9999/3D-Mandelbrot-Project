@@ -17,10 +17,12 @@ void printProgramLog(shaderprogram program);
 void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
 	vec3f color, float step, int bail, float power, float phi, float theta,
 	vec2f resolution, int multisampling, vec3f lightpos, float intensity,
-	vec3f horizontalAxis, vec3f verticalAxis, vec3f depthAxis, float wVar);
+	vec3f horizontalAxis, vec3f verticalAxis, vec3f depthAxis, float wVar,
+	int orbittrap);
 void loadMandelbulbProgram(shaderprogram* program, vec3f fov, vec3f camerapos,
 	vec3f color, float step, int bail, float power, float phi, float theta,
 	vec2f resolution, int multisampling, vec3f lightpos, float intensity,
-	vec3f horizontalAxis, vec3f verticalAxis, vec3f depthAxis, float wVar);
+	vec3f horizontalAxis, vec3f verticalAxis, vec3f depthAxis, float wVar,
+	int orbittrap);
 
 #endif
