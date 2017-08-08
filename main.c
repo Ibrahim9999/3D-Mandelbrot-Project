@@ -15,8 +15,7 @@ void draw() {
 }
 
 //Render Funcion
-void render() {    
-
+void render() {
     draw();
     lastlastframe = lastframe;
     lastframe = glutGet(GLUT_ELAPSED_TIME);
@@ -30,9 +29,7 @@ void render() {
 //Handle mouse input
 void handleMouse(int x, int y) {
     if (userfocus == VIEW_FOCUS)
-	{
         cameraMoveMouse(x, y);
-    }
 }
 
 
@@ -40,6 +37,7 @@ void handleMouse(int x, int y) {
 static unsigned int kbinputbuffer[KEYBUFFERLEN*4];
 static int kbinputlen = 0;
 
+// Clears keystroke buffer
 void clearKeyBuffer() {
     kbinputlen = 0;
 
@@ -49,29 +47,25 @@ void clearKeyBuffer() {
         kbinputbuffer[i++] = false;
     }
 }
-    
+
+// Method for handling keyboard input
 void handleKeyboard(unsigned char key, int x, int y) {
     if (kbinputlen <= KEYBUFFERLEN) {
         int shift=false, ctrl=false, alt=false;
         //printf("****************%d", key);       
         int mods = glutGetModifiers();
 
-        if ((mods & GLUT_ACTIVE_SHIFT) == GLUT_ACTIVE_SHIFT) {
+        if ((mods & GLUT_ACTIVE_SHIFT) == GLUT_ACTIVE_SHIFT)
             shift = true; putchar('S');
-        }
-        if ((mods & GLUT_ACTIVE_CTRL) == GLUT_ACTIVE_CTRL) {
+        if ((mods & GLUT_ACTIVE_CTRL) == GLUT_ACTIVE_CTRL)
             ctrl = true; putchar('C');
-        }
-        if ((mods & GLUT_ACTIVE_ALT) == GLUT_ACTIVE_ALT) {
+        if ((mods & GLUT_ACTIVE_ALT) == GLUT_ACTIVE_ALT)
             alt = true; putchar('A');
-        }
 
-        if (ctrl == true) {
+        if (ctrl == true)
             key = key-1+'a';
-        }
-        else if (shift == true  && isalpha(key)) {
+        else if (shift == true  && isalpha(key))
             key = key- 'A' + 'a';
-        }
 
         kbinputbuffer[4*kbinputlen] = key;
         kbinputbuffer[4*kbinputlen+1] = shift;
@@ -85,6 +79,7 @@ void handleKeyboardUp(unsigned char key, int x, int y) {
     
 }
 
+// Sends keystrokes to ???
 void sendKeySignals() {
     int key;
 
@@ -99,6 +94,7 @@ void sendKeySignals() {
     clearKeyBuffer();
 }
 
+// Fixes window resolution when the viewing window changes size
 void handleResolution(int w, int h) {
     //Set viewport
     glViewport(0, 0, w, h);
@@ -112,7 +108,10 @@ void handleResolution(int w, int h) {
     resolution.x = w; resolution.y = h;
 }
 
+// Writes text to screen
 void printMonitors() {
+	// Writing FPS tos screen
+
     char string[80];    
     float fps = 1000/(lastframe-lastlastframe);
 
@@ -173,6 +172,7 @@ void idle() {
 	sendKeySignals();
     updateMandelbulbVars();
     
+	//Test to see if any value was changed: if false, the window will not update
 	if (!VecEquals(camerapos, oldCameraPos) || !VecEquals(lightpos, oldLightPos)
 		|| !VecEquals(horizontalAxis, oldHAxis) || !VecEquals(verticalAxis, oldVAxis)
 		|| !VecEquals(depthAxis, oldDAxis) || step != oldStep || power != oldPower
@@ -192,28 +192,40 @@ int main(int argc, char* argv[]) {
     hfov = vfov = START_FOV;
     cameradist = START_WIDTH/(2*tan(START_FOV/360*PI_CONST));
     setFOVvec(&fov, vfov, hfov);
-
+	
+	// Initialize camera
     InitializeCamera(&camerapos, &horizontalAxis, &verticalAxis, &depthAxis,
 		&centerpos, &centerHAxis, &centerVAxis, &centerDAxis);
 
+	// Singular color for mandelbulb
     color.x=0; color.y=1; color.z=1;
 	
+	// Pointlight position
     lightpos.x= -0.178390;
 	lightpos.y = -2.660062;
 	lightpos.z = -0.930965;
 
 	//lightpos = (vec3f) { 0, 0, 0 };
 
+	// Setting the real value of the quaternion mandelbrot
 	wVar = 0;
+	// Raytracing step
     step = 0.01;
+	// Maximum Iterations for mandelbrot algorithm
     bail = 10;
+	// Number of sampling points per pixel
     multisampling=1;
+	// Power of the mandelbrot
     power = 2;
+	// Original phi and theta phase shifts
     phi = 0;
     theta = 0;
+	// Pointlight intensity
     intensity = 4.50;
+	// Mandelbrot orbit trap
 	orbittrap = SPHERE;
-
+	
+	// Window resolution
     resolution.x = START_WIDTH; resolution.y = START_HEIGHT;
 
     //Setup window
@@ -235,6 +247,7 @@ int main(int argc, char* argv[]) {
     glutKeyboardUpFunc(handleKeyboardUp);
     glutReshapeFunc(handleResolution);
 
+	// Initializes GLEW
     glewInit();
 
     //printf("starting shaders\n");
@@ -247,7 +260,7 @@ int main(int argc, char* argv[]) {
 
     printf("loaded program\n");
 
-    fflush(stdout);
+    //fflush(stdout);
     printProgramLog(mandelbulb_shader);
 
     //Loop

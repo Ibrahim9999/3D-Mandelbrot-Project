@@ -1,46 +1,62 @@
 #include "math.h"
 
+// Cheicking if two vec3f's are equal to each other
 int VecEquals(vec3f a, vec3f b)
 {
 	return (a.x == b.x && a.y == b.y && a.z == b.z);
 }
 
+// Returns length of vec3f
 float v3f_length(vec3f v) {
     return sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
 }
 
+// Normalizes vec3f
 vec3f v3f_normalize(vec3f v) {
-    float len = v3f_length(v);
-    v.x /= len;
-    v.y /= len;
-    v.z /= len;
+    double len = v3f_length(v);
 
-    return v;
+    return VecDoubleDivide(v, len);
 }
 
-vec3f VecDoubleMultiply(vec3f v, double d)
+// Multiplies vec3f by a double
+vec3f VecDoubleDivide(vec3f v, double d)
 {
-    v.x *= d;
-    v.y *= d;
-    v.z *= d;
+	v.x /= d;
+	v.y /= d;
+	v.z /= d;
 
 	return v;
 }
 
+// Multiplies vec3f by a double
+vec3f VecDoubleMultiply(vec3f v, double d)
+{
+	v.x *= d;
+	v.y *= d;
+	v.z *= d;
+
+	return v;
+}
+
+// Adds to vec3f's together
 vec3f VecVecAdd(vec3f a, vec3f b) {
     a.x += b.x;
     a.y += b.y;
     a.z += b.z;
+
     return a;
 }
 
+// Subtracts a vec3f from another
 vec3f VecVecSubtract(vec3f a, vec3f b) {
     a.x -= b.x;
     a.y -= b.y;
     a.z -= b.z;
+
     return a;
 }
 
+// Returns a quaterion as a vec4f from a real double and an imaginary vec3f 
 vec4f QuatFromDoubleVec(double d, vec3f v)
 {
 	vec4f q;
@@ -53,20 +69,14 @@ vec4f QuatFromDoubleVec(double d, vec3f v)
 	return q;
 }
 
+// Returns a normalized quaterion as a vec4f from an angle and axis, represents
+// a rotation in 3D space
 vec4f QuatFromAxisAngle(double angle, vec3f axis)
 {
-	vec4f q;
-	
-	q.w = cos(angle / 2);
-	
-    vec3f a = VecDoubleMultiply(axis, sin(angle/2));
-    q.x = a.x;
-    q.y = a.y;
-    q.z = a.z;
-	
-	return q;
+	return QuatFromDoubleVec(cos(angle / 2), VecDoubleMultiply(axis, sin(angle / 2)));
 }
 
+// Adds two vec4f's together
 vec4f QuatQuatAdd(vec4f a, vec4f b)
 {
 	vec4f c;
@@ -79,6 +89,7 @@ vec4f QuatQuatAdd(vec4f a, vec4f b)
 	return c;
 }
 
+// Subtracts a vec4f from another
 vec4f QuatQuatSubtract(vec4f a, vec4f b)
 {
 	vec4f c;
@@ -91,11 +102,13 @@ vec4f QuatQuatSubtract(vec4f a, vec4f b)
 	return c;
 }
 
+// Multiplies a vec4f by a double
 vec4f QuatDoubleMultiply(vec4f q, double d)
 {
 	return (vec4f){q.x * d, q.y * d, q.z * d, q.w * d};
 }
 
+// Divides a vec4f by another
 vec4f QuatQuatDivide(vec4f a, vec4f b)
 {
 	vec4f c;
@@ -109,6 +122,7 @@ vec4f QuatQuatDivide(vec4f a, vec4f b)
 	return c;
 }
 
+// Divides a vec4f by a double
 vec4f QuatDoubleDivide(vec4f a, double b)
 {
 	a.w = a.w / b;
@@ -119,11 +133,13 @@ vec4f QuatDoubleDivide(vec4f a, double b)
 	return a;
 }
 
+// Returns the inverse of a quaternion as a vec4f
 vec4f QuatInverse(vec4f q)
 {
 	return QuatDoubleDivide(q, q.z*q.z + q.x*q.x + q.y*q.y + q.w*q.w);
 }
 
+// Takes the Exp of a quaternion as a vec4f
 vec4f QuatExp(vec4f q)
 {
 	vec4f c;
@@ -139,6 +155,7 @@ vec4f QuatExp(vec4f q)
 	return c;
 }
 
+// Takes the natural logarithm of a quaternion as a vec4f
 vec4f QuatLn(vec4f q)
 {
 	vec4f c;
@@ -153,16 +170,19 @@ vec4f QuatLn(vec4f q)
 	return c;
 }
 
+// Raises quaternon as a vec4f to a power ~ Unsure of decimal powers work or not
 vec4f QuatPower(vec4f q, double p)
 {
 	return QuatExp(QuatDoubleMultiply(QuatLn(q),p));
 }
 
+// Moves a point as a vec3f along an axis as a vec3f
 vec3f MoveAlongAxis(vec3f position, vec3f axis, double scalar) {
 	 return VecVecAdd(position, VecDoubleMultiply(axis, scalar));
 }
 
-void VecToEuler(vec4f rotation, double* yaw, double* pitch, double* roll)
+// Extracts yaw, pitch, and roll angles from a unit quaternion as a vec4f
+void QuatToEuler(vec4f rotation, double* yaw, double* pitch, double* roll)
 {
 	double W = rotation.w;
 	double X = rotation.x;
@@ -188,6 +208,7 @@ void VecToEuler(vec4f rotation, double* yaw, double* pitch, double* roll)
 	*yaw = atan2(t0, t1);
 }
 
+// Multiplies two quaternions as vec4f's to each other
 vec4f QuatQuatMultiply(vec4f a, vec4f b)
 {
 	vec4f c;
@@ -200,6 +221,7 @@ vec4f QuatQuatMultiply(vec4f a, vec4f b)
 	return c;
 }
 
+// Multiplies a Quaternion as a vec4f by a vec3f
 vec3f QuatVecMultiply(vec4f q, vec3f v)
 {
 	long double xx = q.x * q.x;
@@ -221,11 +243,13 @@ vec3f QuatVecMultiply(vec4f q, vec3f v)
 	return result;
 }
 
+// Rotates axis as ve3f by quaternion rotation as a vec4f
 void ApplyRotationToVector(vec4f rotation, vec3f* axis)
 {
 	*axis =  QuatVecMultiply(QuatInverse(rotation), QuatVecMultiply(rotation, *axis));
 }
 
+// Applies yaw rotation by a double angle that updates all the relative axes
 void Yaw(double angle, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
 {
 	// Convert angle to radians
@@ -240,6 +264,7 @@ void Yaw(double angle, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthA
 	ApplyRotationToVector(localRotation, depthAxis);
 }
 
+// Applies pitch rotation by a double angle that updates all the relative axes
 void Pitch(double angle, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
 {
 	// Convert angle to radians
@@ -254,6 +279,7 @@ void Pitch(double angle, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* dept
 	ApplyRotationToVector(localRotation, depthAxis);
 }
 
+// Applies roll rotation by a double angle that updates all the relative axes
 void Roll(double angle, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis)
 {
 	// Convert angle to radians
