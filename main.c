@@ -136,7 +136,7 @@ void printMonitors() {
     void *font = GLUT_BITMAP_HELVETICA_18;
     for (char* c=string; *c != '\0'; c++) 
     {
-        //glutBitmapCharacter(font, *c);
+        glutBitmapCharacter(font, *c);
     }
 
     glMatrixMode(GL_MODELVIEW);
