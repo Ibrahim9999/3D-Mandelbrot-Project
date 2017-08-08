@@ -21,7 +21,7 @@ void render() {
     lastlastframe = lastframe;
     lastframe = glutGet(GLUT_ELAPSED_TIME);
 
-    printMonitors();
+    //printMonitors();
 
     glutSwapBuffers();
     glFinish();
