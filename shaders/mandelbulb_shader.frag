@@ -152,13 +152,12 @@ vec3 mandelTest(in vec3 point) {
 
 	//Julia Set Coordinates
 	//vec3 c = vec3(-.4, .6, 0);
-	//vec3 c = vec3(-.8, .156, 0);
 	//vec3 c = vec3(.25, .1, 0);
-	vec3 c = vec3(-0.7269, 0.1889, 0);
+	//vec3 c = vec3(-0.7269, 0.1889, 0);
 	//vec3 c = vec3(-1, 0, 0);
 	//vec3 c = vec3(0, -.9, 0);
 	//vec3 c = vec3(0, -.8, 0);
-    //vec3 c = point;
+    vec3 c = point;
 	
 	int i;
 	for(i = 0; i < bail && v.x*v.x + v.y*v.y + v.z*v.z < 4.0; i++)

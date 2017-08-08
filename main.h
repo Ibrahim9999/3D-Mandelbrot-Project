@@ -15,6 +15,7 @@ extern "C" {
 #include "shader.h"
 #include "math.h"
 #include "camera.h"
+#include "options.h"
 
 #define EXIT_SUCCESS 0
 #define EXIT_ERROR 1
@@ -39,6 +40,7 @@ void printMonitors();
 //Mandelbulb shader and variables
 shaderprogram mandelbulb_shader;
 vec3f fov, camerapos, color, horizontalAxis, verticalAxis, depthAxis, lightpos;
+vec3f centerpos, centerHAxis, centerVAxis, centerDAxis;
 vec2f resolution;
 float step;
 float power;
@@ -47,6 +49,7 @@ float theta;
 float intensity;
 float wVar;
 int bail, multisampling;
+int orbittrap;
 
 //Camera variables
 float vfov, hfov;

@@ -167,6 +167,7 @@ void idle() {
 	float oldIntensity = intensity;
 	float oldWVar = wVar;
 	int oldBail = bail;
+	int oldOrbitTrap = orbittrap;
 
 	sendKeySignals();
     updateMandelbulbVars();
@@ -175,7 +176,7 @@ void idle() {
 		|| !VecEquals(horizontalAxis, oldHAxis) || !VecEquals(verticalAxis, oldVAxis)
 		|| !VecEquals(depthAxis, oldDAxis) || step != oldStep || power != oldPower
 		|| phi != oldPhi || theta != oldTheta || intensity != oldIntensity
-		|| wVar != oldWVar || bail != oldBail)
+		|| wVar != oldWVar || bail != oldBail || orbittrap != oldOrbitTrap)
 
 		glutPostRedisplay();
 }
@@ -190,7 +191,9 @@ int main(int argc, char* argv[]) {
     hfov = vfov = START_FOV;
     cameradist = START_WIDTH/(2*tan(START_FOV/360*PI_CONST));
     setFOVvec(&fov, vfov, hfov);
-    InitializeCamera(&camerapos, &depthAxis, &horizontalAxis, &verticalAxis);
+
+    InitializeCamera(&camerapos, &horizontalAxis, &verticalAxis, &depthAxis,
+		&centerpos, &centerHAxis, &centerVAxis, &centerDAxis);
 
     color.x=0; color.y=1; color.z=1;
 	
@@ -208,6 +211,8 @@ int main(int argc, char* argv[]) {
     phi = 0;
     theta = 0;
     intensity = 4.50;
+	orbittrap = SPHERE;
+
     resolution.x = START_WIDTH; resolution.y = START_HEIGHT;
 
     //Setup window
@@ -236,8 +241,8 @@ int main(int argc, char* argv[]) {
 
     //Setup shaders
     loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, color, step,
-		bail, power, phi, theta, resolution, multisampling,
-		lightpos, intensity, horizontalAxis, verticalAxis, depthAxis, wVar);
+		bail, power, phi, theta, resolution, multisampling, lightpos, intensity,
+		horizontalAxis, verticalAxis, depthAxis, wVar);
 
     printf("loaded program\n");
 

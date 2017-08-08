@@ -48,7 +48,7 @@ extern void updateMandelbulbVars();
 
 static int oldMouseX = -1, oldMouseY = -1;
 
-void InitializeCamera(vec3f* cameraPosition, vec3f* depthAxis, vec3f* horizontalAxis, vec3f* verticalAxis)
+void InitializeCamera(vec3f* cameraPosition, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis, vec3f* centerPosition, vec3f* centerHAxis, vec3f* centerVAxis, vec3f* centerDAxis)
 {
 	vec3f v;
 
@@ -56,11 +56,6 @@ void InitializeCamera(vec3f* cameraPosition, vec3f* depthAxis, vec3f* horizontal
 	v.y = 0;
 	v.z = -4;
 	*cameraPosition = v;
-
-	v.x = 0;
-	v.y = 0;
-	v.z = 1;
-	*depthAxis = v;
 
 	v.x = 1;
 	v.y = 0;
@@ -71,6 +66,31 @@ void InitializeCamera(vec3f* cameraPosition, vec3f* depthAxis, vec3f* horizontal
 	v.y = 1;
 	v.z = 0;
 	*verticalAxis = v;
+
+	v.x = 0;
+	v.y = 0;
+	v.z = 1;
+	*depthAxis = v;
+
+	v.x = 0;
+	v.y = 0;
+	v.z = 0;
+	*centerPosition = v;
+
+	v.x = -1;
+	v.y = 0;
+	v.z = 0;
+	*centerHAxis = v;
+
+	v.x = 0;
+	v.y = -1;
+	v.z = 0;
+	*centerVAxis = v;
+
+	v.x = 0;
+	v.y = 0;
+	v.z = -1;
+	*centerDAxis = v;
 }
 
 //Rotate camera based on mouse
@@ -159,25 +179,44 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
 	else if (key == 'n')
 		lightpos.z += D_LIGHT_DIST*mod;
 
-
 	if (key == 'm')
 		intensity -= D_LIGHT_INTENSITY*mod;
 	else if (key == 'u')
 		intensity += D_LIGHT_INTENSITY*mod;
 
 	//Rotations
-	if (key == 'q')
-		Roll(-D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
-	else if (key == 'e')
-		Roll(D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
-	else if (key == 'l')
+	if (key == 'l')
+	{
 		Yaw(D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
+
+		camerapos = VecDoubleMultiply(depthAxis, -v3f_length(camerapos));
+	}
 	else if (key == 'j')
+	{
 		Yaw(-D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
-	else if (key == 'k')
+
+		camerapos = VecDoubleMultiply(depthAxis, -v3f_length(camerapos));
+	}
+	if (key == 'k')
+	{
 		Pitch(D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
+
+		camerapos = VecDoubleMultiply(depthAxis, -v3f_length(camerapos));
+	}
 	else if (key == 'i')
+	{
 		Pitch(-D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
+
+		camerapos = VecDoubleMultiply(depthAxis, -v3f_length(camerapos));
+	}
+	if (key == 'q')
+	{
+		Roll(-D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
+	}
+	else if (key == 'e')
+	{
+		Roll(D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
+	}
 
 	//Move
 	if (key == 'w')

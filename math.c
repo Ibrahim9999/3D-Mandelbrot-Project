@@ -23,6 +23,7 @@ vec3f VecDoubleMultiply(vec3f v, double d)
     v.x *= d;
     v.y *= d;
     v.z *= d;
+
 	return v;
 }
 
