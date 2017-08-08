@@ -41,12 +41,12 @@ shaderprogram mandelbulb_shader;
 vec3f fov, camerapos, color, horizontalAxis, verticalAxis, depthAxis, lightpos;
 vec2f resolution;
 float step;
-int bail, multisampling;
 float power;
 float phi;
 float theta;
 float intensity;
 float wVar;
+int bail, multisampling;
 
 //Camera variables
 float vfov, hfov;

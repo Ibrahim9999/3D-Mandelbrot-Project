@@ -32,6 +32,7 @@ typedef struct vector4f {
 	double w;
 } vec4f;
 
+int VecEquals(vec3f a, vec3f b);
 float v3f_length(vec3f v);
 vec3f v3f_normalize(vec3f v);
 vec3f VecDoubleMultiply(vec3f v, double d);

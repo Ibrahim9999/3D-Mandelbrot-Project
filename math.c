@@ -1,5 +1,10 @@
 #include "math.h"
 
+int VecEquals(vec3f a, vec3f b)
+{
+	return (a.x == b.x && a.y == b.y && a.z == b.z);
+}
+
 float v3f_length(vec3f v) {
     return sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
 }

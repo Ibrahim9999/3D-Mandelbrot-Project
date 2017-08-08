@@ -155,9 +155,29 @@ void updateMandelbulbVars() {
 
 //Idle Function
 void idle() {
+	vec3f oldCameraPos = camerapos;
+	vec3f oldLightPos = lightpos;
+	vec3f oldHAxis = horizontalAxis;
+	vec3f oldVAxis = verticalAxis;
+	vec3f oldDAxis = depthAxis;
+	float oldStep = step;
+	float oldPower = power;
+	float oldPhi = phi;
+	float oldTheta = theta;
+	float oldIntensity = intensity;
+	float oldWVar = wVar;
+	int oldBail = bail;
+
 	sendKeySignals();
     updateMandelbulbVars();
-    glutPostRedisplay();
+    
+	if (!VecEquals(camerapos, oldCameraPos) || !VecEquals(lightpos, oldLightPos)
+		|| !VecEquals(horizontalAxis, oldHAxis) || !VecEquals(verticalAxis, oldVAxis)
+		|| !VecEquals(depthAxis, oldDAxis) || step != oldStep || power != oldPower
+		|| phi != oldPhi || theta != oldTheta || intensity != oldIntensity
+		|| wVar != oldWVar || bail != oldBail)
+
+		glutPostRedisplay();
 }
 
 //Main
