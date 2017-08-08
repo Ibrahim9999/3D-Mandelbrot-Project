@@ -29,7 +29,8 @@ void render() {
 
 //Handle mouse input
 void handleMouse(int x, int y) {
-    if (userfocus == VIEW_FOCUS) {
+    if (userfocus == VIEW_FOCUS)
+	{
         cameraMoveMouse(x, y);
     }
 }
