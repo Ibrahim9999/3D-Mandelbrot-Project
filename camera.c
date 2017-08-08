@@ -196,7 +196,7 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
 		camerapos = MoveAlongAxis(camerapos, depthAxis, -D_CAMERA_DIST*mod);
 
     if (key == '1')
-        screenshot("screenshot.ppm", 1024, 1024);
+        screenshot("Images/screenshot.ppm", 1024, 1024);
 
 	printf("*********************************\n");
 	printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
