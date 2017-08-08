@@ -38,6 +38,8 @@ void handleMouse(int x, int y) {
 //Handle keyboard input
 static unsigned int kbinputbuffer[KEYBUFFERLEN*4];
 static int kbinputlen = 0;
+char line[INPUT_MAX];
+int command_char = 0;
 
 void clearKeyBuffer() {
     kbinputlen = 0;
@@ -50,33 +52,49 @@ void clearKeyBuffer() {
 }
     
 void handleKeyboard(unsigned char key, int x, int y) {
-    if (kbinputlen <= KEYBUFFERLEN) {
-        int shift=false, ctrl=false, alt=false;
-        //printf("****************%d", key);       
-        int mods = glutGetModifiers();
+    if (key == ':') {
+        userfocus = COMMAND_FOCUS;
+        return;
+    }
 
-        if ((mods & GLUT_ACTIVE_SHIFT) == GLUT_ACTIVE_SHIFT) {
-            shift = true; putchar('S');
-        }
-        if ((mods & GLUT_ACTIVE_CTRL) == GLUT_ACTIVE_CTRL) {
-            ctrl = true; putchar('C');
-        }
-        if ((mods & GLUT_ACTIVE_ALT) == GLUT_ACTIVE_ALT) {
-            alt = true; putchar('A');
-        }
+    if (userfocus == VIEW_FOCUS) {
+        if (kbinputlen <= KEYBUFFERLEN) {
+            int shift=false, ctrl=false, alt=false;
+            //printf("****************%d", key);       
+            int mods = glutGetModifiers();
 
-        if (ctrl == true) {
-            key = key-1+'a';
-        }
-        else if (shift == true  && isalpha(key)) {
-            key = key- 'A' + 'a';
-        }
+            if ((mods & GLUT_ACTIVE_SHIFT) == GLUT_ACTIVE_SHIFT) {
+                shift = true; putchar('S');
+            }
+            if ((mods & GLUT_ACTIVE_CTRL) == GLUT_ACTIVE_CTRL) {
+                ctrl = true; putchar('C');
+            }
+            if ((mods & GLUT_ACTIVE_ALT) == GLUT_ACTIVE_ALT) {
+                alt = true; putchar('A');
+            }
 
-        kbinputbuffer[4*kbinputlen] = key;
-        kbinputbuffer[4*kbinputlen+1] = shift;
-        kbinputbuffer[4*kbinputlen+2] = ctrl;
-        kbinputbuffer[4*kbinputlen+3] = alt;
-        kbinputlen++;
+            if (ctrl == true) {
+                key = key-1+'a';
+            }
+            else if (shift == true  && isalpha(key)) {
+                key = key- 'A' + 'a';
+            }
+
+            kbinputbuffer[4*kbinputlen] = key;
+            kbinputbuffer[4*kbinputlen+1] = shift;
+            kbinputbuffer[4*kbinputlen+2] = ctrl;
+            kbinputbuffer[4*kbinputlen+3] = alt;
+            kbinputlen++;
+        }
+    }
+    else if (userfocus == COMMAND_FOCUS) {
+        if (key != '\r' && key != '\n') {
+            line[command_char++] = key;
+        }
+        else {
+            line[command_char] = '\0';
+            command_char = -1;
+        }
     }
 }
 
@@ -85,17 +103,24 @@ void handleKeyboardUp(unsigned char key, int x, int y) {
 }
 
 void sendKeySignals() {
-    int key;
-
-    for (key = 0; key != kbinputlen; key++) {
-            putchar(kbinputbuffer[key*4]);
-            if (userfocus == VIEW_FOCUS) {
+    if (userfocus == VIEW_FOCUS) {
+        int key;
+        for (key = 0; key != kbinputlen; key++) {
+                putchar(kbinputbuffer[key*4]);
                 cameraMoveKeyboard(kbinputbuffer[key*4], kbinputbuffer[key*4+1],
                     kbinputbuffer[key*4+2], kbinputbuffer[key*4+3]);
-            }
-    }
+        }
 
-    clearKeyBuffer();
+        clearKeyBuffer();
+    }
+    else if (userfocus == COMMAND_FOCUS) {
+        if (command_char == -1) {
+            processCommand(line);
+            command_char = 0;
+            printf("%s", line);
+            userfocus = VIEW_FOCUS;
+        }
+    }
 }
 
 void handleResolution(int w, int h) {
@@ -111,14 +136,7 @@ void handleResolution(int w, int h) {
     resolution.x = w; resolution.y = h;
 }
 
-void printMonitors() {
-    char string[80];    
-    float fps = 1000/(lastframe-lastlastframe);
-
-    strcpy(string, "FPS:");
-	
-    sprintf(string+4, "%f", fps);
-	
+void printString(char* string) {
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();             
     glLoadIdentity();   
@@ -142,8 +160,12 @@ void printMonitors() {
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
-    glPopMatrix();  
-	
+    glPopMatrix();  	
+}
+
+//Print monitors (text)
+void printMonitors() {
+    printString(line);
 }
 
 //Update shader variables

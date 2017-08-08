@@ -23,8 +23,10 @@ extern "C" {
 #define true 1
 #define false 0
 
-#define MENU_FOCUS 0
+#define COMMAND_FOCUS 0
 #define VIEW_FOCUS 1
+
+#define INPUT_MAX 80
 
 #define START_HEIGHT 400
 #define START_WIDTH 400
