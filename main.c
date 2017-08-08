@@ -149,8 +149,8 @@ void printMonitors() {
 //Update shader variables
 void updateMandelbulbVars() {
     loadMandelbulbVars(mandelbulb_shader, fov, camerapos, color, step, bail,
-		power, phi, theta, totalRotation, resolution, multisampling, lightpos,
-		intensity, horizontalAxis, verticalAxis, depthAxis, wVar);
+		power, phi, theta, resolution, multisampling, lightpos, intensity,
+		horizontalAxis, verticalAxis, depthAxis, wVar);
 }
 
 //Idle Function
@@ -172,16 +172,13 @@ int main(int argc, char* argv[]) {
     setFOVvec(&fov, vfov, hfov);
     InitializeCamera(&camerapos, &depthAxis, &horizontalAxis, &verticalAxis);
 
-    totalRotation.x = 0;
-	totalRotation.y = 0;
-	totalRotation.z = 0;
-	totalRotation.w = 1;
-
     color.x=0; color.y=1; color.z=1;
 	
     lightpos.x= -0.178390;
 	lightpos.y = -2.660062;
 	lightpos.z = -0.930965;
+
+	//lightpos = (vec3f) { 0, 0, 0 };
 
 	wVar = 0;
     step = 0.01;
@@ -219,7 +216,7 @@ int main(int argc, char* argv[]) {
 
     //Setup shaders
     loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, color, step,
-		bail, power, phi, theta, totalRotation, resolution, multisampling,
+		bail, power, phi, theta, resolution, multisampling,
 		lightpos, intensity, horizontalAxis, verticalAxis, depthAxis, wVar);
 
     printf("loaded program\n");

@@ -13,7 +13,7 @@ extern "C" {
 #include <GL/glut.h>
 #include <ctype.h>
 #include "shader.h"
-#include "vector.h"
+#include "math.h"
 #include "camera.h"
 
 #define EXIT_SUCCESS 0
@@ -38,9 +38,8 @@ void printMonitors();
 
 //Mandelbulb shader and variables
 shaderprogram mandelbulb_shader;
-vec2f resolution;
 vec3f fov, camerapos, color, horizontalAxis, verticalAxis, depthAxis, lightpos;
-vec4f totalRotation;
+vec2f resolution;
 float step;
 int bail, multisampling;
 float power;

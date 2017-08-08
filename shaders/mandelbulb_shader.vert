@@ -4,7 +4,6 @@ uniform vec3 FOV;
 uniform vec3 horizontalAxis;
 uniform vec3 verticalAxis;
 uniform vec3 depthAxis;
-uniform vec4 totalRotation;
 
 out vec3 direction;
 
@@ -47,15 +46,6 @@ void main() {
         direction = vec3(FOV.x, -FOV.y, FOV.z);
         gl_Position = vec4(1.0, -1.0, 0.0, 1.0);
     }
-	/*
-    float magnitude = sqrt(direction.x*direction.x + direction.y*direction.y + direction.z*direction.z);
-
-	direction.x /= magnitude;
-	direction.y /= magnitude;
-	direction.y /= magnitude;
-
-    ApplyRotationToVector(totalRotation, direction);
-	*/
 
 	vec3 p = vec3 (0,0,0);
 	

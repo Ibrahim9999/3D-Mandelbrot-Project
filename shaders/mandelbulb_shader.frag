@@ -17,6 +17,7 @@ uniform vec2 resolution;
 uniform int multisampling;
 uniform vec3 lightpos;
 uniform float intensity;
+uniform float wVar;
 
 out vec3 outputColor;
 
@@ -138,8 +139,36 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float p
         return vec3(x, y, z) + c;
     }
 
+	//return TriplexPower(v, power) + TriplexPower(c, -1);
+	//return TriplexPower(v, power) + vec3(c.x, -c.y, c.z);
+
     return TriplexPower(v, power) + c;
-	//return TriplexPower(v, power) + TriplexPower(c, power);
+}
+
+vec3 mandelTest(in vec3 point) {
+    //vec3 v = TriplexPower(point, -1);
+	//vec3 v = vec3(point.x, -point.y, -point.z);
+	vec3 v = point;
+
+	//Julia Set Coordinates
+	//vec3 c = vec3(-.4, .6, 0);
+	//vec3 c = vec3(-.8, .156, 0);
+	//vec3 c = vec3(.25, .1, 0);
+	//vec3 c = vec3(0, -.8, 0);
+	//vec3 c = vec3(-0.7269, 0.1889, 0);
+	//vec3 c = vec3(-.9, 0, wVar);
+	//vec3 c = vec3(0, -.9, wVar);
+	//vec3 c = vec3(-0.7269, 0.1889, 0);
+    vec3 c = point;
+	
+	int i;
+	for(i = 0; i < bail && v.x*v.x + v.y*v.y + v.z*v.z < 4.0; i++)
+        v = nextPoint(v, c, power, theta, phi);
+
+    if (i >= bail)
+        return v;
+
+    return vec3(0);
 }
 
 vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in float sphereRadius) {
@@ -166,20 +195,6 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in f
     vec3 intersection = spherePos+collisionOffset;
 
     return intersection;
-}
-
-vec3 mandelTest(in vec3 point) {
-    vec3 v = point;
-    vec3 c = point;
-	
-    int i = 0;
-    while (v.x*v.x + v.y*v.y + v.z*v.z < 4.0 && i < bail) {
-        v = nextPoint(v, c, power, theta, phi);
-        i++;
-    }
-    if (i >= bail)
-        return v;
-    return vec3(0);
 }
 
 void main() {    
@@ -222,47 +237,16 @@ void main() {
                         }
                         cur_intensity -= 1*step;
                     }
-                    outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
+                    //outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
+                    outputColor += clamp(ColorFromHSV(atan(div.y, div.x)/PI*360, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
                     //outputColor += clamp(vec3(color*cur_intensity), vec3(0.0), vec3(1.0));
-                    continue;
+                    
+					continue;
                 }
             }
             outputColor += vec3(1.0);
         }
     }
+
     outputColor /= multisampling*multisampling;
-
-    /*
-
-	vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), dir, ALMOST_TWO);
-    //outputColor = vec4((dir + 1)/2,1.0);
-    outputColor = vec3(1.0, 1, 1);
-
-    if (intersection != vec3(0)) {
-
-        pos = intersection;
-        vec3 div = mandelTest(pos);
-        while (div == vec3(0) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0) {
-            pos = pos + step*dir;
-            div = mandelTest(pos);
-        }
-
-        if (mandelTest(pos) != vec3(0)) {
-            vec3 shadow = pos;
-            float intensity = 4.50;
-            while (intensity >= 0 && length(lightpos-shadow) > step) {
-                shadow += normalize(lightpos-shadow) * step;
-                if (mandelTest(shadow) != vec3(0))
-                    intensity -= 10*step;
-                else
-                    intensity -= 1*step;
-            }
-            outputColor = clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*intensity, vec3(0.0), vec3(1.0));
-            //outputColor = ColorFromHSV((atan(div.y, div.x)+PI)/2/PI*360, 1.0, 1.0);
-        }
-
-    }
-
-    */
-
 }

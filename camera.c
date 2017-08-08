@@ -1,5 +1,4 @@
 #include "camera.h"
-#include "vector.h"
 #include <time.h>
 #include <math.h>
 #include <stdlib.h>
@@ -9,6 +8,7 @@
 
 #define D_ANGLE 1
 #define D_CAMERA_DIST 0.05
+#define D_W .1
 #define D_BAIL 1
 #define D_STEP .001
 #define D_POWER 1
@@ -22,19 +22,19 @@
 #define MINMOD 0.1
 #define MODCOEF 10
 
-extern vec4f totalRotation;
 extern vec3f camerapos;
 extern vec3f horizontalAxis;
 extern vec3f verticalAxis;
 extern vec3f depthAxis;
 extern vec3f lightpos;
+extern vec2f resolution;
 extern int bail;
 extern float power;
 extern float step;
 extern float theta;
 extern float phi;
 extern float intensity;
-extern vec2f resolution;
+extern float wVar;
 
 extern int multisampling;
 
@@ -81,8 +81,8 @@ void cameraMoveMouse(int x, int y) {
 
     //Rotate if not first click
     if (oldMouseX != -1 && oldMouseY != -1) {
-        Yaw((oldMouseX-x)*ANGLE_PER_PIXEL, &totalRotation, &horizontalAxis, &verticalAxis, &depthAxis);
-        Pitch((oldMouseY-y)*ANGLE_PER_PIXEL, &totalRotation, &horizontalAxis, &verticalAxis,
+        Yaw((oldMouseX-x)*ANGLE_PER_PIXEL, &horizontalAxis, &verticalAxis, &depthAxis);
+        Pitch((oldMouseY-y)*ANGLE_PER_PIXEL, &horizontalAxis, &verticalAxis,
             &depthAxis);
     }
 
@@ -103,22 +103,6 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
     if (ctrl)
         mod*=MINMOD/modmod;
 
-
-    printf("*********************************\n");
-	printf("totalRotation: %f, <%f,%f,%f>\n", totalRotation.w, totalRotation.x, totalRotation.y, totalRotation.z);
-	printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
-	printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
-	printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
-	printf("****\n");
-	printf("camerapos: %f,%f,%f\n", camerapos.x, camerapos.y, camerapos.z);
-	printf("lightpos: %f,%f,%f\n", lightpos.x, lightpos.y, lightpos.z);
-	printf("power: %f\n", power);
-	printf("phi: %f\n", phi);
-	printf("theta: %f\n", theta);
-	printf("step: %f\n", step);
-	printf("bail: %d\n", bail);
-	//printf("bail: %f, %d, %d, %f\n", time, BAIL_PER_SEC, time*BAIL_PER_SEC, time*BAIL_PER_SEC);
-
 	/*
 	
 	double unitScalar = (camerapos.x*camerapos.x + camerapos.y*camerapos.y + camerapos.z*camerapos.z) / 16;
@@ -131,14 +115,19 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
 	
 	*/
 
-	if (key == 'c')
+	if (key == '5')
+		wVar -= D_W*mod;
+	else if (key == '6')
+		wVar += D_W*mod;
+
+	if (key == 'c' && bail > 0)
 		bail -= D_BAIL*mod;
-	else if (key == 'v')
+	else if (key == 'v' && bail < 300)
 		bail += D_BAIL*mod;
 
-	if (key == 'z')
+	if (key == 'z' && step < 2)
 		step += D_STEP*mod;
-	else if (key == 'x')
+	else if (key == 'x' && step > .001)
 		step -= D_STEP*mod;
 
 	if (key == 'p')
@@ -146,7 +135,7 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
 	else if (key == 'o')
 		power -= D_POWER*mod;
 
-	else if (key == '7')
+	if (key == '7')
 		phi -= D_PHI*mod;
 	else if (key == '8')
 		phi += D_PHI*mod;
@@ -171,49 +160,57 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
 		lightpos.z += D_LIGHT_DIST*mod;
 
 
-	if (key == 'u')
+	if (key == 'm')
 		intensity -= D_LIGHT_INTENSITY*mod;
-	else if (key == 'm')
-		intensity += D_LIGHT_INTENSITY*mod; // += DOES NOT WORK, POSSIBLE FLOATING POINT ERROR?
+	else if (key == 'u')
+		intensity += D_LIGHT_INTENSITY*mod;
 
 	//Rotations
-	else if (key == 'q')
-		Roll(-D_ANGLE*mod, &totalRotation, &horizontalAxis,
-			&verticalAxis, &depthAxis);
+	if (key == 'q')
+		Roll(-D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
 	else if (key == 'e')
-		Roll(D_ANGLE*mod, &totalRotation, &horizontalAxis,
-			&verticalAxis, &depthAxis);
+		Roll(D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
 	else if (key == 'l')
-		Yaw(-D_ANGLE*mod, &totalRotation, &horizontalAxis,
-			&verticalAxis, &depthAxis);
+		Yaw(D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
 	else if (key == 'j')
-		Yaw(D_ANGLE*mod, &totalRotation, &horizontalAxis,
-			&verticalAxis, &depthAxis);
+		Yaw(-D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
 	else if (key == 'k')
-		Pitch(-D_ANGLE*mod, &totalRotation, &horizontalAxis,
-			&verticalAxis, &depthAxis);
+		Pitch(D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
 	else if (key == 'i')
-		Pitch(mod*D_ANGLE, &totalRotation, &horizontalAxis,
-			&verticalAxis, &depthAxis);
+		Pitch(-D_ANGLE*mod, &horizontalAxis, &verticalAxis, &depthAxis);
 
 	//Move
-	else if (key == 'w')
+	if (key == 'w')
 		camerapos = MoveAlongAxis(camerapos, verticalAxis, D_CAMERA_DIST*mod);
 	else if (key == 's')
 		camerapos = MoveAlongAxis(camerapos, verticalAxis, -D_CAMERA_DIST*mod);
-	else if (key == 'a')
+	if (key == 'a')
 		camerapos = MoveAlongAxis(camerapos, horizontalAxis, -D_CAMERA_DIST*mod);
 	else if (key == 'd')
 		camerapos = MoveAlongAxis(camerapos, horizontalAxis, D_CAMERA_DIST*mod);
 
 	// Zoom
-	else if (key == 'r')
+	if (key == 'r')
 		camerapos = MoveAlongAxis(camerapos, depthAxis, D_CAMERA_DIST*mod);
 	else if (key == 'f')
 		camerapos = MoveAlongAxis(camerapos, depthAxis, -D_CAMERA_DIST*mod);
 
-    else if (key == '1')
+    if (key == '1')
         screenshot("screenshot.ppm", 1024, 1024);
+
+	printf("*********************************\n");
+	printf("horizontalAxis: %f,%f,%f\n", horizontalAxis.x, horizontalAxis.y, horizontalAxis.z);
+	printf("verticalAxis: %f,%f,%f\n", verticalAxis.x, verticalAxis.y, verticalAxis.z);
+	printf("depthAxis: %f,%f,%f\n", depthAxis.x, depthAxis.y, depthAxis.z);
+	printf("*********\n");
+	printf("camerapos: %f,%f,%f\n", camerapos.x, camerapos.y, camerapos.z);
+	printf("lightpos: %f,%f,%f\n", lightpos.x, lightpos.y, lightpos.z);
+	printf("power: %f\n", power);
+	printf("phi: %f\n", phi);
+	printf("theta: %f\n", theta);
+	printf("step: %f\n", step);
+	printf("bail: %d\n", bail);
+	printf("wVar: %f\n", wVar);
 }
 
 void screenshot(char* filename, int width, int height) {
@@ -245,6 +242,15 @@ void screenshot(char* filename, int width, int height) {
     resolution.x = width, resolution.y = height;
     changeFOVscale(&vfov, &hfov, width, height);
     setFOVvec(&fov, vfov, hfov);
+
+	vec3f p = (vec3f) { 0, 0, 0 };
+
+	p = MoveAlongAxis(p, horizontalAxis, fov.x);
+	p = MoveAlongAxis(p, verticalAxis, fov.y);
+	p = MoveAlongAxis(p, depthAxis, fov.z);
+
+	fov = p;
+
     updateMandelbulbVars();
 
     draw();
@@ -270,7 +276,16 @@ void screenshot(char* filename, int width, int height) {
     glScissor(0, 0, resolution.x, resolution.y);
     changeFOV(&vfov, &hfov, resolution.x, resolution.y, cameradist);
     setFOVvec(&fov, vfov, hfov);
-    updateMandelbulbVars();
+
+	p = (vec3f) { 0, 0, 0 };
+
+	p = MoveAlongAxis(p, horizontalAxis, fov.x);
+	p = MoveAlongAxis(p, verticalAxis, fov.y);
+	p = MoveAlongAxis(p, depthAxis, fov.z);
+
+	fov = p;
+
+	updateMandelbulbVars();
 
     file = fopen(filename, "w");
     fprintf(file, "P6\n%d %d\n255\n", width, height);
