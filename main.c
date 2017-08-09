@@ -2,9 +2,6 @@
 
 //Render quad
 void draw() {
-    //Clear
-    glClear(GL_COLOR_BUFFER_BIT);
-
     //Draw quad over screen
     glBegin(GL_QUADS);
 	    glVertex3f(1.0f, 1.0f, 0.0);
@@ -16,14 +13,47 @@ void draw() {
 
 //Render Funcion
 void render() {    
+    //Clear
+    glClear(GL_COLOR_BUFFER_BIT);
 
-    draw();
+    //Redraw fractal if changed
+    if (varsupdated == true) {
+        GLint backbuffer;
+
+        draw();
+        printf("RERENDERED");
+
+        //Copy frambuffer
+        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &backbuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, lastrender);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, backbuffer);
+        glBlitFramebuffer(0, 0, resolution.x, resolution.y, 0, 0, resolution.x, resolution.y,
+                GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, backbuffer);
+
+        varsupdated = false;
+    }
+    //Otherwise just put back old frambuffer and then draw text
+    else {
+        GLint backbuffer;
+
+        //Copy frambuffer
+        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &backbuffer);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, lastrender);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, backbuffer);
+        glBlitFramebuffer(0, 0, resolution.x, resolution.y, 0, 0, resolution.x, resolution.y,
+                GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, backbuffer);
+    }
+
     lastlastframe = lastframe;
     lastframe = glutGet(GLUT_ELAPSED_TIME);
 
-    //printMonitors();
-
-    glutSwapBuffers();
+    printMonitors();
+    
+    //glutSwapBuffers();
     glFinish();
 }
 
@@ -43,13 +73,16 @@ char line[INPUT_MAX];
 int command_char = 0;
 
 void clearKeyBuffer() {
-    kbinputlen = 0;
-
     int i = 0;
 
-    while (i < KEYBUFFERLEN*4) {
+    while (i < kbinputlen*4) {
         kbinputbuffer[i++] = false;
     }
+
+    kbinputlen = 0;
+
+    line[0] = '\0';
+    command_char = 0;
 }
     
 void handleKeyboard(unsigned char key, int x, int y) {
@@ -93,9 +126,12 @@ void handleKeyboard(unsigned char key, int x, int y) {
             line[command_char++] = key;
         }
         else {
-            line[command_char] = '\0';
             command_char = -1;
         }
+
+        line[command_char] = '\0';
+
+        monitorsupdated = true;
     }
 }
 
@@ -104,12 +140,15 @@ void handleKeyboardUp(unsigned char key, int x, int y) {
 }
 
 void sendKeySignals() {
+    int inputsent = false;
+
     if (userfocus == VIEW_FOCUS) {
         int key;
         for (key = 0; key != kbinputlen; key++) {
-                putchar(kbinputbuffer[key*4]);
-                cameraMoveKeyboard(kbinputbuffer[key*4], kbinputbuffer[key*4+1],
+            putchar(kbinputbuffer[key*4]);
+            cameraMoveKeyboard(kbinputbuffer[key*4], kbinputbuffer[key*4+1],
                     kbinputbuffer[key*4+2], kbinputbuffer[key*4+3]);
+            inputsent = true;
         }
 
         clearKeyBuffer();
@@ -118,9 +157,14 @@ void sendKeySignals() {
         if (command_char == -1) {
             processCommand(line);
             command_char = 0;
-            printf("%s", line);
             userfocus = VIEW_FOCUS;
+            clearKeyBuffer();
+            inputsent = true;
         }
+    }
+
+    if (inputsent == true) {
+        updateMandelbulbVars();
     }
 }
 
@@ -139,8 +183,8 @@ void handleResolution(int w, int h) {
 
 void printString(char* string) {
     glMatrixMode(GL_PROJECTION);
-    glPushMatrix();             
-    glLoadIdentity();   
+    glPushMatrix();
+    glLoadIdentity();
     int w = glutGet( GLUT_WINDOW_WIDTH );
     int h = glutGet( GLUT_WINDOW_HEIGHT );
     glOrtho( 0, w, 0, h, -1, 1 );
@@ -155,13 +199,13 @@ void printString(char* string) {
     void *font = GLUT_BITMAP_HELVETICA_18;
     for (char* c=string; *c != '\0'; c++) 
     {
-        //glutBitmapCharacter(font, *c);
+        glutBitmapCharacter(font, *c);
     }
 
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
-    glPopMatrix();  	
+    glPopMatrix();
 }
 
 //Print monitors (text)
@@ -174,6 +218,8 @@ void updateMandelbulbVars() {
     loadMandelbulbVars(mandelbulb_shader, fov, camerapos, color, step, bail,
 		power, phi, theta, resolution, multisampling, lightpos, intensity,
 		horizontalAxis, verticalAxis, depthAxis, wVar, orbittrap);
+
+    varsupdated = true;
 }
 
 //Idle Function
@@ -193,15 +239,26 @@ void idle() {
 	int oldOrbitTrap = orbittrap;
 
 	sendKeySignals();
-    updateMandelbulbVars();
     
 	if (!VecEquals(camerapos, oldCameraPos) || !VecEquals(lightpos, oldLightPos)
 		|| !VecEquals(horizontalAxis, oldHAxis) || !VecEquals(verticalAxis, oldVAxis)
 		|| !VecEquals(depthAxis, oldDAxis) || step != oldStep || power != oldPower
 		|| phi != oldPhi || theta != oldTheta || intensity != oldIntensity
-		|| wVar != oldWVar || bail != oldBail || orbittrap != oldOrbitTrap)
-
+		|| wVar != oldWVar || bail != oldBail || orbittrap != oldOrbitTrap ||
+        monitorsupdated == true)
 		glutPostRedisplay();
+}
+
+//Initialize stuff
+void init() {
+    GLint renderbuffer;
+    
+    //Initialize some render stuff
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &renderbuffer);
+    glGenFramebuffers(1, &lastrender);
+    glBindFramebuffers(GL_FRAMEBUFFER);
+    glGenRenderBuffers(1, &lastrenderbuffer);
+    
 }
 
 //Main
@@ -240,7 +297,7 @@ int main(int argc, char* argv[]) {
 
     //Setup window
     glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
 	glutInitWindowSize(resolution.x, resolution.y);
 	glutCreateWindow("3D Mandelbulb Viewer");
@@ -258,6 +315,8 @@ int main(int argc, char* argv[]) {
     glutReshapeFunc(handleResolution);
 
     glewInit();
+
+    init();
 
     //printf("starting shaders\n");
     fflush(stdout);

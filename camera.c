@@ -279,14 +279,6 @@ void screenshot(char* filename, int width, int height) {
     changeFOVscale(&vfov, &hfov, width, height);
     setFOVvec(&fov, vfov, hfov);
 
-	vec3f p = (vec3f) { 0, 0, 0 };
-
-	p = MoveAlongAxis(p, horizontalAxis, fov.x);
-	p = MoveAlongAxis(p, verticalAxis, fov.y);
-	p = MoveAlongAxis(p, depthAxis, fov.z);
-
-	fov = p;
-
     updateMandelbulbVars();
 
     draw();
@@ -312,14 +304,6 @@ void screenshot(char* filename, int width, int height) {
     glScissor(0, 0, resolution.x, resolution.y);
     changeFOV(&vfov, &hfov, resolution.x, resolution.y, cameradist);
     setFOVvec(&fov, vfov, hfov);
-
-	p = (vec3f) { 0, 0, 0 };
-
-	p = MoveAlongAxis(p, horizontalAxis, fov.x);
-	p = MoveAlongAxis(p, verticalAxis, fov.y);
-	p = MoveAlongAxis(p, depthAxis, fov.z);
-
-	fov = p;
 
 	updateMandelbulbVars();
 

@@ -2,7 +2,7 @@
 #define CAMERA
 
 #include <time.h>
-#include "math.h"
+#include "vecmath.h"
 
 void InitializeCamera(vec3f* cameraPosition, vec3f* depthAxis,
 	vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* centerpos,

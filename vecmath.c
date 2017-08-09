@@ -1,4 +1,4 @@
-#include "math.h"
+#include "vecmath.h"
 
 int VecEquals(vec3f a, vec3f b)
 {

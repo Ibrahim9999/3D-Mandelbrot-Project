@@ -1,8 +1,8 @@
 #ifndef SHADER
 #define SHADER
 
-#include "math.h"
-
+#include "vecmath.h"
+#include <GL/glut.h>
 #define PI_CONST 3.141592
 
 typedef struct shaderprogram_struct {
@@ -24,5 +24,7 @@ void loadMandelbulbProgram(shaderprogram* program, vec3f fov, vec3f camerapos,
 	vec2f resolution, int multisampling, vec3f lightpos, float intensity,
 	vec3f horizontalAxis, vec3f verticalAxis, vec3f depthAxis, float wVar,
 	int orbittrap);
+void loadTextureProgram(shaderprogram* program, GLuint texture, GLuint *sampler);
+void loadTextureVars(shaderprogram program, GLuint texture, GLuint sampler);
 
 #endif

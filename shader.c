@@ -4,7 +4,7 @@
 #include <GL/glut.h>
 #include <math.h>
 #include <string.h>
-#include "math.h"
+#include "vecmath.h"
 #include "shader.h"
 
 char* loadTextFile(const char* filename) {
@@ -176,3 +176,26 @@ void loadMandelbulbProgram(shaderprogram* program, vec3f fov, vec3f camerapos,
 		verticalAxis, depthAxis, wVar, orbittrap);
 }
 
+//Load the display texture shader
+void loadTextureShader(shaderprogram* program, GLuint texture, GLuint *sampler) {
+    loadShaders(program, "shaders/texture_shader.vert", "shaders/texture_shader.frag");
+    
+    glUseProgram(program->prog);
+    
+    glGenSamplers(1, sampler);
+
+    loadTextureVars(*program, texture, *sampler);
+}
+
+//Load the texture to the display texture shader
+void loadTextureVars(shaderprogram program, GLuint texture, GLuint sampler) {
+    GLint texture_loc;
+
+    texture_loc = glGetUniformLocation(program.prog, "drawtexture");
+    
+    glUniform1i(program.prog, 0);
+
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindSampler(0, sampler);
+}

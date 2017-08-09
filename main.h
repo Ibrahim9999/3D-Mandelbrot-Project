@@ -53,17 +53,23 @@ float wVar;
 int bail, multisampling;
 int orbittrap;
 
+//Texture shader and variables
+shaderprogram textureshader;
+GLuint lastrender;
+GLuint lastrenderbuffer;
+
 //Camera variables
 float vfov, hfov;
 float cameradist;
 
-//State of program (view or menu)
+//State of program
 int userfocus = VIEW_FOCUS;
+int varsupdated = true;
+int monitorsupdated = false;
 
 //Timer
 float lastframe;
 float lastlastframe;
-
 
 #ifdef __cplusplus
 }
