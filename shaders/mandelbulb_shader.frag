@@ -18,6 +18,7 @@ uniform int multisampling;
 uniform vec3 lightpos;
 uniform float intensity;
 uniform float wVar;
+uniform int orbittrap;
 
 out vec3 outputColor;
 
@@ -96,7 +97,35 @@ vec3 ColorFromHSV(float hue, float saturation, float value)
     return vec3(v, p, q);
 }
 
-vec3 TriplexPower( in vec3 v, in float power)
+bool OrbitTrap(in vec3 v, in float r, in int ot)
+{
+	r *= r;
+	float x = v.x*v.x;
+	float y = v.y*v.y;
+	float z = v.z*v.z;
+	
+	// SPHERE
+	if (ot == 0)
+		return x + y + z < r;
+	
+	// CUBE
+	if (ot == 1)
+		return x < r && y < r && z < r;
+	
+	// W_TRAP
+	if (ot == 2)
+		return x < r;
+
+	// I_TRAP
+	if (ot == 2)
+		return y < r;
+
+	// J_TRAP
+	if (ot == 2)
+		return z < r;
+}
+
+vec3 TriplexPower(in vec3 v, in float power)
 {
 	float x = 0;
     float y = 0;
@@ -141,27 +170,26 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float p
 
 	//return TriplexPower(v, power) + TriplexPower(c, -1);
 	//return TriplexPower(v, power) + vec3(c.x, -c.y, c.z);
-
     return TriplexPower(v, power) + c;
 }
 
 vec3 mandelTest(in vec3 point) {
     //vec3 v = TriplexPower(point, -1);
 	//vec3 v = vec3(point.x, -point.y, -point.z);
+	//vec3 v = vec3(point.x, abs(point.y), abs(point.z));
 	vec3 v = point;
 
 	//Julia Set Coordinates
 	//vec3 c = vec3(-.4, .6, 0);
-	//vec3 c = vec3(-.8, .156, 0);
 	//vec3 c = vec3(.25, .1, 0);
-	vec3 c = vec3(-0.7269, 0.1889, 0);
+	//vec3 c = vec3(-0.7269, 0.1889, 0);
 	//vec3 c = vec3(-1, 0, 0);
 	//vec3 c = vec3(0, -.9, 0);
 	//vec3 c = vec3(0, -.8, 0);
-    //vec3 c = point;
+    vec3 c = point;
 	
 	int i;
-	for(i = 0; i < bail && v.x*v.x + v.y*v.y + v.z*v.z < 4.0; i++)
+	for(i = 0; i < bail && OrbitTrap(v, 2, orbittrap); i++)
         v = nextPoint(v, c, power, theta, phi);
 
     if (i >= bail)
@@ -220,7 +248,7 @@ void main() {
 
                 pos = intersection;
                 vec3 div = mandelTest(pos);
-                while (div == vec3(0) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0) {
+                while (div == vec3(0) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z < 4) {
                     pos = pos + step*aa_dir;
                     div = mandelTest(pos);
                 }
