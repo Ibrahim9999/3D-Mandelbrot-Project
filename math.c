@@ -23,6 +23,7 @@ vec3f VecDoubleMultiply(vec3f v, double d)
     v.x *= d;
     v.y *= d;
     v.z *= d;
+
 	return v;
 }
 
@@ -266,3 +267,33 @@ void Roll(double angle, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depth
 	ApplyRotationToVector(localRotation, horizontalAxis);
 	ApplyRotationToVector(localRotation, verticalAxis);
 }
+
+/*  _     _  _ _     _            _
+ * |       ||   |   |              |
+ * | a b c || x |   | ax + by + cz |
+ * | p q r || y | = | px + qy + rz |
+ * | u v w || z |   | ux + vy + wz |
+ * |_     _||_ _|   |_            _|
+ */
+
+void RotateYZ(double angle, vec4f* v) {
+    v->y = v->y*cos(angle) - v->z*sin(angle);
+    v->z = v->y*sin(angle) + v->z*cos(angle);
+}
+void RotateZW(double angle, vec4f* v) {
+    v->z = v->z*cos(angle) - v->w*sin(angle);
+    v->w = v->z*sin(angle) + v->w*cos(angle);
+}
+void RotateWX(double angle, vec4f* v) {
+    v->w = v->w*cos(angle) - v->x*sin(angle);
+    v->x = v->w*sin(angle) + v->x*cos(angle);
+}
+void RotateXZ(double angle, vec4f* v) {
+    v->x = v->x*cos(angle) - v->z*sin(angle);
+    v->z = v->x*sin(angle) + v->z*cos(angle);
+}
+void RotateYW(double angle, vec4f* v) {
+    v->y = v->y*cos(angle) - v->w*sin(angle);
+    v->w = v->y*sin(angle) + v->w*cos(angle);
+}
+
