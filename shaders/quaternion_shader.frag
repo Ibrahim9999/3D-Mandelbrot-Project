@@ -96,6 +96,18 @@ vec3 ColorFromHSV(float hue, float saturation, float value)
     return vec3(v, p, q);
 }
 
+vec4 QuatQuatMultiply(in vec4 a, in vec4 b)
+{
+	vec4 c;
+	
+	c.w = a.w*b.w - a.x*b.x - a.y*b.y - a.z*b.z;
+	c.x = a.w*b.x + a.x*b.w + a.y*b.z - a.z*b.y;
+	c.y = a.w*b.y - a.x*b.z + a.y*b.w + a.z*b.x;
+	c.z = a.w*b.z + a.x*b.y - a.y*b.x + a.z*b.w;
+	
+	return c;
+}
+
 vec4 QuatDoubleMultiply(in vec4 q, in float d)
 {
     q.w *= d;
@@ -137,14 +149,24 @@ vec4 QuatLn(in vec4 q)
 
 vec4 QuatPower(in vec4 q, in float p)
 {
+	if (power == 1.0)
+		return q;
+	if (power == 2.0)
+	{
+		float w = q.w*q.w - q.x*q.x - q.y*q.y - q.x*q.z;
+		float x = 2*q.w * q.x;
+		float y = 2*q.w * q.y;
+		float z = 2*q.w * q.z;
+
+		//return QuatQuatMultiply(q,q);
+		return vec4 (x, y, z, w);
+	}
+
 	return QuatExp(QuatDoubleMultiply(QuatLn(q),p));
 }
 
 vec4 nextPoint(in vec4 q, in vec4 c, in float power)
 {
-    if (power == 1.0)
-        return q + c;
-
     return QuatPower(q, power) + c;
 }
 
@@ -154,7 +176,7 @@ vec4 mandelTest(in vec4 point)
     vec4 c = point;
 	
     int i = 0;
-    while (q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z < 4.0 && i < bail)
+    while (q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z < 16.0 && i < bail)
 	{
         q = nextPoint(q, c, power);
         i++;
@@ -168,7 +190,7 @@ vec4 mandelTest(in vec4 point)
 
 vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in float sphereRadius) {
 
-    if (length(rayPos-spherePos) <= 2.0) return rayPos;
+    if (length(rayPos-spherePos) <= 4.0) return rayPos;
     vec3 offset = rayPos - spherePos;
 
     float rSquared = sphereRadius*sphereRadius;
@@ -211,14 +233,14 @@ void main()
             aa_dir += vec3(i, j, 0.0) * off;
             aa_dir = normalize(aa_dir);
 
-            vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), aa_dir, ALMOST_TWO);
+            vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), aa_dir, 3.99);
 
             if (intersection != vec3(0))
 			{
 				pos = intersection;
                 vec4 div = mandelTest(vec4 (pos.x, pos.y, pos.z, wVar));
 
-                while (div == vec4(0) && wVar*wVar + pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 4.0)
+                while (div == vec4(0) && wVar*wVar + pos.x*pos.x + pos.y*pos.y + pos.z*pos.z <= 16.0)
 				{
                     pos = pos + step*aa_dir;
                     div = mandelTest(vec4 (pos.x, pos.y, pos.z, wVar));
@@ -243,7 +265,7 @@ void main()
                     }
 
                     //outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
-                    outputColor += clamp(ColorFromHSV(atan(div.y / div.x)/PI*360, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
+                    outputColor += clamp(ColorFromHSV(atan(div.y / div.x)/PI*360 + 180, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
                     //outputColor += clamp(vec3(color*cur_intensity), vec3(0.0), vec3(1.0));
                     
 					continue;

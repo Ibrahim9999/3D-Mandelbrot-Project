@@ -1,6 +1,7 @@
 #version 130
 
-#define ALMOST_TWO 1.9999
+#define BAILOUT_RADIUS 2.0
+#define ALMOST_BAIL BAILOUT_RADIUS - .0001
 #define PI 3.1415926535897932384626433
 
 in vec3 direction;
@@ -22,7 +23,8 @@ uniform int orbittrap;
 
 out vec3 outputColor;
 
-bool equals(in float a, in float b) {
+bool equals(in float a, in float b)
+{
     float epsilon = 0.000000001;
     return (abs(a-b) < epsilon);
 }
@@ -97,9 +99,24 @@ vec3 ColorFromHSV(float hue, float saturation, float value)
     return vec3(v, p, q);
 }
 
-bool OrbitTrap(in vec3 v, in float r, in int ot)
+vec3 VecDoubleDivide(in vec3 v, in float d)
 {
-	r *= r;
+	return vec3(v.x / d, v.y / d, v.z / d);
+}
+
+float VecLength(in vec3 v)
+{
+	return sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+}
+
+vec3 VecNormalize(in vec3 v)
+{
+	return VecDoubleDivide(v, VecLength(v));
+}
+
+bool OrbitTrap(in vec3 v, in int ot)
+{
+	float r = BAILOUT_RADIUS*BAILOUT_RADIUS;
 	float x = v.x*v.x;
 	float y = v.y*v.y;
 	float z = v.z*v.z;
@@ -173,7 +190,8 @@ vec3 nextPoint (in vec3 v, in vec3 c, in float power, in float theta, in float p
     return TriplexPower(v, power) + c;
 }
 
-vec3 mandelTest(in vec3 point) {
+vec3 mandelTest(in vec3 point)
+{
     //vec3 v = TriplexPower(point, -1);
 	//vec3 v = vec3(point.x, -point.y, -point.z);
 	//vec3 v = vec3(point.x, abs(point.y), abs(point.z));
@@ -189,7 +207,7 @@ vec3 mandelTest(in vec3 point) {
     vec3 c = point;
 	
 	int i;
-	for(i = 0; i < bail && OrbitTrap(v, 2, orbittrap); i++)
+	for(i = 0; i < bail && OrbitTrap(v, orbittrap); i++)
         v = nextPoint(v, c, power, theta, phi);
 
     if (i >= bail)
@@ -198,9 +216,42 @@ vec3 mandelTest(in vec3 point) {
     return vec3(0);
 }
 
+float DistanceEstimator(vec3 pos)
+{
+	vec3 z = pos;
+	float derivative = 1.0;
+	float r = 0.0;
+	
+	for (int i = 0; i < bail; i++)
+	{
+		r = VecLength(z);
+
+		if (r < BAILOUT_RADIUS)
+			break;
+
+		z = TriplexPower(z, power);
+
+		z += pos;
+	}
+	
+	return .5 * log(r) * r / derivative;
+}
+
+vec3 CalculateNormal(vec3 p)
+{
+	float e = 2e-6f;
+	float n = DistanceEstimator(p);
+	float dx = DistanceEstimator(p + vec3(e, 0, 0)) - n;
+	float dy = DistanceEstimator(p + vec3(0, e, 0)) - n;
+	float dz = DistanceEstimator(p + vec3(0, 0, e)) - n;
+	vec3 grad = vec3(dx, dy, dz);
+
+	return VecNormalize(grad);
+}
+
 vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in float sphereRadius) {
 
-    if (length(rayPos-spherePos) <= 2.0) return rayPos;
+    if (length(rayPos-spherePos) <= BAILOUT_RADIUS) return rayPos;
     vec3 offset = rayPos - spherePos;
 
     float rSquared = sphereRadius*sphereRadius;
@@ -215,7 +266,6 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in f
     if (aSquared > rSquared)
         return vec3(0); // No Collision
 
-
     float h = sqrt(rSquared - aSquared);    // collision distance from plane
 
     vec3 collisionOffset = a - h*rayDir;
@@ -227,6 +277,7 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in f
 void main() {    
     vec3 pos = camerapos;
     vec3 dir = normalize(direction);
+	float distanceStep;
 
     vec3 off = (FOV/vec3(resolution.xy/2, 0.0))/multisampling;
     outputColor = vec3(0);
@@ -234,13 +285,14 @@ void main() {
     for (int i = -(multisampling/2); i <= multisampling/2; i++) {
         for (int j = -(multisampling/2); j <= multisampling/2; j++) {
 
-            if (multisampling % 2 == 0 && (i == 0 || j == 0)) continue;
+            if (multisampling % 2 == 0 && (i == 0 || j == 0))
+				continue;
 
             vec3 aa_dir = dir;
             aa_dir += vec3(i, j, 0.0) * off;
             aa_dir = normalize(aa_dir);
 
-            vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), aa_dir, ALMOST_TWO);
+            vec3 intersection = rayIntersectsSphere(pos, vec3(0,0,0), aa_dir, ALMOST_BAIL);
             //outputColor = vec4((aa_dir + 1)/2,1.0);
             //outputColor = vec4(1.0);
 
@@ -248,22 +300,36 @@ void main() {
 
                 pos = intersection;
                 vec3 div = mandelTest(pos);
-                while (div == vec3(0) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z < 4) {
-                    pos = pos + step*aa_dir;
+
+                while (div == vec3(0) && pos.x*pos.x + pos.y*pos.y + pos.z*pos.z < BAILOUT_RADIUS*BAILOUT_RADIUS)
+				{
+					distanceStep = DistanceEstimator(pos);
+
+					if (distanceStep < step)
+						distanceStep = step;
+
+                    pos = pos + distanceStep*aa_dir;
                     div = mandelTest(pos);
                 }
 
-                if (mandelTest(pos) != vec3(0)) {
+                if (mandelTest(pos) != vec3(0))
+				{
                     float cur_intensity = intensity;
                     vec3 shadow = pos;
-                    while (cur_intensity >= 0 && length(lightpos-shadow) > step) {
-                        shadow += normalize(lightpos-shadow) * step;
-                        if (mandelTest(shadow) != vec3(0)) {
-                            cur_intensity -= 10*step;
+
+                    while (cur_intensity >= 0 && length(lightpos-shadow) > distanceStep)
+					{
+                        shadow += normalize(lightpos-shadow) * distanceStep;
+
+                        if (mandelTest(shadow) != vec3(0))
+						{
+                            cur_intensity -= 10*distanceStep;
                             continue;
                         }
-                        cur_intensity -= 1*step;
+
+                        cur_intensity -= 1*distanceStep;
                     }
+
                     //outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
                     outputColor += clamp(ColorFromHSV(atan(div.y, div.x)/PI*360, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
                     //outputColor += clamp(vec3(color*cur_intensity), vec3(0.0), vec3(1.0));

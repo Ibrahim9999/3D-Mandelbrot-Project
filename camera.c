@@ -8,7 +8,7 @@
 
 #define D_ANGLE 1
 #define D_CAMERA_DIST 0.05
-#define D_W .1
+#define D_W .001
 #define D_BAIL 1
 #define D_STEP .001
 #define D_POWER 1

@@ -236,7 +236,7 @@ int main(int argc, char* argv[]) {
 	// Setting the real value of the quaternion mandelbrot
 	wVar = 0;
 	// Raytracing step
-    step = 0.01;
+    step = 0.1;
 	// Maximum Iterations for mandelbrot algorithm
     bail = 10;
 	// Number of sampling points per pixel
