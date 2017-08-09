@@ -58,5 +58,10 @@ void ApplyRotationToVector(vec4f rotation, vec3f* axis);
 void Yaw(double angle, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
 void Pitch(double angle, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
 void Roll(double angle, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis);
+void RotateYZ(double angle, vec4f* v);
+void RotateZW(double angle, vec4f* v);
+void RotateWX(double angle, vec4f* v);
+void RotateXZ(double angle, vec4f* v);
+void RotateYW(double angle, vec4f* v);
 
 #endif

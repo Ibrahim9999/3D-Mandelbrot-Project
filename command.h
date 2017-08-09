@@ -3,4 +3,4 @@
 
 void processCommand(char* command);
 
-#endif COMMAND
+#endif
