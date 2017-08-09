@@ -36,9 +36,9 @@ int VecEquals(vec3f a, vec3f b);
 float v3f_length(vec3f v);
 vec3f v3f_normalize(vec3f v);
 vec3f VecDoubleMultiply(vec3f v, double d);
+vec3f VecDoubleDivide(vec3f v, double d);
 vec3f VecVecAdd(vec3f a, vec3f b);
 vec3f VecVecSubtract(vec3f a, vec3f b);
-
 vec4f QuatFromDoubleVec(double d, vec3f v);
 vec4f QuatFromAxisAngle(double angle, vec3f axis);
 vec4f QuatQuatAdd(vec4f a, vec4f b);

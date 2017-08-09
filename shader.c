@@ -7,6 +7,7 @@
 #include "math.h"
 #include "shader.h"
 
+// Loads shaders as text files
 char* loadTextFile(const char* filename) {
     printf("loading files\n");
     fflush(stdout);
@@ -37,7 +38,7 @@ char* loadTextFile(const char* filename) {
     return text;
 }
 
-
+// Prints program log to print any errors or successes
 void printProgramLog(shaderprogram program) {
     int length, written;
     char* log;
@@ -53,6 +54,7 @@ void printProgramLog(shaderprogram program) {
     }
 }
 
+// Prints shader log as it gets compiled
 void printShaderLog(GLuint shader) {
     int length, written;
     char* log;
@@ -68,6 +70,7 @@ void printShaderLog(GLuint shader) {
     }
 }
 
+// Loads shaders into program
 void loadShaders(shaderprogram *program, const char* vname, const char* fname) {
     char *vs=NULL, *fs=NULL;
     const char *cvs, *cfs;
@@ -110,15 +113,17 @@ void loadShaders(shaderprogram *program, const char* vname, const char* fname) {
     glLinkProgram(program->prog);
 }
 
+// Loads mandelbrot variables into shaders
 void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     vec3f color, float step, int bail, float power, float phi, float theta, 
 	vec2f resolution, int multisampling, vec3f lightpos, float intensity,
-	vec3f horizontalAxis, vec3f verticalAxis, vec3f depthAxis, float wVar) {
+	vec3f horizontalAxis, vec3f verticalAxis, vec3f depthAxis, float wVar,
+	int orbittrap) {
     
 	GLint fov_loc, camerapos_loc, color_loc, step_loc, bail_loc, power_loc,
 		phi_loc, theta_loc, resolution_loc, multisampling_loc, lightpos_loc,
 		intensity_loc, horizontalAxis_loc, verticalAxis_loc, depthAxis_loc,
-		wVar_loc;
+		wVar_loc, orbittrap_loc;
 
     fov_loc = glGetUniformLocation(program.prog, "FOV");
     camerapos_loc = glGetUniformLocation(program.prog, "camerapos");
@@ -136,6 +141,7 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
 	verticalAxis_loc = glGetUniformLocation(program.prog, "verticalAxis");
 	depthAxis_loc = glGetUniformLocation(program.prog, "depthAxis");
 	wVar_loc = glGetUniformLocation(program.prog, "wVar");
+	orbittrap_loc = glGetUniformLocation(program.prog, "orbittrap");
 
     //printf("************ %f, %f, %f", fov.x, fov.y, fov.z);
 
@@ -155,12 +161,15 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
 	glUniform3f(verticalAxis_loc, verticalAxis.x, verticalAxis.y, verticalAxis.z);
 	glUniform3f(depthAxis_loc, depthAxis.x, depthAxis.y, depthAxis.z);
 	glUniform1f(wVar_loc, wVar);
+	glUniform1i(orbittrap_loc, orbittrap);
 }
 
+// Loads program to output mandelbrot to viewing window
 void loadMandelbulbProgram(shaderprogram* program, vec3f fov, vec3f camerapos,
     vec3f color, float step, int bail, float power, float phi, float theta,
 	vec2f resolution, int multisampling, vec3f lightpos, float intensity,
-	vec3f horizontalAxis, vec3f verticalAxis, vec3f depthAxis, float wVar) {
+	vec3f horizontalAxis, vec3f verticalAxis, vec3f depthAxis, float wVar,
+	int orbittrap) {
 
     //loadShaders(program, "shaders/mandelbulb_shader.vert", "shaders/quaternion_shader.frag");
 	loadShaders(program, "shaders/mandelbulb_shader.vert", "shaders/mandelbulb_shader.frag");
@@ -169,6 +178,6 @@ void loadMandelbulbProgram(shaderprogram* program, vec3f fov, vec3f camerapos,
 
     loadMandelbulbVars(*program, fov, camerapos, color, step, bail, power, phi,
 		theta, resolution, multisampling, lightpos, intensity, horizontalAxis,
-		verticalAxis, depthAxis, wVar);
+		verticalAxis, depthAxis, wVar, orbittrap);
 }
 
