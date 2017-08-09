@@ -218,7 +218,7 @@ int main(int argc, char* argv[]) {
     hfov = vfov = START_FOV;
     cameradist = START_WIDTH/(2*tan(START_FOV/360*PI_CONST));
     setFOVvec(&fov, vfov, hfov);
-	
+
 	// Initialize camera
     InitializeCamera(&camerapos, &horizontalAxis, &verticalAxis, &depthAxis,
 		&centerpos, &centerHAxis, &centerVAxis, &centerDAxis);
