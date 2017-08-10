@@ -48,9 +48,7 @@ void render() {
 //Handle mouse input
 void handleMouse(int x, int y) {
     if (userfocus == VIEW_FOCUS)
-	{
         cameraMoveMouse(x, y);
-    }
 }
 
 
@@ -60,6 +58,7 @@ static int kbinputlen = 0;
 char line[INPUT_MAX];
 int command_char = 0;
 
+// Clears keystroke buffer
 void clearKeyBuffer() {
     int i = 0;
 
@@ -72,11 +71,13 @@ void clearKeyBuffer() {
     line[0] = '\0';
     command_char = 0;
 }
-    
+
+// Method for handling keyboard input
 void handleKeyboard(unsigned char key, int x, int y) {
     if (key == ':') {
         userfocus = COMMAND_FOCUS;
     }
+
 
     if (userfocus == VIEW_FOCUS) {
         if (kbinputlen <= KEYBUFFERLEN) {
@@ -109,14 +110,16 @@ void handleKeyboard(unsigned char key, int x, int y) {
         }
     }
     else if (userfocus == COMMAND_FOCUS) {
-        if (key != '\r' && key != '\n') {
-            line[command_char++] = key;
+        if (key == '\r' || key == '\n') {
+           command_char = -1;
+        }
+        else if (key == '\b' && command_char > 0) {
+            line[--command_char] = '\0';
         }
         else {
-            command_char = -1;
+            line[command_char++] = key;
+            line[command_char] = '\0';
         }
-
-        line[command_char] = '\0';
 
         monitorsupdated = true;
     }
@@ -126,6 +129,7 @@ void handleKeyboardUp(unsigned char key, int x, int y) {
     
 }
 
+// Sends keystrokes to ???
 void sendKeySignals() {
     int inputsent = false;
 
@@ -155,6 +159,7 @@ void sendKeySignals() {
     }
 }
 
+// Fixes window resolution when the viewing window changes size
 void handleResolution(int w, int h) {
     //Set viewport
     glViewport(0, 0, w, h);
@@ -171,6 +176,7 @@ void handleResolution(int w, int h) {
          GL_UNSIGNED_BYTE, 0);
 }
 
+// Writes text to screen
 void printString(char* string) {
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -230,6 +236,7 @@ void idle() {
 
 	sendKeySignals();
     
+	//Test to see if any value was changed: if false, the window will not update
 	if (!VecEquals(camerapos, oldCameraPos) || !VecEquals(lightpos, oldLightPos)
 		|| !VecEquals(horizontalAxis, oldHAxis) || !VecEquals(verticalAxis, oldVAxis)
 		|| !VecEquals(depthAxis, oldDAxis) || step != oldStep || power != oldPower
@@ -261,27 +268,39 @@ int main(int argc, char* argv[]) {
     cameradist = START_WIDTH/(2*tan(START_FOV/360*PI_CONST));
     setFOVvec(&fov, vfov, hfov);
 
+	// Initialize camera
     InitializeCamera(&camerapos, &horizontalAxis, &verticalAxis, &depthAxis,
 		&centerpos, &centerHAxis, &centerVAxis, &centerDAxis);
 
+	// Singular color for mandelbulb
     color.x=0; color.y=1; color.z=1;
 	
+	// Pointlight position
     lightpos.x= -0.178390;
 	lightpos.y = -2.660062;
 	lightpos.z = -0.930965;
 
 	//lightpos = (vec3f) { 0, 0, 0 };
 
+	// Setting the real value of the quaternion mandelbrot
 	wVar = 0;
-    step = 0.01;
+	// Raytracing step
+    step = 0.1;
+	// Maximum Iterations for mandelbrot algorithm
     bail = 10;
+	// Number of sampling points per pixel
     multisampling=1;
+	// Power of the mandelbrot
     power = 2;
+	// Original phi and theta phase shifts
     phi = 0;
     theta = 0;
+	// Pointlight intensity
     intensity = 4.50;
+	// Mandelbrot orbit trap
 	orbittrap = SPHERE;
-
+	
+	// Window resolution
     resolution.x = START_WIDTH; resolution.y = START_HEIGHT;
 
     //Setup window
@@ -303,6 +322,7 @@ int main(int argc, char* argv[]) {
     glutKeyboardUpFunc(handleKeyboardUp);
     glutReshapeFunc(handleResolution);
 
+	// Initializes GLEW
     glewInit();
 
     init();
@@ -318,7 +338,7 @@ int main(int argc, char* argv[]) {
 
     printf("loaded program\n");
 
-    fflush(stdout);
+    //fflush(stdout);
     printProgramLog(mandelbulb_shader);
 
     //Loop

@@ -7,6 +7,7 @@
 #include "vecmath.h"
 #include "shader.h"
 
+// Loads shaders as text files
 char* loadTextFile(const char* filename) {
     printf("loading files\n");
     fflush(stdout);
@@ -37,7 +38,7 @@ char* loadTextFile(const char* filename) {
     return text;
 }
 
-
+// Prints program log to print any errors or successes
 void printProgramLog(shaderprogram program) {
     int length, written;
     char* log;
@@ -53,6 +54,7 @@ void printProgramLog(shaderprogram program) {
     }
 }
 
+// Prints shader log as it gets compiled
 void printShaderLog(GLuint shader) {
     int length, written;
     char* log;
@@ -68,6 +70,7 @@ void printShaderLog(GLuint shader) {
     }
 }
 
+// Loads shaders into program
 void loadShaders(shaderprogram *program, const char* vname, const char* fname) {
     char *vs=NULL, *fs=NULL;
     const char *cvs, *cfs;
@@ -110,6 +113,7 @@ void loadShaders(shaderprogram *program, const char* vname, const char* fname) {
     glLinkProgram(program->prog);
 }
 
+// Loads mandelbrot variables into shaders
 void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
     vec3f color, float step, int bail, float power, float phi, float theta, 
 	vec2f resolution, int multisampling, vec3f lightpos, float intensity,
@@ -160,6 +164,7 @@ void loadMandelbulbVars(shaderprogram program, vec3f fov, vec3f camerapos,
 	glUniform1i(orbittrap_loc, orbittrap);
 }
 
+// Loads program to output mandelbrot to viewing window
 void loadMandelbulbProgram(shaderprogram* program, vec3f fov, vec3f camerapos,
     vec3f color, float step, int bail, float power, float phi, float theta,
 	vec2f resolution, int multisampling, vec3f lightpos, float intensity,
