@@ -4,8 +4,8 @@ in vec2 texturecoord;
 
 uniform sampler2D drawtexture;
 
-out vec3 outColor
+out vec3 outColor;
 
 void main() {
-    outColor = texture(texture, texturecoord);
+    outColor = texture(drawtexture, texturecoord).rgb;
 }

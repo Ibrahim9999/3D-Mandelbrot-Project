@@ -177,12 +177,12 @@ void loadMandelbulbProgram(shaderprogram* program, vec3f fov, vec3f camerapos,
 }
 
 //Load the display texture shader
-void loadTextureShader(shaderprogram* program, GLuint texture, GLuint *sampler) {
+void loadTextureProgram(shaderprogram* program, GLuint texture, GLuint *sampler) {
     loadShaders(program, "shaders/texture_shader.vert", "shaders/texture_shader.frag");
     
     glUseProgram(program->prog);
     
-    glGenSamplers(1, sampler);
+    //glGenSamplers(1, sampler);
 
     loadTextureVars(*program, texture, *sampler);
 }
@@ -192,10 +192,15 @@ void loadTextureVars(shaderprogram program, GLuint texture, GLuint sampler) {
     GLint texture_loc;
 
     texture_loc = glGetUniformLocation(program.prog, "drawtexture");
-    
-    glUniform1i(program.prog, 0);
 
-    glActiveTexture(GL_TEXTURE0 + 0);
+    glUniform1i(texture_loc, 0);
+    
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     glBindSampler(0, sampler);
+
 }

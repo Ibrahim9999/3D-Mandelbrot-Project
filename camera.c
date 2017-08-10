@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <GL/glew.h>
 #include <GL/glut.h>
+#include "shader.h"
 
 #define D_ANGLE 1
 #define D_CAMERA_DIST 0.05
@@ -21,6 +22,8 @@
 #define MAGMOD 10
 #define MINMOD 0.1
 #define MODCOEF 10
+
+extern shaderprogram mandelbulb_shader;
 
 extern vec3f camerapos;
 extern vec3f horizontalAxis;
@@ -47,6 +50,7 @@ extern void render();
 extern void updateMandelbulbVars();
 
 static int oldMouseX = -1, oldMouseY = -1;
+
 
 void InitializeCamera(vec3f* cameraPosition, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis, vec3f* centerPosition, vec3f* centerHAxis, vec3f* centerVAxis, vec3f* centerDAxis)
 {
@@ -109,6 +113,8 @@ void cameraMoveMouse(int x, int y) {
 		camerapos = VecDoubleMultiply(depthAxis, -v3f_length(camerapos));
     }
 
+
+    updateMandelbulbVars();
 	glutPostRedisplay();
 
     oldMouseX = x;
@@ -279,9 +285,13 @@ void screenshot(char* filename, int width, int height) {
     changeFOVscale(&vfov, &hfov, width, height);
     setFOVvec(&fov, vfov, hfov);
 
+
+    glUseProgram(mandelbulb_shader.prog);
     updateMandelbulbVars();
 
+    glClear(GL_COLOR_BUFFER_BIT);
     draw();
+
 
     data = malloc(width * height * 3);
 

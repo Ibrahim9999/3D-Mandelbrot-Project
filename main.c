@@ -18,34 +18,22 @@ void render() {
 
     //Redraw fractal if changed
     if (varsupdated == true) {
-        GLint backbuffer;
-
+        glUseProgram(mandelbulb_shader.prog);
+        updateMandelbulbVars();
         draw();
         printf("RERENDERED");
 
-        //Copy frambuffer
-        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &backbuffer);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, lastrender);
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, backbuffer);
-        glBlitFramebuffer(0, 0, resolution.x, resolution.y, 0, 0, resolution.x, resolution.y,
-                GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, backbuffer);
+        glBindTexture(GL_TEXTURE_2D, lastrender);
+        glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, resolution.x, resolution.y, 0);
 
         varsupdated = false;
     }
-    //Otherwise just put back old frambuffer and then draw text
+    //Otherwise just render the texture of the old render and then draw text
     else {
-        GLint backbuffer;
-
-        //Copy frambuffer
-        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &backbuffer);
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, lastrender);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, backbuffer);
-        glBlitFramebuffer(0, 0, resolution.x, resolution.y, 0, 0, resolution.x, resolution.y,
-                GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, backbuffer);
+        glUseProgram(textureshader.prog);
+        loadTextureVars(textureshader, lastrender, lastrendersampler);
+        draw();
+        printf("REDRAWED");
     }
 
     lastlastframe = lastframe;
@@ -53,7 +41,7 @@ void render() {
 
     printMonitors();
     
-    //glutSwapBuffers();
+    glutSwapBuffers();
     glFinish();
 }
 
@@ -88,7 +76,6 @@ void clearKeyBuffer() {
 void handleKeyboard(unsigned char key, int x, int y) {
     if (key == ':') {
         userfocus = COMMAND_FOCUS;
-        return;
     }
 
     if (userfocus == VIEW_FOCUS) {
@@ -179,6 +166,9 @@ void handleResolution(int w, int h) {
     printf("nvec: %f, %f, %f\n", fov.x, fov.y, fov.z);
 	
     resolution.x = w; resolution.y = h;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, resolution.x, resolution.y, 0, GL_RGB,
+         GL_UNSIGNED_BYTE, 0);
 }
 
 void printString(char* string) {
@@ -245,20 +235,19 @@ void idle() {
 		|| !VecEquals(depthAxis, oldDAxis) || step != oldStep || power != oldPower
 		|| phi != oldPhi || theta != oldTheta || intensity != oldIntensity
 		|| wVar != oldWVar || bail != oldBail || orbittrap != oldOrbitTrap ||
-        monitorsupdated == true)
+        monitorsupdated == true) {
+        monitorsupdated = false;
 		glutPostRedisplay();
+    }
 }
 
 //Initialize stuff
 void init() {
-    GLint renderbuffer;
-    
-    //Initialize some render stuff
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &renderbuffer);
-    glGenFramebuffers(1, &lastrender);
-    glBindFramebuffers(GL_FRAMEBUFFER);
-    glGenRenderBuffers(1, &lastrenderbuffer);
-    
+    //Initialize the render storage
+    glGenTextures(1, &lastrender);
+    glBindTexture(GL_TEXTURE_2D, lastrender);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, resolution.x, resolution.y, 0, GL_RGB,
+            GL_UNSIGNED_BYTE, 0);
 }
 
 //Main
@@ -297,7 +286,7 @@ int main(int argc, char* argv[]) {
 
     //Setup window
     glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100,100);
 	glutInitWindowSize(resolution.x, resolution.y);
 	glutCreateWindow("3D Mandelbulb Viewer");
@@ -322,6 +311,7 @@ int main(int argc, char* argv[]) {
     fflush(stdout);
 
     //Setup shaders
+    loadTextureProgram(&textureshader, lastrender, &lastrendersampler);
     loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, color, step,
 		bail, power, phi, theta, resolution, multisampling, lightpos, intensity,
 		horizontalAxis, verticalAxis, depthAxis, wVar, orbittrap);

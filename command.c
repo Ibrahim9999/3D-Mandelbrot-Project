@@ -10,7 +10,7 @@ extern void screenshot(char* filename, int dim);
 void processCommand(char* command) {
     char* tokens[80];
     int tokennum = 0;
-    tokens[tokennum++] = command;
+    tokens[tokennum++] = command+1;
 
     ++command;
     while (*(command++) != '\0') {

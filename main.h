@@ -56,7 +56,7 @@ int orbittrap;
 //Texture shader and variables
 shaderprogram textureshader;
 GLuint lastrender;
-GLuint lastrenderbuffer;
+GLuint lastrendersampler;
 
 //Camera variables
 float vfov, hfov;
