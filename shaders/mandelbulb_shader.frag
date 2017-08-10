@@ -216,6 +216,21 @@ vec3 mandelTest(in vec3 point)
     return vec3(0);
 }
 
+float Potential(in vec3 pos)
+{
+	vec3 z = pos;
+
+	for(int i = 1; i < bail; i++)
+	{
+ 		z = TriplexPower(z, power) + pos;
+
+		if (dot(z,z) > BAILOUT_RADIUS)
+			return log(length(z)) / pow(power, float(i));
+	}	
+
+	return 0.0;	
+}
+
 float DistanceEstimator(vec3 pos)
 {
 	vec3 z = pos;
@@ -236,7 +251,19 @@ float DistanceEstimator(vec3 pos)
 	
 	return .5 * log(r) * r / derivative;
 }
+/*
+float DistanceEstimator(in vec3 p)
+{
+	float pot = Potential(p);
 
+	if (pot==0.0)
+		return 0.0;
+
+	gradient = (vec3(Potential(p+xDir*EPS), Potential(p+yDir*EPS), Potential(p+zDir*EPS))-pot)/EPS;
+
+	return (.5 / exp(pot)) * sinh(pot) / length(gradient);
+}
+*/
 vec3 CalculateNormal(vec3 p)
 {
 	float e = 2e-6f;
@@ -251,7 +278,8 @@ vec3 CalculateNormal(vec3 p)
 
 vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in float sphereRadius) {
 
-    if (length(rayPos-spherePos) <= BAILOUT_RADIUS) return rayPos;
+    if (length(rayPos-spherePos) <= BAILOUT_RADIUS)
+		return rayPos;
     vec3 offset = rayPos - spherePos;
 
     float rSquared = sphereRadius*sphereRadius;
@@ -277,14 +305,15 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in f
 void main() {    
     vec3 pos = camerapos;
     vec3 dir = normalize(direction);
-	float distanceStep;
+	float distanceStep = step;
 
     vec3 off = (FOV/vec3(resolution.xy/2, 0.0))/multisampling;
     outputColor = vec3(0);
 
-    for (int i = -(multisampling/2); i <= multisampling/2; i++) {
-        for (int j = -(multisampling/2); j <= multisampling/2; j++) {
-
+    for (int i = -(multisampling/2); i <= multisampling/2; i++)
+	{
+        for (int j = -(multisampling/2); j <= multisampling/2; j++)
+		{
             if (multisampling % 2 == 0 && (i == 0 || j == 0))
 				continue;
 
@@ -330,8 +359,8 @@ void main() {
                         cur_intensity -= 1*distanceStep;
                     }
 
-                    //outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
-                    outputColor += clamp(ColorFromHSV(atan(div.y, div.x)/PI*360, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
+                    outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360 + 180, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
+                    //outputColor += clamp(ColorFromHSV(atan(div.y, div.x)/PI*360 + 180, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
                     //outputColor += clamp(vec3(color*cur_intensity), vec3(0.0), vec3(1.0));
                     
 					continue;

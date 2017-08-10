@@ -205,7 +205,6 @@ vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in f
     if (aSquared > rSquared)
         return vec3(0); // No Collision
 
-
     float h = sqrt(rSquared - aSquared);    // collision distance from plane
 
     vec3 collisionOffset = a - h*rayDir;

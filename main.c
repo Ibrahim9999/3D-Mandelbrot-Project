@@ -158,7 +158,7 @@ void printString(char* string) {
     void *font = GLUT_BITMAP_HELVETICA_18;
     for (char* c=string; *c != '\0'; c++) 
     {
-        glutBitmapCharacter(font, *c);
+        //glutBitmapCharacter(font, *c);
     }
 
     glMatrixMode(GL_MODELVIEW);
@@ -236,7 +236,7 @@ int main(int argc, char* argv[]) {
 	// Setting the real value of the quaternion mandelbrot
 	wVar = 0;
 	// Raytracing step
-    step = 0.1;
+    step = 0.01;
 	// Maximum Iterations for mandelbrot algorithm
     bail = 10;
 	// Number of sampling points per pixel
