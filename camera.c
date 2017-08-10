@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <GL/glew.h>
 #include <GL/glut.h>
+#include "shader.h"
 
 #define D_ANGLE 1
 #define D_CAMERA_DIST 0.05
@@ -21,6 +22,8 @@
 #define MAGMOD 10
 #define MINMOD 0.1
 #define MODCOEF 10
+
+extern shaderprogram mandelbulb_shader;
 
 extern vec3f camerapos;
 extern vec3f horizontalAxis;
@@ -47,6 +50,7 @@ extern void render();
 extern void updateMandelbulbVars();
 
 static int oldMouseX = -1, oldMouseY = -1;
+
 
 // Sets original values for camera
 void InitializeCamera(vec3f* cameraPosition, vec3f* horizontalAxis, vec3f* verticalAxis, vec3f* depthAxis, vec3f* centerPosition, vec3f* centerHAxis, vec3f* centerVAxis, vec3f* centerDAxis)
@@ -111,6 +115,8 @@ void cameraMoveMouse(int x, int y) {
 		camerapos = VecDoubleMultiply(depthAxis, -v3f_length(camerapos));
     }
 
+
+    updateMandelbulbVars();
 	glutPostRedisplay();
 
     oldMouseX = x;
@@ -296,17 +302,13 @@ void screenshot(char* filename, int width, int height) {
     changeFOVscale(&vfov, &hfov, width, height);
     setFOVvec(&fov, vfov, hfov);
 
-	vec3f p = (vec3f) { 0, 0, 0 };
 
-	p = MoveAlongAxis(p, horizontalAxis, fov.x);
-	p = MoveAlongAxis(p, verticalAxis, fov.y);
-	p = MoveAlongAxis(p, depthAxis, fov.z);
-
-	fov = p;
-
+    glUseProgram(mandelbulb_shader.prog);
     updateMandelbulbVars();
 
+    glClear(GL_COLOR_BUFFER_BIT);
     draw();
+
 
     data = malloc(width * height * 3);
 
@@ -329,14 +331,6 @@ void screenshot(char* filename, int width, int height) {
     glScissor(0, 0, resolution.x, resolution.y);
     changeFOV(&vfov, &hfov, resolution.x, resolution.y, cameradist);
     setFOVvec(&fov, vfov, hfov);
-
-	p = (vec3f) { 0, 0, 0 };
-
-	p = MoveAlongAxis(p, horizontalAxis, fov.x);
-	p = MoveAlongAxis(p, verticalAxis, fov.y);
-	p = MoveAlongAxis(p, depthAxis, fov.z);
-
-	fov = p;
 
 	updateMandelbulbVars();
 

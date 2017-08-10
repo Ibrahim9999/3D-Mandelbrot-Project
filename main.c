@@ -2,9 +2,6 @@
 
 //Render quad
 void draw() {
-    //Clear
-    glClear(GL_COLOR_BUFFER_BIT);
-
     //Draw quad over screen
     glBegin(GL_QUADS);
 	    glVertex3f(1.0f, 1.0f, 0.0);
@@ -15,13 +12,35 @@ void draw() {
 }
 
 //Render Funcion
-void render() {
-    draw();
+void render() {    
+    //Clear
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    //Redraw fractal if changed
+    if (varsupdated == true) {
+        glUseProgram(mandelbulb_shader.prog);
+        updateMandelbulbVars();
+        draw();
+        //printf("RERENDERED");
+
+        glBindTexture(GL_TEXTURE_2D, lastrender);
+        glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, resolution.x, resolution.y, 0);
+
+        varsupdated = false;
+    }
+    //Otherwise just render the texture of the old render and then draw text
+    else {
+        glUseProgram(textureshader.prog);
+        loadTextureVars(textureshader, lastrender, lastrendersampler);
+        draw();
+        //printf("REDRAWED");
+    }
+
     lastlastframe = lastframe;
     lastframe = glutGet(GLUT_ELAPSED_TIME);
 
-    //printMonitors();
-
+    printMonitors();
+    
     glutSwapBuffers();
     glFinish();
 }
@@ -41,20 +60,22 @@ int command_char = 0;
 
 // Clears keystroke buffer
 void clearKeyBuffer() {
-    kbinputlen = 0;
-
     int i = 0;
 
-    while (i < KEYBUFFERLEN*4) {
+    while (i < kbinputlen*4) {
         kbinputbuffer[i++] = false;
     }
+
+    kbinputlen = 0;
+
+    line[0] = '\0';
+    command_char = 0;
 }
 
 // Method for handling keyboard input
 void handleKeyboard(unsigned char key, int x, int y) {
     if (key == ':') {
         userfocus = COMMAND_FOCUS;
-        return;
     }
 
 
@@ -89,13 +110,18 @@ void handleKeyboard(unsigned char key, int x, int y) {
         }
     }
     else if (userfocus == COMMAND_FOCUS) {
-        if (key != '\r' && key != '\n') {
-            line[command_char++] = key;
+        if (key == '\r' || key == '\n') {
+           command_char = -1;
+        }
+        else if (key == '\b' && command_char > 0) {
+            line[--command_char] = '\0';
         }
         else {
+            line[command_char++] = key;
             line[command_char] = '\0';
-            command_char = -1;
         }
+
+        monitorsupdated = true;
     }
 }
 
@@ -105,12 +131,15 @@ void handleKeyboardUp(unsigned char key, int x, int y) {
 
 // Sends keystrokes to ???
 void sendKeySignals() {
+    int inputsent = false;
+
     if (userfocus == VIEW_FOCUS) {
         int key;
         for (key = 0; key != kbinputlen; key++) {
-                putchar(kbinputbuffer[key*4]);
-                cameraMoveKeyboard(kbinputbuffer[key*4], kbinputbuffer[key*4+1],
+            putchar(kbinputbuffer[key*4]);
+            cameraMoveKeyboard(kbinputbuffer[key*4], kbinputbuffer[key*4+1],
                     kbinputbuffer[key*4+2], kbinputbuffer[key*4+3]);
+            inputsent = true;
         }
 
         clearKeyBuffer();
@@ -119,9 +148,14 @@ void sendKeySignals() {
         if (command_char == -1) {
             processCommand(line);
             command_char = 0;
-            printf("%s", line);
             userfocus = VIEW_FOCUS;
+            clearKeyBuffer();
+            inputsent = true;
         }
+    }
+
+    if (inputsent == true) {
+        updateMandelbulbVars();
     }
 }
 
@@ -137,13 +171,16 @@ void handleResolution(int w, int h) {
     printf("nvec: %f, %f, %f\n", fov.x, fov.y, fov.z);
 	
     resolution.x = w; resolution.y = h;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, resolution.x, resolution.y, 0, GL_RGB,
+         GL_UNSIGNED_BYTE, 0);
 }
 
 // Writes text to screen
 void printString(char* string) {
     glMatrixMode(GL_PROJECTION);
-    glPushMatrix();             
-    glLoadIdentity();   
+    glPushMatrix();
+    glLoadIdentity();
     int w = glutGet( GLUT_WINDOW_WIDTH );
     int h = glutGet( GLUT_WINDOW_HEIGHT );
     glOrtho( 0, w, 0, h, -1, 1 );
@@ -164,7 +201,7 @@ void printString(char* string) {
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
-    glPopMatrix();  	
+    glPopMatrix();
 }
 
 //Print monitors (text)
@@ -177,6 +214,8 @@ void updateMandelbulbVars() {
     loadMandelbulbVars(mandelbulb_shader, fov, camerapos, color, step, bail,
 		power, phi, theta, resolution, multisampling, lightpos, intensity,
 		horizontalAxis, verticalAxis, depthAxis, wVar, orbittrap);
+
+    varsupdated = true;
 }
 
 //Idle Function
@@ -196,16 +235,26 @@ void idle() {
 	int oldOrbitTrap = orbittrap;
 
 	sendKeySignals();
-    updateMandelbulbVars();
     
 	//Test to see if any value was changed: if false, the window will not update
 	if (!VecEquals(camerapos, oldCameraPos) || !VecEquals(lightpos, oldLightPos)
 		|| !VecEquals(horizontalAxis, oldHAxis) || !VecEquals(verticalAxis, oldVAxis)
 		|| !VecEquals(depthAxis, oldDAxis) || step != oldStep || power != oldPower
 		|| phi != oldPhi || theta != oldTheta || intensity != oldIntensity
-		|| wVar != oldWVar || bail != oldBail || orbittrap != oldOrbitTrap)
-
+		|| wVar != oldWVar || bail != oldBail || orbittrap != oldOrbitTrap ||
+        monitorsupdated == true) {
+        monitorsupdated = false;
 		glutPostRedisplay();
+    }
+}
+
+//Initialize stuff
+void init() {
+    //Initialize the render storage
+    glGenTextures(1, &lastrender);
+    glBindTexture(GL_TEXTURE_2D, lastrender);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, resolution.x, resolution.y, 0, GL_RGB,
+            GL_UNSIGNED_BYTE, 0);
 }
 
 //Main
@@ -276,10 +325,13 @@ int main(int argc, char* argv[]) {
 	// Initializes GLEW
     glewInit();
 
+    init();
+
     //printf("starting shaders\n");
     fflush(stdout);
 
     //Setup shaders
+    loadTextureProgram(&textureshader, lastrender, &lastrendersampler);
     loadMandelbulbProgram(&mandelbulb_shader, fov, camerapos, color, step,
 		bail, power, phi, theta, resolution, multisampling, lightpos, intensity,
 		horizontalAxis, verticalAxis, depthAxis, wVar, orbittrap);

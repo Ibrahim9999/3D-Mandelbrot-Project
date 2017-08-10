@@ -1,4 +1,4 @@
-#include "math.h"
+#include "vecmath.h"
 
 // Cheicking if two vec3f's are equal to each other
 int VecEquals(vec3f a, vec3f b)

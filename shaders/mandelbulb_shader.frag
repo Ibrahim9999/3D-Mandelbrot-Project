@@ -3,6 +3,7 @@
 #define BAILOUT_RADIUS 2.0
 #define ALMOST_BAIL BAILOUT_RADIUS - .0001
 #define PI 3.1415926535897932384626433
+#define MAX_STEPS 1000
 
 in vec3 direction;
 
@@ -97,21 +98,6 @@ vec3 ColorFromHSV(float hue, float saturation, float value)
         return vec3(t, p, v);
 
     return vec3(v, p, q);
-}
-
-vec3 VecDoubleDivide(in vec3 v, in float d)
-{
-	return vec3(v.x / d, v.y / d, v.z / d);
-}
-
-float VecLength(in vec3 v)
-{
-	return sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
-}
-
-vec3 VecNormalize(in vec3 v)
-{
-	return VecDoubleDivide(v, VecLength(v));
 }
 
 bool OrbitTrap(in vec3 v, in int ot)
@@ -239,7 +225,7 @@ float DistanceEstimator(vec3 pos)
 	
 	for (int i = 0; i < bail; i++)
 	{
-		r = VecLength(z);
+		r = length(z);
 
 		if (r < BAILOUT_RADIUS)
 			break;
@@ -273,7 +259,7 @@ vec3 CalculateNormal(vec3 p)
 	float dz = DistanceEstimator(p + vec3(0, 0, e)) - n;
 	vec3 grad = vec3(dx, dy, dz);
 
-	return VecNormalize(grad);
+	return normalize(grad);
 }
 
 vec3 rayIntersectsSphere(in vec3 rayPos, in vec3 spherePos, in vec3 rayDir, in float sphereRadius) {
@@ -310,10 +296,11 @@ void main() {
     vec3 off = (FOV/vec3(resolution.xy/2, 0.0))/multisampling;
     outputColor = vec3(0);
 
-    for (int i = -(multisampling/2); i <= multisampling/2; i++)
-	{
-        for (int j = -(multisampling/2); j <= multisampling/2; j++)
-		{
+    for (int i = -(multisampling/2); i <= multisampling/2; i++) {
+        for (int j = -(multisampling/2); j <= multisampling/2; j++) {
+
+            int steps = 0;
+
             if (multisampling % 2 == 0 && (i == 0 || j == 0))
 				continue;
 
@@ -339,6 +326,7 @@ void main() {
 
                     pos = pos + distanceStep*aa_dir;
                     div = mandelTest(pos);
+                    steps++;
                 }
 
                 if (mandelTest(pos) != vec3(0))
@@ -346,22 +334,25 @@ void main() {
                     float cur_intensity = intensity;
                     vec3 shadow = pos;
 
-                    while (cur_intensity >= 0 && length(lightpos-shadow) > distanceStep)
+                    while (cur_intensity >= 0 && length(lightpos-shadow) > step)
 					{
-                        shadow += normalize(lightpos-shadow) * distanceStep;
+                        shadow += normalize(lightpos-shadow) * step;
 
                         if (mandelTest(shadow) != vec3(0))
 						{
-                            cur_intensity -= 10*distanceStep;
+                            cur_intensity -= 10*step;
                             continue;
                         }
 
-                        cur_intensity -= 1*distanceStep;
+                        cur_intensity -= 1*step;
                     }
+                    cur_intensity = clamp(cur_intensity, 0, 1);
 
                     outputColor += clamp(ColorFromHSV((asin(div.z / length(div))+PI)/PI*360 + 180, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
                     //outputColor += clamp(ColorFromHSV(atan(div.y, div.x)/PI*360 + 180, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
                     //outputColor += clamp(vec3(color*cur_intensity), vec3(0.0), vec3(1.0));
+                    float fao = 1 - (float(steps) * 0.25 * step);
+                    outputColor = fao * clamp(color * cur_intensity + color*0.5, vec3(0), vec3(1));
                     
 					continue;
                 }
