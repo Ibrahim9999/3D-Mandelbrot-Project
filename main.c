@@ -21,7 +21,7 @@ void render() {
         glUseProgram(mandelbulb_shader.prog);
         updateMandelbulbVars();
         draw();
-        printf("RERENDERED");
+        //printf("RERENDERED");
 
         glBindTexture(GL_TEXTURE_2D, lastrender);
         glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, resolution.x, resolution.y, 0);
@@ -33,7 +33,7 @@ void render() {
         glUseProgram(textureshader.prog);
         loadTextureVars(textureshader, lastrender, lastrendersampler);
         draw();
-        printf("REDRAWED");
+        //printf("REDRAWED");
     }
 
     lastlastframe = lastframe;
