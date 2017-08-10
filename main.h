@@ -16,6 +16,7 @@ extern "C" {
 #include "math.h"
 #include "camera.h"
 #include "options.h"
+#include "command.h"
 
 #define EXIT_SUCCESS 0
 #define EXIT_ERROR 1
@@ -38,6 +39,7 @@ extern "C" {
 //Functions
 void sendKeySignals();
 void printMonitors();
+void updateMandelbulbVars();
 
 //Mandelbulb shader and variables
 shaderprogram mandelbulb_shader;
