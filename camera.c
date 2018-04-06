@@ -126,19 +126,18 @@ void cameraMoveMouse(int x, int y) {
 //Move camera based on keyboard
 void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
 
-    float mod = 1;
-    float modmod = 1;
-
+	float mod = 1;
+	float modmod = 1;
 	// Adjust incrementation for all the commands
-    if (alt)
-        modmod*=MODCOEF;
-    if (shift)
-        mod*=MAGMOD*modmod;
-    if (ctrl)
-        mod*=MINMOD/modmod;
+	if (alt)
+		modmod*=MODCOEF;
+	if (shift)
+		mod*=MAGMOD*modmod;
+	if (ctrl)
+		mod*=MINMOD/modmod;
 
 	/*
-	
+
 	double unitScalar = (camerapos.x*camerapos.x + camerapos.y*camerapos.y + camerapos.z*camerapos.z) / 16;
 	if (unitScalar > 16)
 		unitScalar = 16;
@@ -146,7 +145,7 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
 		unitScalar = .000000001;
 
 	printf("unitScalar: %f\n", unitScalar);
-	
+
 	*/
 
 	// Changing the real component of quaternion mandelbrot
@@ -251,8 +250,8 @@ void cameraMoveKeyboard(int key, int shift, int ctrl, int alt) {
 		camerapos = MoveAlongAxis(camerapos, depthAxis, -D_CAMERA_DIST*mod);
 
 	// Takes a screenshot
-    if (key == '1')
-        screenshot("Images/screenshot.ppm", 1024, 1024);
+    	if (key == '1')
+        	screenshot("Images/screenshot.ppm", 1024, 1024);
 
 	// Outputs values to console
 	printf("*********************************\n");

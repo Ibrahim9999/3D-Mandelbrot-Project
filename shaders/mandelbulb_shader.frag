@@ -352,7 +352,7 @@ void main() {
                     //outputColor += clamp(ColorFromHSV(atan(div.y, div.x)/PI*360 + 180, 1.0, 1.0)*cur_intensity, vec3(0.0), vec3(1.0));
                     //outputColor += clamp(vec3(color*cur_intensity), vec3(0.0), vec3(1.0));
                     float fao = 1 - (float(steps) * 0.25 * step);
-                    outputColor = fao * clamp(color * cur_intensity + color*0.5, vec3(0), vec3(1));
+                    //outputColor = fao * clamp(color * cur_intensity + color*0.5, vec3(0), vec3(1));
                     
 					continue;
                 }

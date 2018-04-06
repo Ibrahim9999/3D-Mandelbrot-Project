@@ -142,7 +142,6 @@ vec4f QuatInverse(vec4f q)
 // Takes the Exp of a quaternion as a vec4f
 vec4f QuatExp(vec4f q)
 {
-	vec4f c;
 	double r = sqrt(q.x*q.x + q.y*q.y + q.z*q.z);
 	double et = exp(q.w);
 	double s = r == 0 ? 0 : et * sin(r) / r;
@@ -152,13 +151,12 @@ vec4f QuatExp(vec4f q)
 	q.y = q.y * s;
 	q.z = q.z * s;
 	
-	return c;
+	return q;
 }
 
 // Takes the natural logarithm of a quaternion as a vec4f
 vec4f QuatLn(vec4f q)
 {
-	vec4f c;
 	double r = sqrt(q.x*q.x + q.y*q.y + q.z*q.z);
 	double t = r == 0 ? 0 : atan2(r, q.w) / r ;
 	
@@ -167,7 +165,7 @@ vec4f QuatLn(vec4f q)
 	q.y = q.y * t;
 	q.z = q.z * t;
 	
-	return c;
+	return q;
 }
 
 // Raises quaternon as a vec4f to a power ~ Unsure of decimal powers work or not

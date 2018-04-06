@@ -7,7 +7,7 @@ void draw() {
 	    glVertex3f(1.0f, 1.0f, 0.0);
 	    glVertex3f(1.0f, -1.0f, 0.0);
 	    glVertex3f(-1.0f, -1.0f, 0.0);
-        glVertex3f(-1.0f, 1.0f, 0.0);
+	    glVertex3f(-1.0f, 1.0f, 0.0);
     glEnd();
 }
 
@@ -192,7 +192,7 @@ void printString(char* string) {
     glColor3f(1, 0, 0);
 	
     glRasterPos2i(20, 20);
-    void *font = GLUT_BITMAP_HELVETICA_18;
+    //void *font = GLUT_BITMAP_HELVETICA_18;
     for (char* c=string; *c != '\0'; c++) 
     {
         //glutBitmapCharacter(font, *c);
